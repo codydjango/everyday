@@ -1,6 +1,23 @@
 <html>
+<head>
+	<script language="javascript" type="text/javascript" src="./web3.min.js"></script>
+	<script src="./index.js"></script>
+	<script>
+		var web3;
+
+		if (typeof web3 !== 'undefined') {
+		  web3 = new Web3(web3.currentProvider);
+		} else {
+		  // Set the provider you want from Web3.providers
+		  web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+		}
+
+		// web3.setProvider(new web3.providers.HttpProvider('http://' + BasicAuthUsername + ':' + BasicAuthPassword + '@localhost:8545'));
+
+		var coinbase = web3.eth.coinbase;
+		var balance = web3.eth.getBalance(coinbase);
+	</script>
+</head>
 <body>
-  <script language="javascript" type="text/javascript" src="./web3.min.js"></script>
-  <script src="./index.js"></script>
 </body>
 </html>

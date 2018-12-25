@@ -1,1 +1,4 @@
-alert('hi')
+// import another component
+import main from './main';
+
+main();
