@@ -4,6 +4,7 @@
     "private": false,
     "dependencies": {
         "components": "^0.1.0",
+        "node-sass": "^4.11.0",
         "react": "^16.7.0",
         "react-dom": "^16.7.0",
         "web3": "^1.0.0-beta.41"
@@ -13,6 +14,9 @@
         "build": "./node_modules/.bin/parcel build src/web/index.html"
     },
     "devDependencies": {
+        "babel-core": "^6.26.3",
+        "babel-preset-env": "^1.7.0",
+        "babel-preset-react": "^6.24.1",
         "parcel-bundler": "^1.10.3"
     }
 }
