@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default props => <span><input type="checkbox" />{props.item.text}</span>
+export default props => <span><input type="checkbox" readOnly checked={props.item.done} />{props.item.text}</span>
 
 
 // class Checkbox extends React.Component {
