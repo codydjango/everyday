@@ -1,11 +1,44 @@
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+// @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+@import url('https://fonts.googleapis.com/css?family=Cutive+Mono');
+
+
 
 body {
-    font-family: 'Noto Sans', sans-serif;
+    font-family: 'Cutive Mono', sans-serif;
+    font-size: 16;
+}
+
+h1 {
+    font-style: italic;
+    padding: 0;
+    margin: 0 0 1em 0;
+    line-height: 1em;
 }
 
 .mylist {
     list-style: none;
-    padding: 0;
+    padding: 0 0 1em 0;
     margin: 0;
+}
+
+.meta {
+    line-height: 1em;
+    background-color: black;
+    color: white;
+    padding: 0em;
+    margin-left: 2px;
+    display: inline-block;
+    border: 1px solid black;
+}
+
+.duration {
+    margin-left: 2px;
+    margin-right: 2px;
+    color: #ffb632;
+}
+
+.multiple {
+    @extend .meta;
+    background-color: #3232ff;
+    border: 1px solid blue;
 }

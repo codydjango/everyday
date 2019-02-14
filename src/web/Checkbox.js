@@ -1,25 +1,11 @@
 import React from 'react'
 
-export default props => <span><input type="checkbox" readOnly checked={props.item.done} />{props.item.text}</span>
-
-
-// class Checkbox extends React.Component {
-//     getInitialState() {
-//         return {
-//             isChecked: false
-//         }
-//     }
-
-//     toggleCheck() {
-//         this.setState({isChecked: !this.state.isChecked});
-//     }
-
-//     render() {
-//         return (
-//             <span onClick={this.toggleCheck}>
-//                 <input type="checkbox" checked={this.state.isChecked} />
-//                 <span className="item">{ this.props.item }</span>
-//             </span>
-//         )
-//     }
-// }
+export default props => (
+    <label htmlFor={ props.item.id }>
+        <input  id={ props.item.id }
+                onChange={ props.action }
+                type="checkbox" checked={ props.item.checked } />
+        { props.item.task.text }
+        { (props.item.duration) ? (<strong className="duration">{ props.item.duration }h</strong>) : '' }
+        { (props.item.multiple) ? (<sup className="multiple">{ props.item.multiple }x</sup>) : '' }
+    </label>)
