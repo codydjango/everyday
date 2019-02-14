@@ -1,7 +1,7 @@
 import web3 from 'web3'
 import React from 'react'
 import { render } from 'react-dom'
-import App from './app';
+import App from './app'
 
 import './scss/index.scss'
 

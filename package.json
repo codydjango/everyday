@@ -3,15 +3,14 @@
     "version": "0.1.0",
     "private": false,
     "dependencies": {
-        "components": "^0.1.0",
-        "node-sass": "^4.11.0",
         "react": "^16.7.0",
         "react-dom": "^16.7.0",
         "web3": "^1.0.0-beta.41"
     },
     "scripts": {
         "start": "./node_modules/.bin/parcel src/web/index.html --open",
-        "build": "./node_modules/.bin/parcel build src/web/index.html"
+        "build": "./node_modules/.bin/parcel build src/web/index.html",
+        "server": "python src/backend/server.py"
     },
     "devDependencies": {
         "babel-core": "^6.26.3",
