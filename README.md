@@ -1,8 +1,8 @@
-# Bragging Rights
+# ERRYDAY
 
-This is an ethereum-contract backed todo-list game.
+This is an ethereum-contract backed todo-list. You can create a task list, get things done, and monitor your progress. Commit to getting things done, and see how you fare against other people who choose the same tasks.
 
-Gamble on whether you can achieve your goals. If you can, win back your ether plus your share of the ether that other people lost!
+If that's not enough to keep you motivated, gamble on whether you achieve your goals. Win back your ether plus your share of the ether that other people lost!
 
 To win, sign in by the target date to report your progress.
 
