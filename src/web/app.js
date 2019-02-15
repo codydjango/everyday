@@ -148,6 +148,8 @@ class App extends React.Component {
     }
 
     render() {
+        this.save()
+
         // <p>better living through simple mechanics</p>
         return (
             <div>
