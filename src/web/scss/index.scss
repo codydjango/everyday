@@ -13,14 +13,16 @@ h1 {
     line-height: 1em;
 }
 
-sup, sub {
-  vertical-align: baseline;
-  position: relative;
-  top: -0.4em;
+sup {
+    position: relative;
+    vertical-align: top;
+    top: -2px;
 }
 
 sub {
-  top: 0.4em;
+    position: relative;
+    vertical-align: top;
+    top: 2px;
 }
 
 .taskList {
@@ -35,7 +37,6 @@ sub {
 }
 
 .duration {
-    margin-left: 2px;
     margin-right: 2px;
     color: #ffb632;
 }

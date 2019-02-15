@@ -1,5 +1,5 @@
 import React from 'react'
-import MyList from './MyList'
+import TaskList from './TaskList'
 import Button from './Button'
 
 const DEBUG = true
@@ -154,10 +154,10 @@ class App extends React.Component {
         return (
             <div>
                 <h1>erryday</h1>
-                <MyList list={ this.state.mylist } action={ this.handleToggle } />
-                <Button action={ this.handleReset } text="reset" />
+                <TaskList list={ this.state.mylist } action={ this.handleToggle } />
 
                 { (this.isDebug()) ? (<React.Fragment>
+                    <Button action={ this.handleReset } text="reset" />
                     <Button action={ this.save.bind(this) } text="save" />
                     <Button action={ this.load.bind(this) } text="load" />
                     <Button action={ this.clear.bind(this) } text="clear" />
