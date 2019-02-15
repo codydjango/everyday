@@ -1,6 +1,7 @@
 import React from 'react'
 import TaskList from './TaskList'
 import Button from './Button'
+import Totals from './Totals'
 
 const DEBUG = true
 const NAMESPACE = 'erryday'
@@ -147,6 +148,13 @@ class App extends React.Component {
         return localStorage.getItem('DEBUG') == 'true'
     }
 
+    getTotals() {
+        return {
+            total: this.state.mylist.length,
+            done: this.state.mylist.filter(i => i.checked).length
+        }
+    }
+
     render() {
         this.save()
 
@@ -155,6 +163,7 @@ class App extends React.Component {
             <div>
                 <h1>erryday</h1>
                 <TaskList list={ this.state.mylist } action={ this.handleToggle } />
+                <Totals totals={ this.getTotals() } />
 
                 { (this.isDebug()) ? (<React.Fragment>
                     <Button action={ this.handleReset } text="reset" />
