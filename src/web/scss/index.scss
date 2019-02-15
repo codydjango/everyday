@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Cutive+Mono');
-@import '~pretty-checkbox/src/pretty-checkbox.scss';
+// @import '~pretty-checkbox/src/pretty-checkbox.scss';
 
 body {
     font-family: 'Cutive Mono', sans-serif;
@@ -45,5 +45,20 @@ sub {
     color: blue;
     padding: 0em;
     margin-left: 2px;
+}
+
+
+.ascii-box {
+    input[type=checkbox] {
+        display: none;
+    }
+
+    .state:before {
+        content: '☐';
+    }
+
+    input[type=checkbox]:checked + .state:before {
+        content: '☑';
+    }
 }
 

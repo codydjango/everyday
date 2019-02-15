@@ -161,7 +161,7 @@ class App extends React.Component {
         // <p>better living through simple mechanics</p>
         return (
             <div>
-                <h1>erryday</h1>
+                <h1>everyday</h1>
                 <TaskList list={ this.state.mylist } action={ this.handleToggle } />
                 <Totals totals={ this.getTotals() } />
 
