@@ -9,7 +9,7 @@ export default props => (
                     type="checkbox" checked={ props.item.checked }/>
             <div className="state p-success">
                 <label htmlFor={ props.item.id }>
-                    { props.item.task.text }
+                    <span style={{ marginRight: '2px' }}>{ props.item.task.text }</span>
                     { (props.item.duration) ? (<sub className="duration">{ props.item.duration }h</sub>) : '' }
                     { (props.item.multiple) ? (<sup className="multiple">{ props.item.multiple }x</sup>) : '' }
                 </label>
