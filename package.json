@@ -10,7 +10,7 @@
     },
     "scripts": {
         "start": "./node_modules/.bin/parcel src/web/index.html --open",
-        "build": "./node_modules/.bin/parcel build src/web/index.html",
+        "build": "./node_modules/.bin/parcel build src/web/index.html --public-url /everyday/",
         "server": "python src/backend/server.py"
     },
     "devDependencies": {
