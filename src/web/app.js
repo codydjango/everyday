@@ -2,6 +2,9 @@ import React from 'react'
 import MyList from './MyList'
 import Button from './Button'
 
+const DEBUG = true
+const NAMESPACE = 'erryday'
+
 const TASKS = [
     { id: 1, text: 'Drink water' },
     { id: 2, text: 'Make bed' },
@@ -19,47 +22,61 @@ const TASKS = [
     { id: 14, text: 'Do dishes' },
     { id: 15, text: 'Check voicemail' },
     { id: 16, text: 'Peruse social media' },
-    { id: 17, text: 'Post on social media' }
+    { id: 17, text: 'Post on social media' },
+    { id: 17, text: '50 squats' }
 ]
 
-const MYLIST = [
+const DEFAULTLIST = [
     { id: 1, taskId: 1, checked: false },
     { id: 2, taskId: 2, checked: false },
     { id: 3, taskId: 3,  checked: false },
-    { id: 4, taskId: 4, checked: false },
-    { id: 5, taskId: 5, checked: false },
-    { id: 6, taskId: 10, checked: false, duration: 1 },
-    { id: 7, taskId: 1, checked: false },
-    { id: 8, taskId: 6, checked: false },
-    { id: 9, taskId: 7, checked: false },
-    { id: 10, taskId: 1, checked: false },
-    { id: 11, taskId: 10, checked: false, duration: 1 },
-    { id: 12, taskId: 11, checked: false },
-    { id: 13, taskId: 1, checked: false },
-    { id: 14, taskId: 12, checked: false },
-    { id: 15, taskId: 13, checked: false },
-    { id: 16, taskId: 1, checked: false },
-    { id: 17, taskId: 14, checked: false },
-    { id: 18, taskId: 10, checked: false, duration: 1 },
-    { id: 19, taskId: 15, checked: false },
-    { id: 20, taskId: 1, checked: false },
-    { id: 21, taskId: 16, checked: false },
-    { id: 22, taskId: 10, checked: false, duration: 1 },
-    { id: 23, taskId: 17, checked: false }
+    { id: 4, taskId: 18, checked: false },
+    { id: 5, taskId: 4, checked: false },
+    { id: 6, taskId: 5, ch18cked: false },
+    { id: 7, taskId: 10, checked: false, duration: 1 },
+    { id: 8, taskId: 1, checked: false },
+    { id: 9, taskId: 6, checked: false },
+    { id: 10, taskId: 7, checked: false },
+    { id: 11, taskId: 1, checked: false },
+    { id: 12, taskId: 10, checked: false, duration: 1 },
+    { id: 13, taskId: 11, checked: false },
+    { id: 14, taskId: 1, checked: false },
+    { id: 15, taskId: 12, checked: false },
+    { id: 16, taskId: 13, checked: false },
+    { id: 17, taskId: 1, checked: false },
+    { id: 18, taskId: 14, checked: false },
+    { id: 19, taskId: 10, checked: false, duration: 1 },
+    { id: 20, taskId: 15, checked: false },
+    { id: 21, taskId: 1, checked: false },
+    { id: 22, taskId: 16, checked: false },
+    { id: 23, taskId: 10, checked: false, duration: 1 },
+    { id: 24, taskId: 17, checked: false },
 ]
 
 
 class App extends React.Component {
     constructor(props) {
         super(props)
-        this.state = { mylist: []}
 
+        let state
+
+        try {
+            state = this.load()
+        } catch (err) {
+            state = this.init()
+        }
+
+        this.state = state
         this.handleReset = this.handleReset.bind(this)
         this.handleToggle = this.handleToggle.bind(this)
+
+        window.ttt = this
     }
 
-    componentDidMount() {
-        this.setState({ mylist: this.aggregate(this.flatten(MYLIST)) })
+    init() {
+        return {
+            'mylist': this.aggregates(this.flatten(DEFAULTLIST))
+        }
     }
 
     getTask(taskId) {
@@ -73,7 +90,7 @@ class App extends React.Component {
         })
     }
 
-    aggregate(list) {
+    aggregates(list) {
         const counts = {}
         return list.map(i => {
             if (counts[i.taskId]) {
@@ -87,12 +104,24 @@ class App extends React.Component {
         })
     }
 
-    save() {
+    getMyList() {
+        return this.state.list
+    }
 
+    save() {
+        window.localStorage.setItem(NAMESPACE, JSON.stringify({
+            mylist: this.state.mylist
+        }))
     }
 
     load() {
+        const saved = JSON.parse(window.localStorage.getItem(NAMESPACE))
+        if (saved === null || Object.entries(saved).length === 0) throw new Error('nothing saved')
+        return saved
+    }
 
+    clear() {
+        window.localStorage.removeItem(NAMESPACE)
     }
 
     handleReset() {
@@ -109,6 +138,15 @@ class App extends React.Component {
         })})
     }
 
+    setDebugTrue() {
+        localStorage.setItem('DEBUG', 'true')
+        this.forceUpdate()
+    }
+
+    isDebug() {
+        return localStorage.getItem('DEBUG') == 'true'
+    }
+
     render() {
         // <p>better living through simple mechanics</p>
         return (
@@ -116,6 +154,15 @@ class App extends React.Component {
                 <h1>erryday</h1>
                 <MyList list={ this.state.mylist } action={ this.handleToggle } />
                 <Button action={ this.handleReset } text="reset" />
+
+                { (this.isDebug()) ? (<React.Fragment>
+                    <Button action={ this.save.bind(this) } text="save" />
+                    <Button action={ this.load.bind(this) } text="load" />
+                    <Button action={ this.clear.bind(this) } text="clear" />
+                    <Button action={ this.init.bind(this) } text="init" />
+                    <Button action={ this.render.bind(this) } text="render" />
+                </React.Fragment>
+                ) : ''}
             </div>
         )
     }

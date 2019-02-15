@@ -21,16 +21,6 @@ h1 {
     margin: 0;
 }
 
-.meta {
-    line-height: 1em;
-    background-color: black;
-    color: white;
-    padding: 0em;
-    margin-left: 2px;
-    display: inline-block;
-    border: 1px solid black;
-}
-
 .duration {
     margin-left: 2px;
     margin-right: 2px;
@@ -38,7 +28,7 @@ h1 {
 }
 
 .multiple {
-    @extend .meta;
-    background-color: #3232ff;
-    border: 1px solid blue;
+    color: blue;
+    padding: 0em;
+    margin-left: 2px;
 }
