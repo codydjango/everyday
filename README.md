@@ -1,4 +1,4 @@
-# ERRYDAY
+# everyday
 
 This is an ethereum-contract backed todo-list. You can create a task list, get things done, and monitor your progress. Commit to getting things done, and see how you fare against other people who choose the same tasks.
 
