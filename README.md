@@ -1,6 +1,8 @@
 # everyday
 
-This is an ethereum-contract backed todo-list. You can create a task list, get things done, and monitor your progress. Commit to getting things done, and see how you fare against other people who choose the same tasks.
+This is an ethereum-contract backed habit-former. It's about getting the bare minimum done, every day. As effort becomes effortless, update your routine for constant progression. 
+
+You can create a task list, get things done, and monitor your progress. Commit to getting things done, and see how you fare against other people who choose the same tasks.
 
 If that's not enough to keep you motivated, gamble on whether you achieve your goals. Win back your ether plus your share of the ether that other people lost!
 

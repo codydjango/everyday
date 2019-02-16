@@ -136,10 +136,10 @@ class NextUp extends React.Component {
     }
 
     render() {
-        return (<div className="nextUp">
+        return (<div className="next">
             { (this.hasNext()) ? (
                 <React.Fragment>
-                    <h2>next up</h2>
+                    <h2>next</h2>
                     <p><strong>{ this.getNextUp().task.text }</strong></p>
                     <Button data-id={ this.getNextUp().id } action={ this.handleToggle } text="done" />
                     <Button action={ this.handleNotNow } text="not now" />

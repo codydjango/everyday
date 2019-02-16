@@ -1,7 +1,7 @@
 import React from 'react'
-import AllTasks from '~/components/AllTasks'
-import MyTasks from '~/components/MyTasks'
-import NextUp from '~/components/NextUp'
+import Theirs from '~/components/Theirs'
+import Mine from '~/components/Mine'
+import Next from '~/components/Next'
 import storage from '~/storage'
 
 import { TASKS, DEFAULTLIST } from '~/settings'
@@ -70,9 +70,9 @@ class App extends React.Component {
             <div className="app">
                 <h1>everyday</h1>
                 <div className="container">
-                    <MyTasks list={ this.state.mylist } action={ this.handleToggle } />
-                    <NextUp list={ this.state.mylist } action={ this.handleToggle } />
-                    <AllTasks list={ TASKS } />
+                    <Next list={ this.state.mylist } action={ this.handleToggle } />
+                    <Mine list={ this.state.mylist } action={ this.handleToggle } />
+                    <Theirs list={ TASKS } />
                 </div>
             </div>
         )

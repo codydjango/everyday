@@ -1,8 +1,10 @@
 @import url('https://fonts.googleapis.com/css?family=Cutive+Mono');
+@import './layout';
 
 body {
     font-family: 'Cutive Mono', sans-serif;
     font-size: 14;
+    background-color: yellow;
 }
 
 h1 {
@@ -86,26 +88,7 @@ sub {
 }
 
 
-.app {
-    .container {
-        position: relative;
-        display: flex;
-        flex-flow: row nowrap;
-        align-items: flex-start;
 
-        .myTasks {
-            width: 200px;
-        }
 
-        .nextUp {
-            width: auto;
-        }
 
-        .allTasks {
-            width: auto;
-            text-align: right;
-            flex: 1;
-        }
-    }
-}
 

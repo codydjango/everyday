@@ -1,0 +1,88 @@
+$breakpoints: (
+    xs: 576px,
+    sm: 768px,
+    md: 992px,
+    lg: 1200px
+);
+
+@mixin respond-above($breakpoint) {
+    // If the breakpoint exists in the map.
+    @if map-has-key($breakpoints, $breakpoint) {
+        // Get the breakpoint value.
+        $breakpoint-value: map-get($breakpoints, $breakpoint);
+
+        // Write the media query.
+        @media screen and (min-width: $breakpoint-value) {
+            @content;
+        }
+
+    // If the breakpoint doesn't exist in the map.
+    } @else {
+        // Log a warning.
+        @warn 'Invalid breakpoint: #{$breakpoint}.';
+    }
+}
+
+
+
+.container {
+    min-width: 300px;
+    display: block;
+    position: relative;
+
+    .next {
+        width: auto;
+        display: block;
+    }
+
+    .mine {
+        width: auto;
+        display: block;
+    }
+
+    .theirs {
+        width: auto;
+        display: none;
+    }
+}
+
+
+
+// @media screen and (min-width: $break-small) {
+@include respond-above(xs) {
+    .container {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: flex-start;
+
+        .next {
+            width: auto;
+            order: 1;
+        }
+
+        .mine {
+            width: 200px;
+            order: 0;
+        }
+
+        .theirs {
+            display: none;
+            width: auto;
+            text-align: right;
+            flex: 1;
+            order: 2;
+        }
+    }
+}
+
+@include respond-above(sm) {
+    .container {}
+}
+
+@include respond-above(md) {
+    .container {}
+}
+
+@include respond-above(lg) {
+    .container {}
+}
