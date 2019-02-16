@@ -1,7 +1,7 @@
 const DEBUG = true
 const NAMESPACE = 'erryday'
 const TIMERINITIAL = 'start timer'
-
+const EARLY = false
 const TASKS = [
     { id: 1, text: 'Drink water' },
     { id: 2, text: 'Make bed' },
@@ -55,5 +55,6 @@ export {
     NAMESPACE,
     TIMERINITIAL,
     TASKS,
-    DEFAULTLIST
+    DEFAULTLIST,
+    EARLY
 }
