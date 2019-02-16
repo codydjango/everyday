@@ -3,7 +3,6 @@ import TaskList from './TaskList'
 import List from './List'
 import Button from './Button'
 import Totals from './Totals'
-import Timer from './Timer'
 
 const DEBUG = true
 const NAMESPACE = 'erryday'
@@ -302,7 +301,7 @@ class App extends React.Component {
                         ) : (
                             <React.Fragment>
                                 <h2>wow. you are so good. your brain is so strong.</h2>
-                                <small>Go drink some water. You deserve it.</small>
+                                <small>Go drink some water.</small>
                             </React.Fragment>
                         ) }
                     </div>
