@@ -1,8 +1,49 @@
 @charset "UTF-8";
 @import url("https://fonts.googleapis.com/css?family=Cutive+Mono");
+.container {
+  min-width: 300px;
+  display: block;
+  position: relative;
+}
+.container .next {
+  width: auto;
+  display: block;
+}
+.container .mine {
+  width: auto;
+  display: block;
+}
+.container .theirs {
+  width: auto;
+  display: none;
+}
+
+@media screen and (min-width: 576px) {
+  .container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+  }
+  .container .next {
+    width: auto;
+    order: 1;
+  }
+  .container .mine {
+    width: 200px;
+    order: 0;
+  }
+  .container .theirs {
+    display: none;
+    width: auto;
+    text-align: right;
+    flex: 1;
+    order: 2;
+  }
+}
 body {
   font-family: "Cutive Mono", sans-serif;
   font-size: 14;
+  background-color: yellow;
 }
 
 h1 {
@@ -68,22 +109,4 @@ sub {
   display: flex;
   flex-flow: row nowrap;
   align-items: flex-start;
-}
-
-.app .container {
-  position: relative;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: flex-start;
-}
-.app .container .myTasks {
-  width: 200px;
-}
-.app .container .nextUp {
-  width: auto;
-}
-.app .container .allTasks {
-  width: auto;
-  text-align: right;
-  flex: 1;
 }
