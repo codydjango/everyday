@@ -1,5 +1,5 @@
 import React from 'react'
-import Task from './Task'
+import Task from '~/components/Task'
 
 const percentage = totals => (totals.done/totals.total * 100)
 const isHalfway = totals => (percentage(totals) > 40)
