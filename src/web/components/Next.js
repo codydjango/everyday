@@ -13,20 +13,90 @@ class NextUp extends React.Component {
             'list': props.list
         }
 
-        this.index = 0
-        this.postponed = false
-
-        this.handleToggle = props.handleAction
+        this.handleDone = this.handleDone.bind(this)
+        this.handleUndo = this.handleUndo.bind(this)
         this.handleNotNow = this.handleNotNow.bind(this)
         this.handleToggleTimer = this.handleToggleTimer.bind(this)
         this.updateCountdownTime = this.updateCountdownTime.bind(this)
         this.updateTimerTime = this.updateTimerTime.bind(this)
     }
 
+    setPageState(state) {
+        window.setState(state)
+    }
+
+    handleUndo() {
+        this.state.list.filter(i=>i.active)[0].checked = false
+        this.setPageState({ mine: this.state.list })
+    }
+
+    handleDone() {
+        this.state.list.filter(i=>i.active)[0].checked = true
+        this.setPageState({ mine: this.bumpActive() })
+    }
+
     handleNotNow() {
-        this.postponed = true
-        this.index += 1
-        this.forceUpdate()
+        this.setPageState({ mine: this.bumpActive() })
+    }
+
+    bumpActiveOld() {
+        let index = this.getActiveIndex()
+        let list = this.state.list
+        let nextIndex
+
+        if ((index + 1) < list.length) {
+            nextIndex = index + 1
+        } else {
+            nextIndex = 0
+        }
+
+        list[index].active = false
+        list[nextIndex].active = true
+
+        return list
+    }
+
+    bumpActive() {
+        let index = this.getActiveIndex()
+        let list = this.state.list
+        let nextIndex, task
+
+        // deactivate previous
+        list[index].active = false
+
+        // loop through the list starting at the active index until there are
+        // no tasks left to be completed
+        while (list.filter(i => (i.checked === false)).length > 0) {
+            if ((index + 1) < list.length) {
+                index += 1
+            } else {
+                index = 0
+            }
+
+            task = list[index]
+            if (task && task.checked) continue
+            if (task && !task.checked) {
+                task.active = true
+                break
+            }
+        }
+
+        return list
+
+
+        // while (this.state.list.filter(i => (i.checked === false)).length > 0 || this.postponed) {
+        //     for (let i=index; i < this.state.list.length; i +=1 ) {
+        //         mytask = this.state.list[i]
+        //         if (mytask && mytask.checked) continue
+        //         if (mytask && !mytask.checked) {
+        //             mytask.active = true
+        //             return mytask;
+        //         }
+        //     }
+
+        //     this.postponed = false
+        //     index = 0
+        // }
     }
 
     getTotals() {
@@ -83,49 +153,50 @@ class NextUp extends React.Component {
         if (task.duration) {
             this.futureDate = this.getCountdownDate(task.duration)
             this.timer = setInterval(() => {
-                this.setState({ 'time': this.updateCountdownTime(new Date().getTime()) })
+                this.setState({ time: this.updateCountdownTime(new Date().getTime()) })
             }, 1000)
-            this.setState({ 'time': this.updateCountdownTime(new Date().getTime()) })
+            this.setState({ time: this.updateCountdownTime(new Date().getTime()) })
         } else {
             this.startDate = Date.now()
             this.timer = setInterval(() => {
-                this.setState({ 'time': this.updateTimerTime(new Date().getTime()) })
+                this.setState({ time: this.updateTimerTime(new Date().getTime()) })
             }, 1000)
-            this.setState({ 'time': this.updateTimerTime(new Date().getTime()) })
+            this.setState({ time: this.updateTimerTime(new Date().getTime()) })
         }
     }
 
     stopTimer(msg) {
         clearInterval(this.timer)
         this.timer = undefined
-        this.setState({ 'time': TIMERINITIAL })
+        this.setState({ time: TIMERINITIAL })
         if (msg) alert(msg)
     }
 
     handleToggleTimer() {
-        ;(this.timer) ? this.stopTimer() : this.startTimer();
+        ;(this.timer) ? this.stopTimer() : this.startTimer()
+    }
+
+    getActiveIndex() {
+        try {
+            return this.state.list.indexOf(this.state.list.filter(i => i.active)[0])
+        } catch (err) {
+            console.log('err', err)
+            return 0
+        }
     }
 
     getCurrent() {
+        this.index = this.getActiveIndex()
+
         return this.state.list[this.index]
     }
 
-    getNextUp() {
-        let index = this.index || 0
+    getNext() {
+        let index = this.getActiveIndex()
         let mytask = null
 
-        while (this.state.list.filter(i => (i.checked === false)).length > 0 || this.postponed) {
-            for (let i=index; i < this.state.list.length; i +=1 ) {
-                mytask = this.state.list[i]
-                if (mytask && mytask.checked) continue
-                if (mytask && !mytask.checked) {
-                    this.index = i
-                    return mytask;
-                }
-            }
-
-            this.postponed = false
-            index = 0
+        if (this.state.list[index]) {
+            return this.state.list[index]
         }
 
         return null
@@ -142,8 +213,11 @@ class NextUp extends React.Component {
             { (this.hasNext()) ? (
                 <React.Fragment>
                     <h2>next</h2>
-                    <p><strong>{ this.getNextUp().task.text }</strong></p>
-                    <Button data-id={ this.getNextUp().id } action={ this.handleToggle } text="done" />
+                    <p><strong>{ this.getNext().task.text }</strong></p>
+                    { (this.getCurrent().checked)
+                        ? (<Button action={ this.handleUndo } text="undo" />)
+                        : (<Button action={ this.handleDone } text="done" />)}
+
                     <Button action={ this.handleNotNow } text="not now" />
                     <Button action={ this.handleToggleTimer } text={ this.state.time } />
                     <Totals totals={ this.getTotals() } />
