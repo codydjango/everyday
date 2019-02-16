@@ -16,7 +16,7 @@ class NextUp extends React.Component {
         this.index = 0
         this.postponed = false
 
-        this.handleToggle = props.action
+        this.handleToggle = props.handleAction
         this.handleNotNow = this.handleNotNow.bind(this)
         this.handleToggleTimer = this.handleToggleTimer.bind(this)
         this.updateCountdownTime = this.updateCountdownTime.bind(this)
@@ -132,7 +132,9 @@ class NextUp extends React.Component {
     }
 
     hasNext() {
-        return (this.state.list.filter(i => (i.checked === false)).length > 0)
+        return (this.state.list.filter(i => {
+            return (i && (i.checked === false))
+        }).length > 0)
     }
 
     render() {

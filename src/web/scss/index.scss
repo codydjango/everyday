@@ -77,16 +77,20 @@ sub {
     input[type=checkbox]:checked + .visible:before {
         content: '☑';
     }
-}
 
-.ascii-box {
     .visible {
         display: flex;
         flex-flow: row nowrap;
         align-items: flex-start;
     }
-}
 
+    .taskText {
+        font-weight: normal;
+        &.active {
+            font-weight: 600;
+        }
+    }
+}
 
 
 
