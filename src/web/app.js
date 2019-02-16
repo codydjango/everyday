@@ -3,9 +3,11 @@ import TaskList from './TaskList'
 import List from './List'
 import Button from './Button'
 import Totals from './Totals'
+import Timer from './Timer'
 
 const DEBUG = true
 const NAMESPACE = 'erryday'
+const TIMERINITIAL = 'start timer'
 
 const TASKS = [
     { id: 1, text: 'Drink water' },
@@ -35,23 +37,23 @@ const DEFAULTLIST = [
     { id: 4, taskId: 18, checked: false },
     { id: 5, taskId: 4, checked: false },
     { id: 6, taskId: 5, checked: false },
-    { id: 7, taskId: 10, checked: false, duration: 1 },
+    { id: 7, taskId: 10, checked: false, duration: '1h' },
     { id: 8, taskId: 1, checked: false },
     { id: 9, taskId: 6, checked: false },
     { id: 10, taskId: 7, checked: false },
     { id: 11, taskId: 1, checked: false },
-    { id: 12, taskId: 10, checked: false, duration: 1 },
+    { id: 12, taskId: 10, checked: false, duration: '1h' },
     { id: 13, taskId: 11, checked: false },
     { id: 14, taskId: 1, checked: false },
     { id: 15, taskId: 12, checked: false },
     { id: 16, taskId: 13, checked: false },
     { id: 17, taskId: 1, checked: false },
     { id: 18, taskId: 14, checked: false },
-    { id: 19, taskId: 10, checked: false, duration: 1 },
+    { id: 19, taskId: 10, checked: false, duration: '1h' },
     { id: 20, taskId: 15, checked: false },
     { id: 21, taskId: 1, checked: false },
     { id: 22, taskId: 16, checked: false },
-    { id: 23, taskId: 10, checked: false, duration: 1 },
+    { id: 23, taskId: 10, checked: false, duration: '1h' },
     { id: 24, taskId: 17, checked: false },
 ]
 
@@ -69,10 +71,14 @@ class App extends React.Component {
         }
 
         this.state = state
+        this.state.time = TIMERINITIAL
         this.handleReset = this.handleReset.bind(this)
         this.handleToggle = this.handleToggle.bind(this)
         this.handleNotNow = this.handleNotNow.bind(this)
-        this.handleStartTimer = this.handleStartTimer.bind(this)
+        this.handleToggleTimer = this.handleToggleTimer.bind(this)
+        this.updateCountdownTime = this.updateCountdownTime.bind(this)
+        this.updateTimerTime = this.updateTimerTime.bind(this)
+
         this.index = 0
         this.postponed = false
 
@@ -139,14 +145,83 @@ class App extends React.Component {
     }
 
     handleNotNow() {
-        console.log('ok not now')
         this.postponed = true
         this.index += 1
         this.forceUpdate()
     }
 
-    handleStartTimer() {
-        console.log('start the timer')
+    getCountdownDate(duration) {
+        let milliseconds, seconds, minutes
+
+        milliseconds = 1000
+        seconds = 60
+        minutes = 60
+        minutes = parseInt(duration) * minutes
+
+        return new Date(Date.now() + milliseconds * seconds * minutes)
+    }
+
+
+    updateCountdownTime(now) {
+        let distance, hours, minutes, seconds
+
+        distance = this.futureDate - now
+        hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+        seconds = Math.floor((distance % (1000 * 60)) / 1000)
+
+        if (distance <= 0) return this.stopTimer('time\'s up!')
+        return this.formatTime(hours, minutes, seconds)
+    }
+
+    updateTimerTime(now) {
+        let distance, hours, minutes, seconds
+
+        distance = now - this.startDate
+        hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+        seconds = Math.floor((distance % (1000 * 60)) / 1000)
+
+        if (distance >= (1000 * 60 * 60)) return this.stopTimer('time\'s up!')
+        return this.formatTime(hours, minutes, seconds)
+    }
+
+    formatTime(hours, minutes, seconds) {
+        const pad = (num, size) => ('000000000' + num).substr(-size)
+        return `${ pad(hours, 2) }:${ pad(minutes, 2) }:${ pad(seconds, 2) }`
+    }
+
+    startTimer() {
+        const task = this.getCurrent()
+
+        if (task.duration) {
+            this.futureDate = this.getCountdownDate(task.duration)
+            this.timer = setInterval(() => {
+                this.setState({ 'time': this.updateCountdownTime(new Date().getTime()) })
+            }, 1000)
+            this.setState({ 'time': this.updateCountdownTime(new Date().getTime()) })
+        } else {
+            this.startDate = Date.now()
+            this.timer = setInterval(() => {
+                this.setState({ 'time': this.updateTimerTime(new Date().getTime()) })
+            }, 1000)
+            this.setState({ 'time': this.updateTimerTime(new Date().getTime()) })
+        }
+    }
+
+    stopTimer(msg) {
+        clearInterval(this.timer)
+        this.timer = undefined
+        this.setState({ 'time': TIMERINITIAL })
+        if (msg) alert(msg)
+    }
+
+    handleToggleTimer() {
+        ;(this.timer) ? this.stopTimer() : this.startTimer();
+    }
+
+    getCurrent() {
+        return this.state.mylist[this.index]
     }
 
     getNextUp() {
@@ -203,7 +278,7 @@ class App extends React.Component {
 
     render() {
         this.save()
-
+        // <Timer time={this.state.time} />
         return (
             <div className="app">
                 <h1>everyday</h1>
@@ -221,6 +296,7 @@ class App extends React.Component {
                                 <p><strong>{ this.getNextUp().task.text }</strong></p>
                                 <Button data-id={ this.getNextUp().id } action={ this.handleToggle } text="done" />
                                 <Button action={ this.handleNotNow } text="not now" />
+                                <Button action={ this.handleToggleTimer } text={ this.state.time } />
                                 <Totals totals={ this.getTotals() } />
                             </React.Fragment>
                         ) : (
