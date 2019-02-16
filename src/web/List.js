@@ -1,12 +1,11 @@
 import React from 'react'
-import Task from './Task'
 import getKey from './utilities/getKey'
 
 export default props => (
-    <ul className="list taskList">
+    <ul className="list">
         { props.list.map(item => (
             <li key={ getKey(item) }>
-                <Task action={ props.action } item={ item } />
+                <div><span>{ item.text }</span></div>
             </li>)
         ) }
     </ul>)

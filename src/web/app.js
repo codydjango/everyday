@@ -1,5 +1,6 @@
 import React from 'react'
 import TaskList from './TaskList'
+import List from './List'
 import Button from './Button'
 import Totals from './Totals'
 
@@ -33,7 +34,7 @@ const DEFAULTLIST = [
     { id: 3, taskId: 3,  checked: false },
     { id: 4, taskId: 18, checked: false },
     { id: 5, taskId: 4, checked: false },
-    { id: 6, taskId: 5, ch18cked: false },
+    { id: 6, taskId: 5, checked: false },
     { id: 7, taskId: 10, checked: false, duration: 1 },
     { id: 8, taskId: 1, checked: false },
     { id: 9, taskId: 6, checked: false },
@@ -70,6 +71,10 @@ class App extends React.Component {
         this.state = state
         this.handleReset = this.handleReset.bind(this)
         this.handleToggle = this.handleToggle.bind(this)
+        this.handleNotNow = this.handleNotNow.bind(this)
+        this.handleStartTimer = this.handleStartTimer.bind(this)
+        this.index = 0
+        this.postponed = false
 
         window.ttt = this
     }
@@ -126,15 +131,52 @@ class App extends React.Component {
     }
 
     handleReset() {
+        this.index = 0
         this.setState({ mylist: this.state.mylist.map(i => {
             i.checked = false
             return i
         })})
     }
 
+    handleNotNow() {
+        console.log('ok not now')
+        this.postponed = true
+        this.index += 1
+        this.forceUpdate()
+    }
+
+    handleStartTimer() {
+        console.log('start the timer')
+    }
+
+    getNextUp() {
+        let index = this.index || 0
+        let mytask = null
+
+        while (this.state.mylist.filter(i => (i.checked === false)).length > 0 || this.postponed) {
+            for (let i=index; i < this.state.mylist.length; i +=1 ) {
+                mytask = this.state.mylist[i]
+                if (mytask && mytask.checked) continue
+                if (mytask && !mytask.checked) {
+                    this.index = i
+                    return mytask;
+                }
+            }
+
+            this.postponed = false
+            index = 0
+        }
+
+        return null
+    }
+
+    hasNext() {
+        return (this.state.mylist.filter(i => (i.checked === false)).length > 0)
+    }
+
     handleToggle(e) {
         this.setState({ mylist: this.state.mylist.map(i => {
-            if (i.id == e.currentTarget.id) i.checked = !i.checked
+            if (i.id == e.currentTarget.dataset.id) i.checked = !i.checked
             return i
         })})
     }
@@ -155,15 +197,49 @@ class App extends React.Component {
         }
     }
 
+    getAllTasks() {
+        return TASKS
+    }
+
     render() {
         this.save()
 
-        // <p>better living through simple mechanics</p>
         return (
-            <div>
+            <div className="app">
                 <h1>everyday</h1>
-                <TaskList list={ this.state.mylist } action={ this.handleToggle } />
-                <Totals totals={ this.getTotals() } />
+
+                <div className="container">
+                    <div className="myTasks">
+                        <h2>mine</h2>
+                        <TaskList list={ this.state.mylist } action={ this.handleToggle } />
+                    </div>
+
+                    <div className="nextUp">
+                        { (this.hasNext()) ? (
+                            <React.Fragment>
+                                <h2>next up</h2>
+                                <p><strong>{ this.getNextUp().task.text }</strong></p>
+                                <Button data-id={ this.getNextUp().id } action={ this.handleToggle } text="done" />
+                                <Button action={ this.handleNotNow } text="not now" />
+                                <Totals totals={ this.getTotals() } />
+                            </React.Fragment>
+                        ) : (
+                            <React.Fragment>
+                                <h2>wow. you are so good. your brain is so strong.</h2>
+                                <small>Go drink some water. You deserve it.</small>
+                            </React.Fragment>
+                        ) }
+                    </div>
+
+                    { (false) ? (
+                        <div className="allTasks">
+                            <h2>everyone else</h2>
+                            <List list={ this.getAllTasks() } />
+                        </div>
+                    ) : '' }
+                </div>
+
+
 
                 { (this.isDebug()) ? (<React.Fragment>
                     <Button action={ this.handleReset } text="reset" />

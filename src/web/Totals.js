@@ -19,5 +19,5 @@ function getMessageFor(totals) {
 // <div><span>{ `${props.totals.done}/${props.totals.total}` }</span></div>
 export default props => (
     <div className="totals">
-        <small>{ getMessageFor(props.totals) }</small>
+        <p><small>{ getMessageFor(props.totals) }</small></p>
     </div>)

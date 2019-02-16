@@ -1,11 +1,12 @@
 {
-    "name": "braggingrights",
+    "name": "everyday",
     "version": "0.1.0",
     "private": false,
     "dependencies": {
         "pretty-checkbox": "^3.0.3",
         "react": "^16.7.0",
         "react-dom": "^16.7.0",
+        "utilities": "^1.0.5",
         "web3": "^1.0.0-beta.41"
     },
     "scripts": {

@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css?family=Cutive+Mono');
-// @import '~pretty-checkbox/src/pretty-checkbox.scss';
 
 body {
     font-family: 'Cutive Mono', sans-serif;
@@ -7,6 +6,13 @@ body {
 }
 
 h1 {
+    font-style: italic;
+    padding: 0;
+    margin: 0 0 1em 0;
+    line-height: 1em;
+}
+
+h2 {
     font-style: italic;
     padding: 0;
     margin: 0 0 1em 0;
@@ -25,15 +31,24 @@ sub {
     top: 2px;
 }
 
-.taskList {
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.list {
     list-style: none;
     padding: 0 0 1em 0;
     margin: 0;
 }
 
+.taskList {
+    @extend .list;
+}
+
 .task {
-    padding: 0.1em 0;
-    margin-bottom: 0.1em;
+    @extend .clearfix;
 }
 
 .duration {
@@ -53,12 +68,44 @@ sub {
         display: none;
     }
 
-    .state:before {
+    .visible:before {
         content: '☐';
     }
 
-    input[type=checkbox]:checked + .state:before {
+    input[type=checkbox]:checked + .visible:before {
         content: '☑';
+    }
+}
+
+.ascii-box {
+    .visible {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: flex-start;
+    }
+}
+
+
+.app {
+    .container {
+        position: relative;
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: flex-start;
+
+        .myTasks {
+            width: 200px;
+        }
+
+        .nextUp {
+            width: auto;
+        }
+
+        .allTasks {
+            width: auto;
+            text-align: right;
+            flex: 1;
+        }
     }
 }
 
