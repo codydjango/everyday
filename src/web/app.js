@@ -300,7 +300,7 @@ class App extends React.Component {
                             </React.Fragment>
                         ) : (
                             <React.Fragment>
-                                <h2>wow. you are so good. your brain is so strong.</h2>
+                                <h2>you are so good. your brain is so strong.</h2>
                                 <small>Go drink some water.</small>
                             </React.Fragment>
                         ) }
