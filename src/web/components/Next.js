@@ -4,13 +4,45 @@ import Button from '~/components/Button'
 import Totals from '~/components/Totals'
 import { TIMERINITIAL } from '~/settings'
 
-class NextUp extends React.Component {
+class Next extends React.Component {
+    static nothingActive(list) {
+        return (list.filter(i => (i.active === false)).length === 0)
+    }
+
+    static hasTasks(list) {
+        return (list.filter(i => {
+            return (i && (i.checked === false))
+        }).length > 0)
+    }
+
+    static bumpActive(list, index = 0) {
+        let nextIndex, task
+
+        // loop through the list starting at the active index until there are
+        // no tasks left to be completed
+        while (list.filter(i => (i.checked === false)).length > 0) {
+            task = list[index]
+
+            if (task && (task.checked === false)) {
+                task.active = true
+                break
+            }
+
+            index = ((index + 1) < list.length) ? (index + 1) : 0
+        }
+
+        return list
+    }
+
     constructor(props) {
         super(props)
 
-        this.state = {
-            'time': TIMERINITIAL,
-            'list': props.list
+        this.state = { 'time': TIMERINITIAL }
+
+        if (Next.nothingActive(props.list) && Next.hasTasks(props.list)) {
+            this.state.list = Next.bumpActive(props.list)
+        } else {
+            this.state.list = props.list
         }
 
         this.handleDone = this.handleDone.bind(this)
@@ -21,82 +53,24 @@ class NextUp extends React.Component {
         this.updateTimerTime = this.updateTimerTime.bind(this)
     }
 
-    setPageState(state) {
-        window.setState(state)
-    }
-
     handleUndo() {
         this.state.list.filter(i=>i.active)[0].checked = false
-        this.setPageState({ mine: this.state.list })
+        window.setState({ mine: this.state.list })
     }
 
     handleDone() {
-        this.state.list.filter(i=>i.active)[0].checked = true
-        this.setPageState({ mine: this.bumpActive() })
+        const activeIndex = this.getActiveIndex()
+        const list = this.state.list
+        list[activeIndex].checked = true
+        list[activeIndex].active = false
+        window.setState({ mine: Next.bumpActive(list, activeIndex + 1) })
     }
 
     handleNotNow() {
-        this.setPageState({ mine: this.bumpActive() })
-    }
-
-    bumpActiveOld() {
-        let index = this.getActiveIndex()
-        let list = this.state.list
-        let nextIndex
-
-        if ((index + 1) < list.length) {
-            nextIndex = index + 1
-        } else {
-            nextIndex = 0
-        }
-
-        list[index].active = false
-        list[nextIndex].active = true
-
-        return list
-    }
-
-    bumpActive() {
-        let index = this.getActiveIndex()
-        let list = this.state.list
-        let nextIndex, task
-
-        // deactivate previous
-        list[index].active = false
-
-        // loop through the list starting at the active index until there are
-        // no tasks left to be completed
-        while (list.filter(i => (i.checked === false)).length > 0) {
-            if ((index + 1) < list.length) {
-                index += 1
-            } else {
-                index = 0
-            }
-
-            task = list[index]
-            if (task && task.checked) continue
-            if (task && !task.checked) {
-                task.active = true
-                break
-            }
-        }
-
-        return list
-
-
-        // while (this.state.list.filter(i => (i.checked === false)).length > 0 || this.postponed) {
-        //     for (let i=index; i < this.state.list.length; i +=1 ) {
-        //         mytask = this.state.list[i]
-        //         if (mytask && mytask.checked) continue
-        //         if (mytask && !mytask.checked) {
-        //             mytask.active = true
-        //             return mytask;
-        //         }
-        //     }
-
-        //     this.postponed = false
-        //     index = 0
-        // }
+        const activeIndex = this.getActiveIndex()
+        const list = this.state.list
+        list[activeIndex].active = false
+        window.setState({ mine: Next.bumpActive(list, activeIndex + 1) })
     }
 
     getTotals() {
@@ -148,7 +122,7 @@ class NextUp extends React.Component {
     }
 
     startTimer() {
-        const task = this.getCurrent()
+        const task = this.getActiveTask()
 
         if (task.duration) {
             this.futureDate = this.getCountdownDate(task.duration)
@@ -177,44 +151,21 @@ class NextUp extends React.Component {
     }
 
     getActiveIndex() {
-        try {
-            return this.state.list.indexOf(this.state.list.filter(i => i.active)[0])
-        } catch (err) {
-            console.log('err', err)
-            return 0
-        }
+        let index = this.state.list.indexOf(this.state.list.filter(i => i.active)[0])
+        return (index !== -1) ? index : null
     }
 
-    getCurrent() {
-        this.index = this.getActiveIndex()
-
-        return this.state.list[this.index]
-    }
-
-    getNext() {
-        let index = this.getActiveIndex()
-        let mytask = null
-
-        if (this.state.list[index]) {
-            return this.state.list[index]
-        }
-
-        return null
-    }
-
-    hasNext() {
-        return (this.state.list.filter(i => {
-            return (i && (i.checked === false))
-        }).length > 0)
+    getActiveTask() {
+        return this.state.list[this.getActiveIndex()]
     }
 
     render() {
         return (<div className="next">
-            { (this.hasNext()) ? (
+            { (Next.hasTasks(this.state.list)) ? (
                 <React.Fragment>
                     <h2>next</h2>
-                    <p><strong>{ this.getNext().task.text }</strong></p>
-                    { (this.getCurrent().checked)
+                    <p><strong>{ this.getActiveTask().task.text }</strong></p>
+                    { (this.getActiveTask().checked)
                         ? (<Button action={ this.handleUndo } text="undo" />)
                         : (<Button action={ this.handleDone } text="done" />)}
 
@@ -225,11 +176,11 @@ class NextUp extends React.Component {
             ) : (
                 <React.Fragment>
                     <h2>you are so good. your brain is so strong.</h2>
-                    <small>Go drink some water.</small>
+                    <p><small>Go drink some water.</small></p>
                 </React.Fragment>
             ) }
         </div>)
     }
 }
 
-export default NextUp
+export default Next

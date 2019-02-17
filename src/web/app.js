@@ -12,8 +12,6 @@ window.setState = (state) => {
     }, 1)
 }
 
-console.log('useState', useState)
-
 class App extends React.Component {
     constructor(props) {
         super(props)
