@@ -8,7 +8,7 @@ import { TASKS, DEFAULTLIST } from '~/settings'
 
 window.setState = (state) => {
     setTimeout(() => {
-        window.ttt.setState(state)
+        window.everyday.setState(state)
     }, 1)
 }
 
@@ -17,19 +17,17 @@ class App extends React.Component {
         super(props)
 
         let state
-
         try {
             state = storage.load()
         } catch (err) {
             state = { mine: this.aggregates(this.flatten(DEFAULTLIST))}
         }
 
-        window.ttt = this
+        window.everyday = this
 
         this.state = state
         this.handleReset = this.handleReset.bind(this)
         this.handleClearDone = this.handleClearDone.bind(this)
-        this.handleToggleDone = this.handleToggleDone.bind(this)
         this.handleSetActive = this.handleSetActive.bind(this)
     }
 
@@ -59,30 +57,28 @@ class App extends React.Component {
     }
 
     handleClearDone() {
-        this.index = 0
-        this.setState({ mine: this.state.mine.map(i => {
+        let list = this.state.mine.map(i => {
             i.checked = false
+            i.active = false
             return i
-        })})
+        })
+
+        list[0].active = true
+
+        this.setState({ mine: list})
     }
 
     handleReset() {
-        this.setState({ mine: this.aggregates(this.flatten(DEFAULTLIST))})
+        this.setState({ mine: this.aggregates(this.flatten(DEFAULTLIST)) })
     }
 
-    handleToggleDone(e) {
-        this.setState({ mine: this.state.mine.map(i => {
-            if (i.id == e.currentTarget.dataset.id) i.checked = !i.checked
-            return i
-        })})
-    }
-
-    handleSetActive(e) {
-        e.preventDefault()
-        this.setState({ mine: this.state.mine.map(i => {
-            i.active = (i.id == e.currentTarget.dataset.id)
-            return i
-        })})
+    handleSetActive(id) {
+        this.setState((state) => {
+            return { mine: state.mine.map(i => {
+                i.active = (i.id == id)
+                return i
+            })}
+        })
     }
 
     render() {
@@ -92,8 +88,8 @@ class App extends React.Component {
             <div className="app">
                 <h1>everyday</h1>
                 <div className="container">
-                    <Next list={ this.state.mine } handleAction={ this.handleToggleDone } />
-                    <Mine list={ this.state.mine } handleAction={ this.handleSetActive } />
+                    <Next list={ this.state.mine } />
+                    <Mine list={ this.state.mine } handleAction={ this.handleSetActive } handleClearDone={ this.handleClearDone }/>
                     <Theirs list={ TASKS } />
                 </div>
             </div>

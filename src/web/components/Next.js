@@ -6,13 +6,17 @@ import { TIMERINITIAL } from '~/settings'
 
 class Next extends React.Component {
     static nothingActive(list) {
-        return (list.filter(i => (i.active === false)).length === 0)
+        return (list.filter(i => (i.active)).length === 0)
     }
 
     static hasTasks(list) {
         return (list.filter(i => {
             return (i && (i.checked === false))
         }).length > 0)
+    }
+
+    static hasTasksAndActive(list) {
+        return (Next.hasTasks(list) && (Next.nothingActive(list) === false))
     }
 
     static bumpActive(list, index = 0) {
@@ -161,7 +165,7 @@ class Next extends React.Component {
 
     render() {
         return (<div className="next">
-            { (Next.hasTasks(this.state.list)) ? (
+            { (Next.hasTasksAndActive(this.state.list)) ? (
                 <React.Fragment>
                     <h2>next</h2>
                     <p><strong>{ this.getActiveTask().task.text }</strong></p>
