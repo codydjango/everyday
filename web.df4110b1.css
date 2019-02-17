@@ -1,0 +1,133 @@
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css?family=Cutive+Mono");
+.container {
+  min-width: 300px;
+  display: block;
+  position: relative;
+}
+.container .next {
+  width: auto;
+  display: block;
+}
+.container .mine {
+  width: auto;
+  display: block;
+}
+.container .theirs {
+  width: auto;
+  display: none;
+}
+
+@media screen and (min-width: 576px) {
+  .container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+  }
+  .container .next {
+    width: auto;
+    order: 1;
+  }
+  .container .mine {
+    width: 200px;
+    order: 0;
+  }
+  .container .theirs {
+    display: none;
+    width: auto;
+    text-align: right;
+    flex: 1;
+    order: 2;
+  }
+}
+.noselect, body {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+     supported by Chrome and Opera */
+}
+
+body {
+  font-family: "Cutive Mono", sans-serif;
+  font-size: 14;
+  background-color: yellow;
+}
+
+h1 {
+  font-style: italic;
+  padding: 0;
+  margin: 0 0 1em 0;
+  line-height: 1em;
+}
+
+h2 {
+  font-style: italic;
+  padding: 0;
+  margin: 0 0 1em 0;
+  line-height: 1em;
+}
+
+sup {
+  position: relative;
+  vertical-align: top;
+  top: -2px;
+}
+
+sub {
+  position: relative;
+  vertical-align: top;
+  top: 2px;
+}
+
+.clearfix::after, .task::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.list, .taskList {
+  list-style: none;
+  padding: 0 0 1em 0;
+  margin: 0;
+}
+
+.duration {
+  margin-right: 2px;
+  color: #ffb632;
+}
+
+.multiple {
+  color: blue;
+  padding: 0em;
+  margin-left: 2px;
+}
+
+.ascii-box input[type=checkbox] {
+  display: none;
+}
+.ascii-box .visible:before {
+  content: "☐";
+}
+.ascii-box input[type=checkbox]:checked + .visible:before {
+  content: "☑";
+}
+.ascii-box .visible {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+}
+.ascii-box .taskText {
+  font-weight: normal;
+}
+.ascii-box .taskText.active {
+  font-weight: 600;
+}
