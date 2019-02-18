@@ -58,21 +58,23 @@ sub {
 .taskList {
     @extend .list;
 
-    &.edit {
-        background-color: orange;
-    }
-
     .task {
-        border: 1px solid transparent;
         display: block;
     }
 
-    .dragged .task {
-        border: 1px dashed black;
+    &.edit {
+        .task {
+            label {
+                background-color: #DCDC00
+            }
+        }
     }
 
     .drag {
         cursor: move;
+        label {
+            cursor: move;
+        }
     }
 }
 

@@ -6,6 +6,17 @@ import storage from '~/storage'
 import { TASKS, DEFAULTLIST } from '~/settings'
 
 class App extends React.Component {
+    static resetList() {
+        return App.flatten(DEFAULTLIST)
+    }
+
+    static flatten(list) {
+        return list.map(i => {
+            i.task = TASKS[i.taskId - 1]
+            return i
+        })
+    }
+
     constructor(props) {
         super(props)
 
@@ -29,41 +40,19 @@ class App extends React.Component {
         this.updateList = this.updateList.bind(this)
     }
 
-    static resetList() {
-        return App.aggregates(App.flatten(DEFAULTLIST))
-    }
-
-    static flatten(list) {
-        return list.map(i => {
-            i.task = TASKS[i.taskId - 1]
-            return i
-        })
-    }
-
-    static aggregates(list) {
-        const counts = {}
-        return list.map(i => {
-            if (counts[i.taskId]) {
-                counts[i.taskId] += 1
-                i.multiple = counts[i.taskId]
-            } else {
-                counts[i.taskId] = 1
-            }
-
-            return i
-        })
+    componentDidUpdate() {
+        this.save()
     }
 
     handleClearDone() {
-        let list = this.state.mine.map(i => {
+        let list = this.state.mine.slice(0).map(i => {
             i.checked = false
             i.active = false
             return i
         })
-
         list[0].active = true
 
-        this.setState({ mine: list})
+        this.setState({ mine: list })
     }
 
     updateList(list) {
@@ -75,12 +64,10 @@ class App extends React.Component {
     }
 
     handleSetActive(id) {
-        this.setState(state => {
-            return { mine: state.mine.map(i => {
-                i.active = (i.id == id)
-                return i
-            })}
-        })
+        this.setState({ mine: this.state.mine.slice(0).map(i => {
+            i.active = (i.id == id)
+            return i
+        })})
 
         this.doneRef.current.focus()
     }
@@ -90,8 +77,6 @@ class App extends React.Component {
     }
 
     render() {
-        this.save()
-
         const doneRef = this.doneRef
 
         return (
