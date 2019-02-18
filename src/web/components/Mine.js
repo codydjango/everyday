@@ -15,9 +15,9 @@ export default props => {
 
     const getEditInstruction = () => {
         return (<ul className="instruction">
-            <li>drag item to reorder</li>
-            <li>click item to delete</li>
-            <li>click "done" to exit editing mode</li>
+            <li><small>drag item to reorder</small></li>
+            <li><small>click item to delete</small></li>
+            <li><small>click "done" to exit editing mode</small></li>
         </ul>)
     }
 

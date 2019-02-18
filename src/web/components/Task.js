@@ -19,7 +19,7 @@ export default ({ handleAction, item, ...props }) => (
                     onClick={ (e) => { e.preventDefault() } }>
                     <span className={ (item.active) ? 'taskText active' : 'taskText' } style={{ marginRight: '2px' }}>{ item.task.text }</span>
                     { (item.duration) ? (<sub className="duration">{ item.duration }</sub>) : '' }
-                    { (item.multiple) ? (<sup className="multiple">{ item.multiple }x</sup>) : '' }
+                    { (item.multiple) ? (<sup className="multiple">x{ item.multiple }</sup>) : '' }
                 </label>
             </span>
         </span>

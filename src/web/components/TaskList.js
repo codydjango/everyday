@@ -26,7 +26,6 @@ export default props => {
 
     const editTask = item => <Task handleAction={ () => {}} item={ item } />
     const normalTask = item => <Task tabIndex="0" handleAction={ props.handleAction } item={ item } />
-    const getTask = item => (props.editMode) ? editTask(item) : normalTask(item)
 
     const onDragStart = (e, i) => {
         let dragged = state.list[i]
@@ -81,31 +80,26 @@ export default props => {
         props.onUpdate(newlist)
     }
 
-    const returnEdit = () => (
-        <ul className={'list taskList edit'}>
-            { state.list.map((item, i) => {
-                return (<li
-                    onDragOver={ () => { throttle(onDragOver, 100)(i) } }
+    return (props.editMode)
+        ? (<ul className={'list taskList edit'}>
+                { state.list.map((item, i) => {
+                    return (<li
+                        onDragOver={ () => { throttle(onDragOver, 100)(i) } }
+                        key={ getKey(item) }>
+                        <div className="drag"
+                            draggable
+                            onDragStart={ (e) => { onDragStart(e, i) }}
+                            onDragEnd={ (e) => { onDragEnd(e) }}
+                            onClick={ (e) => onClick(e, i) }>
+                            { editTask(item) }
+                        </div>
+                    </li>)
+                })}
+            </ul>)
+        : (<ul className={'list taskList'}>
+                { state.list.map((item, i) => (<li
+                    className={ (props.editMode) ? 'drag': '' }
                     key={ getKey(item) }>
-                    <div className="drag"
-                        draggable
-                        onDragStart={ (e) => { onDragStart(e, i) }}
-                        onDragEnd={ (e) => { onDragEnd(e) }}
-                        onClick={ (e) => onClick(e, i) }>
-                        { editTask(item) }
-                    </div>
-                </li>)
-            })}
-        </ul>)
-
-    const returnNormal = () => (
-        <ul className={'list taskList'}>
-            { state.list.map((item, i) => (<li
-                className={ (props.editMode) ? 'drag': '' }
-                key={ getKey(item) }>
-                { normalTask(item) }
-            </li>))}
-        </ul>)
-
-    return ((props.editMode) ? returnEdit() : returnNormal())
-}
+                    { normalTask(item) }
+                </li>))}
+            </ul>)}
