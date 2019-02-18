@@ -38,6 +38,11 @@ class Next extends React.Component {
         return list
     }
 
+    static getActiveIndex(list) {
+        const index = list.indexOf(list.filter(i => i.active)[0])
+        return (index !== -1) ? index : null
+    }
+
     constructor(props) {
         super(props)
 
@@ -59,22 +64,26 @@ class Next extends React.Component {
 
     handleUndo() {
         this.state.list.filter(i=>i.active)[0].checked = false
-        window.setState({ mine: this.state.list })
+        this.props.updateList(this.state.list)
     }
 
     handleDone() {
-        const activeIndex = this.getActiveIndex()
+        const activeIndex = Next.getActiveIndex(this.state.list)
         const list = this.state.list
+
         list[activeIndex].checked = true
         list[activeIndex].active = false
-        window.setState({ mine: Next.bumpActive(list, activeIndex + 1) })
+
+        this.props.updateList(Next.bumpActive(list, activeIndex + 1))
     }
 
     handleNotNow() {
-        const activeIndex = this.getActiveIndex()
+        const activeIndex = Next.getActiveIndex(this.state.list)
         const list = this.state.list
+
         list[activeIndex].active = false
-        window.setState({ mine: Next.bumpActive(list, activeIndex + 1) })
+
+        this.props.updateList(Next.bumpActive(list, activeIndex + 1))
     }
 
     getTotals() {
@@ -154,13 +163,8 @@ class Next extends React.Component {
         ;(this.timer) ? this.stopTimer() : this.startTimer()
     }
 
-    getActiveIndex() {
-        let index = this.state.list.indexOf(this.state.list.filter(i => i.active)[0])
-        return (index !== -1) ? index : null
-    }
-
     getActiveTask() {
-        return this.state.list[this.getActiveIndex()]
+        return this.state.list[Next.getActiveIndex(this.state.list)]
     }
 
     render() {

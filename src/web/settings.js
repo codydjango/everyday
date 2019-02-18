@@ -1,5 +1,5 @@
 const DEBUG = true
-const NAMESPACE = 'erryday'
+const NAMESPACE = 'everyday'
 const TIMERINITIAL = 'start timer'
 const EARLY = false
 const TASKS = [

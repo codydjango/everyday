@@ -3,14 +3,7 @@ import Theirs from '~/components/Theirs'
 import Mine from '~/components/Mine'
 import Next from '~/components/Next'
 import storage from '~/storage'
-
 import { TASKS, DEFAULTLIST } from '~/settings'
-
-window.setState = (state) => {
-    setTimeout(() => {
-        window.everyday.setState(state)
-    }, 1)
-}
 
 class App extends React.Component {
     constructor(props) {
@@ -23,12 +16,15 @@ class App extends React.Component {
             state = { mine: this.aggregates(this.flatten(DEFAULTLIST))}
         }
 
-        window.everyday = this
-
         this.state = state
+
+        // handlers
         this.handleReset = this.handleReset.bind(this)
         this.handleClearDone = this.handleClearDone.bind(this)
         this.handleSetActive = this.handleSetActive.bind(this)
+
+        // callback
+        this.updateList = this.updateList.bind(this)
     }
 
     getTask(taskId) {
@@ -68,6 +64,10 @@ class App extends React.Component {
         this.setState({ mine: list})
     }
 
+    updateList(list) {
+        this.setState({ mine: list })
+    }
+
     handleReset() {
         this.setState({ mine: this.aggregates(this.flatten(DEFAULTLIST)) })
     }
@@ -88,8 +88,11 @@ class App extends React.Component {
             <div className="app">
                 <h1>everyday</h1>
                 <div className="container">
-                    <Next list={ this.state.mine } />
-                    <Mine list={ this.state.mine } handleAction={ this.handleSetActive } handleClearDone={ this.handleClearDone }/>
+                    <Next list={ this.state.mine }
+                          updateList={ this.updateList }/>
+                    <Mine list={ this.state.mine }
+                          handleAction={ this.handleSetActive }
+                          handleClearDone={ this.handleClearDone }/>
                     <Theirs list={ TASKS } />
                 </div>
             </div>
