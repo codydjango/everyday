@@ -2,6 +2,7 @@ import React from 'react'
 
 import Button from '~/components/Button'
 import Totals from '~/components/Totals'
+import Timer from '~/utilities/Timer'
 import { TIMERINITIAL } from '~/settings'
 
 class Next extends React.Component {
@@ -19,7 +20,7 @@ class Next extends React.Component {
         return (Next.hasTasks(list) && (Next.nothingActive(list) === false))
     }
 
-    static bumpActive(list, index = 0) {
+    static bumpActiveIndex(list, index = 0) {
         let nextIndex, task
 
         // loop through the list starting at the active index until there are
@@ -38,7 +39,7 @@ class Next extends React.Component {
         return list
     }
 
-    static getActiveIndex(list) {
+    static activeIndex(list) {
         const index = list.indexOf(list.filter(i => i.active)[0])
         return (index !== -1) ? index : null
     }
@@ -49,17 +50,22 @@ class Next extends React.Component {
         this.state = { 'time': TIMERINITIAL }
 
         if (Next.nothingActive(props.list) && Next.hasTasks(props.list)) {
-            this.state.list = Next.bumpActive(props.list)
+            this.state.list = Next.bumpActiveIndex(props.list)
         } else {
             this.state.list = props.list
         }
+
+        this.timer = new Timer(time => this.setState({ time }), TIMERINITIAL)
 
         this.handleDone = this.handleDone.bind(this)
         this.handleUndo = this.handleUndo.bind(this)
         this.handleNotNow = this.handleNotNow.bind(this)
         this.handleToggleTimer = this.handleToggleTimer.bind(this)
-        this.updateCountdownTime = this.updateCountdownTime.bind(this)
-        this.updateTimerTime = this.updateTimerTime.bind(this)
+
+    }
+
+    get activeTask() {
+        return this.state.list[Next.activeIndex(this.state.list)]
     }
 
     handleUndo() {
@@ -68,22 +74,24 @@ class Next extends React.Component {
     }
 
     handleDone() {
-        const activeIndex = Next.getActiveIndex(this.state.list)
+        const activeIndex = Next.activeIndex(this.state.list)
         const list = this.state.list
 
         list[activeIndex].checked = true
         list[activeIndex].active = false
 
-        this.props.updateList(Next.bumpActive(list, activeIndex + 1))
+        this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1))
     }
 
-    handleNotNow() {
-        const activeIndex = Next.getActiveIndex(this.state.list)
+    handleNotNow(e) {
+        e.preventDefault()
+
+        const activeIndex = Next.activeIndex(this.state.list)
         const list = this.state.list
 
         list[activeIndex].active = false
 
-        this.props.updateList(Next.bumpActive(list, activeIndex + 1))
+        this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1))
     }
 
     getTotals() {
@@ -93,78 +101,10 @@ class Next extends React.Component {
         }
     }
 
-    getCountdownDate(duration) {
-        let milliseconds, seconds, minutes
+    handleToggleTimer(e) {
+        e.preventDefault()
 
-        milliseconds = 1000
-        seconds = 60
-        minutes = 60
-        minutes = parseInt(duration) * minutes
-
-        return new Date(Date.now() + milliseconds * seconds * minutes)
-    }
-
-
-    updateCountdownTime(now) {
-        let distance, hours, minutes, seconds
-
-        distance = this.futureDate - now
-        hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-        minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-        seconds = Math.floor((distance % (1000 * 60)) / 1000)
-
-        if (distance <= 0) return this.stopTimer('time\'s up!')
-        return this.formatTime(hours, minutes, seconds)
-    }
-
-    updateTimerTime(now) {
-        let distance, hours, minutes, seconds
-
-        distance = now - this.startDate
-        hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-        minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-        seconds = Math.floor((distance % (1000 * 60)) / 1000)
-
-        if (distance >= (1000 * 60 * 60)) return this.stopTimer('time\'s up!')
-        return this.formatTime(hours, minutes, seconds)
-    }
-
-    formatTime(hours, minutes, seconds) {
-        const pad = (num, size) => ('000000000' + num).substr(-size)
-        return `${ pad(hours, 2) }:${ pad(minutes, 2) }:${ pad(seconds, 2) }`
-    }
-
-    startTimer() {
-        const task = this.getActiveTask()
-
-        if (task.duration) {
-            this.futureDate = this.getCountdownDate(task.duration)
-            this.timer = setInterval(() => {
-                this.setState({ time: this.updateCountdownTime(new Date().getTime()) })
-            }, 1000)
-            this.setState({ time: this.updateCountdownTime(new Date().getTime()) })
-        } else {
-            this.startDate = Date.now()
-            this.timer = setInterval(() => {
-                this.setState({ time: this.updateTimerTime(new Date().getTime()) })
-            }, 1000)
-            this.setState({ time: this.updateTimerTime(new Date().getTime()) })
-        }
-    }
-
-    stopTimer(msg) {
-        clearInterval(this.timer)
-        this.timer = undefined
-        this.setState({ time: TIMERINITIAL })
-        if (msg) alert(msg)
-    }
-
-    handleToggleTimer() {
-        ;(this.timer) ? this.stopTimer() : this.startTimer()
-    }
-
-    getActiveTask() {
-        return this.state.list[Next.getActiveIndex(this.state.list)]
+        ;(this.timer.active) ? this.timer.stop() : this.timer.start(this.activeTask.duration || null)
     }
 
     render() {
@@ -172,8 +112,8 @@ class Next extends React.Component {
             { (Next.hasTasksAndActive(this.state.list)) ? (
                 <React.Fragment>
                     <h2>next</h2>
-                    <p><strong>{ this.getActiveTask().task.text }</strong></p>
-                    { (this.getActiveTask().checked)
+                    <p><strong>{ this.activeTask.task.text }</strong></p>
+                    { (this.activeTask.checked)
                         ? (<Button action={ this.handleUndo } text="undo" />)
                         : (<Button action={ this.handleDone } text="done" />)}
 
