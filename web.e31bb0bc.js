@@ -84266,18 +84266,24 @@ var _default = function _default(props) {
     props.updateList(list);
   };
 
+  var getEditInstruction = function getEditInstruction() {
+    return _react.default.createElement("ul", {
+      className: "instruction"
+    }, _react.default.createElement("li", null, "drag to reorder"), _react.default.createElement("li", null, "click to delete"));
+  };
+
   return _react.default.createElement("div", {
     className: "mine"
   }, _react.default.createElement("h2", null, "my routine"), _react.default.createElement(_TaskList.default, _extends({}, props, {
     editMode: edit,
     onUpdate: onUpdate
-  })), _react.default.createElement("footer", null, _react.default.createElement(_Link.default, {
+  })), _react.default.createElement("footer", null, _react.default.createElement("div", null, _react.default.createElement(_Link.default, {
     text: edit ? 'done' : 'edit',
     action: toggleEdit
   }), _react.default.createElement(_Link.default, {
     text: "reset",
     action: props.handleClearDone
-  })));
+  })), edit ? getEditInstruction() : ''));
 };
 
 exports.default = _default;
@@ -84797,8 +84803,10 @@ function (_React$Component) {
       state = _storage.default.load();
     } catch (err) {
       console.log('err', err);
+      var list = App.resetList();
+      list[0].active = true;
       state = {
-        mine: App.resetList()
+        mine: list
       };
     }
 
@@ -85006,7 +85014,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59662" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52651" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

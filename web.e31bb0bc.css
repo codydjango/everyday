@@ -99,6 +99,10 @@ sub {
   margin: 0;
 }
 
+.instruction li {
+  font-style: italic;
+}
+
 .taskList .task {
   display: block;
 }
