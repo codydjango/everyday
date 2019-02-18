@@ -14,7 +14,11 @@ export default props => {
     }
 
     const getEditInstruction = () => {
-        return (<ul className="instruction"><li>drag to reorder</li><li>click to delete</li></ul>)
+        return (<ul className="instruction">
+            <li>drag item to reorder</li>
+            <li>click item to delete</li>
+            <li>click "done" to exit editing mode</li>
+        </ul>)
     }
 
     return (<div className="mine">
