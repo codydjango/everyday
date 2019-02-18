@@ -40,7 +40,7 @@
     order: 2;
   }
 }
-.noselect {
+.noselect, body {
   -webkit-touch-callout: none;
   /* iOS Safari */
   -webkit-user-select: none;
@@ -88,10 +88,9 @@ sub {
   top: 2px;
 }
 
-.clearfix::after, .task::after {
-  content: "";
-  clear: both;
-  display: table;
+.link {
+  display: inline-block;
+  padding: 2px;
 }
 
 .list, .taskList {
@@ -100,10 +99,16 @@ sub {
   margin: 0;
 }
 
-.taskList.edit {
-  background-color: orange;
+.taskList .task {
+  display: block;
+}
+.taskList.edit .task label {
+  background-color: #DCDC00;
 }
 .taskList .drag {
+  cursor: move;
+}
+.taskList .drag label {
   cursor: move;
 }
 

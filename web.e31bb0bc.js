@@ -83936,44 +83936,60 @@ var _react = _interopRequireDefault(require("react"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var _default = function _default(props) {
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+var _default = function _default(_ref) {
   var _React$createElement;
 
-  return _react.default.createElement("div", {
+  var handleAction = _ref.handleAction,
+      item = _ref.item,
+      props = _objectWithoutProperties(_ref, ["handleAction", "item"]);
+
+  return _react.default.createElement("div", _extends({
     className: "task",
+    role: "button",
+    "aria-pressed": item.active ? 'true' : 'false',
     onClick: function onClick(e) {
       e.preventDefault();
-      props.handleAction(props.item.id);
+      handleAction(item.id);
+    },
+    onKeyPress: function onKeyPress(_ref2) {
+      var key = _ref2.key;
+      if (key === 'Enter') handleAction(item.id);
     }
-  }, _react.default.createElement("span", {
+  }, props), _react.default.createElement("span", {
     className: "ascii-box",
     style: {
       marginRight: '0px'
     }
   }, _react.default.createElement("input", (_React$createElement = {
     type: "checkbox",
-    id: "taskId_".concat(props.item.id),
-    "data-id": props.item.id,
+    id: "taskId_".concat(item.id),
+    "data-id": item.id,
     readOnly: true
-  }, _defineProperty(_React$createElement, "type", "checkbox"), _defineProperty(_React$createElement, "checked", props.item.checked), _React$createElement)), _react.default.createElement("div", {
+  }, _defineProperty(_React$createElement, "type", "checkbox"), _defineProperty(_React$createElement, "checked", item.checked), _React$createElement)), _react.default.createElement("span", {
     className: "visible"
   }, _react.default.createElement("label", {
-    htmlFor: "taskId_".concat(props.item.id),
+    htmlFor: "taskId_".concat(item.id),
     onClick: function onClick(e) {
       e.preventDefault();
     }
   }, _react.default.createElement("span", {
-    className: props.item.active ? 'taskText active' : 'taskText',
+    className: item.active ? 'taskText active' : 'taskText',
     style: {
       marginRight: '2px'
     }
-  }, props.item.task.text), props.item.duration ? _react.default.createElement("sub", {
+  }, item.task.text), item.duration ? _react.default.createElement("sub", {
     className: "duration"
-  }, props.item.duration) : '', props.item.multiple ? _react.default.createElement("sup", {
+  }, item.duration) : '', item.multiple ? _react.default.createElement("sup", {
     className: "multiple"
-  }, props.item.multiple, "x") : ''))));
+  }, item.multiple, "x") : ''))));
 };
 
 exports.default = _default;
@@ -84024,9 +84040,25 @@ function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = 
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function aggregates(list) {
+  var counts = {};
+  return list.slice(0).map(function (i) {
+    delete i.multiple;
+
+    if (Number.isInteger(counts[i.taskId])) {
+      counts[i.taskId] += 1;
+      i.multiple = counts[i.taskId];
+    } else {
+      counts[i.taskId] = 1;
+    }
+
+    return i;
+  });
+}
+
 var _default = function _default(props) {
   var _useState = (0, _react.useState)({
-    list: props.list,
+    list: aggregates(props.list),
     dragged: undefined
   }),
       _useState2 = _slicedToArray(_useState, 2),
@@ -84042,6 +84074,7 @@ var _default = function _default(props) {
 
   var normalTask = function normalTask(item) {
     return _react.default.createElement(_Task.default, {
+      tabIndex: "0",
       handleAction: props.handleAction,
       item: item
     });
@@ -84054,6 +84087,7 @@ var _default = function _default(props) {
   var _onDragStart = function onDragStart(e, i) {
     var dragged = state.list[i];
     e.dataTransfer.effectAllowed = 'move';
+    e.target.parentNode.classList.add('dragged');
     e.dataTransfer.setData('text/html', e.target.parentNode);
     e.dataTransfer.setDragImage(e.target.parentNode, 20, 20);
     setState({
@@ -84062,14 +84096,14 @@ var _default = function _default(props) {
     });
   };
 
-  var _onDragEnd = function onDragEnd() {
+  var _onDragEnd = function onDragEnd(e) {
+    e.target.parentNode.classList.remove('dragged');
+    var newlist = aggregates(state.list);
     setState({
-      list: state.list,
-      dragged: undefined
+      dragged: undefined,
+      list: newlist
     });
-    setTimeout(function () {
-      props.onUpdate(state.list);
-    }, 1);
+    props.onUpdate(newlist);
   };
 
   var _onDragOver = function onDragOver(i) {
@@ -84078,10 +84112,22 @@ var _default = function _default(props) {
       return i.id != state.dragged.id;
     });
     newlist.splice(i, 0, state.dragged);
+    newlist = aggregates(newlist);
     setState({
       dragged: state.dragged,
       list: newlist
     });
+  };
+
+  var _onClick = function onClick(e, i) {
+    var newlist = state.list.splice(0);
+    newlist.splice(i, 1);
+    newlist = aggregates(newlist);
+    setState({
+      dragged: state.dragged,
+      list: newlist
+    });
+    props.onUpdate(newlist);
   };
 
   var returnEdit = function returnEdit() {
@@ -84090,9 +84136,9 @@ var _default = function _default(props) {
     }, state.list.map(function (item, i) {
       return _react.default.createElement("li", {
         onDragOver: function onDragOver() {
-          (0, _throttle.default)(_onDragOver, 50)(i);
+          (0, _throttle.default)(_onDragOver, 100)(i);
         },
-        key: "lik_".concat(i)
+        key: (0, _getKey.default)(item)
       }, _react.default.createElement("div", {
         className: "drag",
         draggable: true,
@@ -84100,7 +84146,10 @@ var _default = function _default(props) {
           _onDragStart(e, i);
         },
         onDragEnd: function onDragEnd(e) {
-          _onDragEnd();
+          _onDragEnd(e);
+        },
+        onClick: function onClick(e) {
+          return _onClick(e, i);
         }
       }, editTask(item)));
     }));
@@ -84112,7 +84161,7 @@ var _default = function _default(props) {
     }, state.list.map(function (item, i) {
       return _react.default.createElement("li", {
         className: props.editMode ? 'drag' : '',
-        key: "lik_".concat(i)
+        key: (0, _getKey.default)(item)
       }, normalTask(item));
     }));
   };
@@ -84143,10 +84192,11 @@ var _default = function _default(_ref) {
 
   return _react.default.createElement("a", {
     href: "#",
+    className: "link",
     onClick: function onClick(e) {
       action();
     }
-  }, _react.default.createElement("p", null, props.text));
+  }, props.text);
 };
 
 exports.default = _default;
@@ -84213,23 +84263,21 @@ var _default = function _default(props) {
       list: list,
       edit: false
     });
-    setTimeout(function () {
-      props.updateList(list);
-    }, 100);
+    props.updateList(list);
   };
 
   return _react.default.createElement("div", {
     className: "mine"
-  }, _react.default.createElement("h2", null, "mine"), _react.default.createElement(_TaskList.default, _extends({}, props, {
+  }, _react.default.createElement("h2", null, "my routine"), _react.default.createElement(_TaskList.default, _extends({}, props, {
     editMode: edit,
     onUpdate: onUpdate
-  })), _react.default.createElement(_Link.default, {
+  })), _react.default.createElement("footer", null, _react.default.createElement(_Link.default, {
     text: edit ? 'done' : 'edit',
     action: toggleEdit
   }), _react.default.createElement(_Link.default, {
     text: "reset",
     action: props.handleClearDone
-  }));
+  })));
 };
 
 exports.default = _default;
@@ -84245,20 +84293,13 @@ var _react = _interopRequireDefault(require("react"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
-
-function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
-
-var _default = function _default(_ref) {
-  var action = _ref.action,
-      props = _objectWithoutProperties(_ref, ["action"]);
-
-  return _react.default.createElement("button", _extends({
-    onClick: action
-  }, props), props.text);
-};
+var _default = _react.default.forwardRef(function (props, ref) {
+  return _react.default.createElement("button", {
+    ref: ref,
+    id: props.id,
+    onClick: props.action
+  }, props.text);
+});
 
 exports.default = _default;
 },{"react":"../../node_modules/react/index.js"}],"components/Totals.js":[function(require,module,exports) {
@@ -84579,6 +84620,12 @@ function (_React$Component) {
       this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1));
     }
   }, {
+    key: "handleToggleTimer",
+    value: function handleToggleTimer(e) {
+      e.preventDefault();
+      this.timer.active ? this.timer.stop() : this.timer.start(this.activeTask.duration || null);
+    }
+  }, {
     key: "getTotals",
     value: function getTotals() {
       var list = this.props.list;
@@ -84590,20 +84637,18 @@ function (_React$Component) {
       };
     }
   }, {
-    key: "handleToggleTimer",
-    value: function handleToggleTimer(e) {
-      e.preventDefault();
-      this.timer.active ? this.timer.stop() : this.timer.start(this.activeTask.duration || null);
-    }
-  }, {
     key: "render",
     value: function render() {
       return _react.default.createElement("div", {
         className: "next"
-      }, Next.hasTasksAndActive(this.props.list) ? _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "next"), _react.default.createElement("p", null, _react.default.createElement("strong", null, this.activeTask.task.text)), this.activeTask.checked ? _react.default.createElement(_Button.default, {
+      }, Next.hasTasksAndActive(this.props.list) ? _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "next up"), _react.default.createElement("p", null, _react.default.createElement("strong", null, this.activeTask.task.text)), this.activeTask.checked ? _react.default.createElement(_Button.default, {
+        id: "undo",
+        ref: this.props.doneRef,
         action: this.handleUndo,
         text: "undo"
       }) : _react.default.createElement(_Button.default, {
+        id: "done",
+        ref: this.props.doneRef,
         action: this.handleDone,
         text: "done"
       }), _react.default.createElement(_Button.default, {
@@ -84706,13 +84751,13 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
@@ -84725,6 +84770,21 @@ var App =
 function (_React$Component) {
   _inherits(App, _React$Component);
 
+  _createClass(App, null, [{
+    key: "resetList",
+    value: function resetList() {
+      return App.flatten(_settings.DEFAULTLIST);
+    }
+  }, {
+    key: "flatten",
+    value: function flatten(list) {
+      return list.map(function (i) {
+        i.task = _settings.TASKS[i.taskId - 1];
+        return i;
+      });
+    }
+  }]);
+
   function App(props) {
     var _this;
 
@@ -84736,13 +84796,14 @@ function (_React$Component) {
     try {
       state = _storage.default.load();
     } catch (err) {
+      console.log('err', err);
       state = {
-        mine: _this.aggregates(_this.flatten(_settings.DEFAULTLIST))
+        mine: App.resetList()
       };
     }
 
     _this.state = state;
-    window.ttt = _assertThisInitialized(_assertThisInitialized(_this)); // handlers
+    _this.doneRef = _react.default.createRef(); // handlers
 
     _this.handleReset = _this.handleReset.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.handleClearDone = _this.handleClearDone.bind(_assertThisInitialized(_assertThisInitialized(_this)));
@@ -84753,9 +84814,14 @@ function (_React$Component) {
   }
 
   _createClass(App, [{
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      this.save();
+    }
+  }, {
     key: "handleClearDone",
     value: function handleClearDone() {
-      var list = this.state.mine.map(function (i) {
+      var list = this.state.mine.slice(0).map(function (i) {
         i.checked = false;
         i.active = false;
         return i;
@@ -84773,28 +84839,22 @@ function (_React$Component) {
       });
     }
   }, {
-    key: "resetList",
-    value: function resetList() {
-      return App.aggregates(App.flatten(_settings.DEFAULTLIST));
-    }
-  }, {
     key: "handleReset",
     value: function handleReset() {
       this.setState({
-        mine: this.resetList()
+        mine: App.resetList()
       });
     }
   }, {
     key: "handleSetActive",
     value: function handleSetActive(id) {
-      this.setState(function (state) {
-        return {
-          mine: state.mine.map(function (i) {
-            i.active = i.id == id;
-            return i;
-          })
-        };
+      this.setState({
+        mine: this.state.mine.slice(0).map(function (i) {
+          i.active = i.id == id;
+          return i;
+        })
       });
+      this.doneRef.current.focus();
     }
   }, {
     key: "save",
@@ -84806,12 +84866,13 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      this.save();
+      var doneRef = this.doneRef;
       return _react.default.createElement("div", {
         className: "app"
       }, _react.default.createElement("h1", null, "everyday"), _react.default.createElement("div", {
         className: "container"
       }, _react.default.createElement(_Next.default, {
+        doneRef: doneRef,
         list: this.state.mine,
         updateList: this.updateList
       }), _react.default.createElement(_Mine.default, {
@@ -84822,29 +84883,6 @@ function (_React$Component) {
       }), _react.default.createElement(_Theirs.default, {
         list: _settings.TASKS
       })));
-    }
-  }], [{
-    key: "flatten",
-    value: function flatten(list) {
-      return list.map(function (i) {
-        i.task = _settings.TASKS[i.taskId - 1];
-        return i;
-      });
-    }
-  }, {
-    key: "aggregates",
-    value: function aggregates(list) {
-      var counts = {};
-      return list.map(function (i) {
-        if (counts[i.taskId]) {
-          counts[i.taskId] += 1;
-          i.multiple = counts[i.taskId];
-        } else {
-          counts[i.taskId] = 1;
-        }
-
-        return i;
-      });
     }
   }]);
 
@@ -84968,7 +85006,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51272" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59662" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
