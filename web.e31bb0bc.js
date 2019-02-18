@@ -83977,7 +83977,26 @@ var _default = function _default(props) {
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js"}],"components/TaskList.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js"}],"utilities/throttle.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _default;
+
+function _default(fn, duration) {
+  var timer = false;
+  return function () {
+    if (timer) return;
+    fn.apply(void 0, arguments);
+    timer = true;
+    setTimeout(function () {
+      return timer = false;
+    }, duration);
+  };
+}
+},{}],"components/TaskList.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -83985,29 +84004,124 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _react = _interopRequireDefault(require("react"));
+var _react = _interopRequireWildcard(require("react"));
 
 var _Task = _interopRequireDefault(require("~/components/Task"));
 
 var _getKey = _interopRequireDefault(require("~/utilities/getKey"));
 
+var _throttle = _interopRequireDefault(require("~/utilities/throttle"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 var _default = function _default(props) {
-  return _react.default.createElement("ul", {
-    className: "list taskList"
-  }, props.list.map(function (item) {
-    return _react.default.createElement("li", {
-      key: (0, _getKey.default)(item)
-    }, _react.default.createElement(_Task.default, {
+  var _useState = (0, _react.useState)({
+    list: props.list,
+    dragged: undefined
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      state = _useState2[0],
+      setState = _useState2[1];
+
+  var editTask = function editTask(item) {
+    return _react.default.createElement(_Task.default, {
+      handleAction: function handleAction() {},
+      item: item
+    });
+  };
+
+  var normalTask = function normalTask(item) {
+    return _react.default.createElement(_Task.default, {
       handleAction: props.handleAction,
       item: item
+    });
+  };
+
+  var getTask = function getTask(item) {
+    return props.editMode ? editTask(item) : normalTask(item);
+  };
+
+  var _onDragStart = function onDragStart(e, i) {
+    var dragged = state.list[i];
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.parentNode);
+    e.dataTransfer.setDragImage(e.target.parentNode, 20, 20);
+    setState({
+      list: state.list,
+      dragged: dragged
+    });
+  };
+
+  var _onDragEnd = function onDragEnd() {
+    setState({
+      list: state.list,
+      dragged: undefined
+    });
+    setTimeout(function () {
+      props.onUpdate(state.list);
+    }, 1);
+  };
+
+  var _onDragOver = function onDragOver(i) {
+    if (state.dragged === state.list[i]) return;
+    var newlist = state.list.filter(function (i) {
+      return i.id != state.dragged.id;
+    });
+    newlist.splice(i, 0, state.dragged);
+    setState({
+      dragged: state.dragged,
+      list: newlist
+    });
+  };
+
+  var returnEdit = function returnEdit() {
+    return _react.default.createElement("ul", {
+      className: 'list taskList edit'
+    }, state.list.map(function (item, i) {
+      return _react.default.createElement("li", {
+        onDragOver: function onDragOver() {
+          (0, _throttle.default)(_onDragOver, 50)(i);
+        },
+        key: "lik_".concat(i)
+      }, _react.default.createElement("div", {
+        className: "drag",
+        draggable: true,
+        onDragStart: function onDragStart(e) {
+          _onDragStart(e, i);
+        },
+        onDragEnd: function onDragEnd(e) {
+          _onDragEnd();
+        }
+      }, editTask(item)));
     }));
-  }));
+  };
+
+  var returnNormal = function returnNormal() {
+    return _react.default.createElement("ul", {
+      className: 'list taskList'
+    }, state.list.map(function (item, i) {
+      return _react.default.createElement("li", {
+        className: props.editMode ? 'drag' : '',
+        key: "lik_".concat(i)
+      }, normalTask(item));
+    }));
+  };
+
+  return props.editMode ? returnEdit() : returnNormal();
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Task":"components/Task.js","~/utilities/getKey":"utilities/getKey.js"}],"components/Link.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Task":"components/Task.js","~/utilities/getKey":"utilities/getKey.js","~/utilities/throttle":"utilities/throttle.js"}],"components/Link.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -84044,7 +84158,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _react = _interopRequireDefault(require("react"));
+var _react = _interopRequireWildcard(require("react"));
 
 var _TaskList = _interopRequireDefault(require("~/components/TaskList"));
 
@@ -84052,10 +84166,67 @@ var _Link = _interopRequireDefault(require("~/components/Link"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 var _default = function _default(props) {
+  var _useState = (0, _react.useState)({
+    list: props.list,
+    edit: false
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      _useState2$ = _useState2[0],
+      list = _useState2$.list,
+      edit = _useState2$.edit,
+      setEditState = _useState2[1];
+
+  var toggleEdit = function toggleEdit() {
+    ;
+    edit ? endEdit() : startEdit();
+  };
+
+  var onUpdate = function onUpdate(newlist) {
+    setEditState({
+      list: newlist,
+      edit: edit
+    });
+  };
+
+  var startEdit = function startEdit() {
+    setEditState({
+      list: list,
+      edit: true
+    });
+  };
+
+  var endEdit = function endEdit() {
+    setEditState({
+      list: list,
+      edit: false
+    });
+    setTimeout(function () {
+      props.updateList(list);
+    }, 100);
+  };
+
   return _react.default.createElement("div", {
     className: "mine"
-  }, _react.default.createElement("h2", null, "mine"), _react.default.createElement(_TaskList.default, props), _react.default.createElement(_Link.default, {
+  }, _react.default.createElement("h2", null, "mine"), _react.default.createElement(_TaskList.default, _extends({}, props, {
+    editMode: edit,
+    onUpdate: onUpdate
+  })), _react.default.createElement(_Link.default, {
+    text: edit ? 'done' : 'edit',
+    action: toggleEdit
+  }), _react.default.createElement(_Link.default, {
     text: "reset",
     action: props.handleClearDone
   }));
@@ -84256,7 +84427,6 @@ function () {
   }, {
     key: "active",
     get: function get() {
-      console.log('get active', !!this.timerId, this.timerId);
       return !!this.timerId;
     }
   }]);
@@ -84369,13 +84539,6 @@ function (_React$Component) {
     _this.state = {
       'time': _settings.TIMERINITIAL
     };
-
-    if (Next.nothingActive(props.list) && Next.hasTasks(props.list)) {
-      _this.state.list = Next.bumpActiveIndex(props.list);
-    } else {
-      _this.state.list = props.list;
-    }
-
     _this.timer = new _Timer.default(function (time) {
       return _this.setState({
         time: time
@@ -84391,16 +84554,17 @@ function (_React$Component) {
   _createClass(Next, [{
     key: "handleUndo",
     value: function handleUndo() {
-      this.state.list.filter(function (i) {
+      var list = this.props.list.slice(0);
+      list.filter(function (i) {
         return i.active;
       })[0].checked = false;
-      this.props.updateList(this.state.list);
+      this.props.updateList(list);
     }
   }, {
     key: "handleDone",
     value: function handleDone() {
-      var activeIndex = Next.activeIndex(this.state.list);
-      var list = this.state.list;
+      var list = this.props.list.slice(0);
+      var activeIndex = Next.activeIndex(list);
       list[activeIndex].checked = true;
       list[activeIndex].active = false;
       this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1));
@@ -84409,17 +84573,18 @@ function (_React$Component) {
     key: "handleNotNow",
     value: function handleNotNow(e) {
       e.preventDefault();
-      var activeIndex = Next.activeIndex(this.state.list);
-      var list = this.state.list;
+      var list = this.props.list.slice(0);
+      var activeIndex = Next.activeIndex(list);
       list[activeIndex].active = false;
       this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1));
     }
   }, {
     key: "getTotals",
     value: function getTotals() {
+      var list = this.props.list;
       return {
-        total: this.state.list.length,
-        done: this.state.list.filter(function (i) {
+        total: list.length,
+        done: list.filter(function (i) {
           return i.checked;
         }).length
       };
@@ -84435,7 +84600,7 @@ function (_React$Component) {
     value: function render() {
       return _react.default.createElement("div", {
         className: "next"
-      }, Next.hasTasksAndActive(this.state.list) ? _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "next"), _react.default.createElement("p", null, _react.default.createElement("strong", null, this.activeTask.task.text)), this.activeTask.checked ? _react.default.createElement(_Button.default, {
+      }, Next.hasTasksAndActive(this.props.list) ? _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "next"), _react.default.createElement("p", null, _react.default.createElement("strong", null, this.activeTask.task.text)), this.activeTask.checked ? _react.default.createElement(_Button.default, {
         action: this.handleUndo,
         text: "undo"
       }) : _react.default.createElement(_Button.default, {
@@ -84454,7 +84619,7 @@ function (_React$Component) {
   }, {
     key: "activeTask",
     get: function get() {
-      return this.state.list[Next.activeIndex(this.state.list)];
+      return this.props.list[Next.activeIndex(this.props.list)];
     }
   }]);
 
@@ -84576,7 +84741,8 @@ function (_React$Component) {
       };
     }
 
-    _this.state = state; // handlers
+    _this.state = state;
+    window.ttt = _assertThisInitialized(_assertThisInitialized(_this)); // handlers
 
     _this.handleReset = _this.handleReset.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.handleClearDone = _this.handleClearDone.bind(_assertThisInitialized(_assertThisInitialized(_this)));
@@ -84587,36 +84753,6 @@ function (_React$Component) {
   }
 
   _createClass(App, [{
-    key: "getTask",
-    value: function getTask(taskId) {
-      return _settings.TASKS[taskId - 1];
-    }
-  }, {
-    key: "flatten",
-    value: function flatten(list) {
-      var _this2 = this;
-
-      return list.map(function (i) {
-        i.task = _this2.getTask(i.taskId);
-        return i;
-      });
-    }
-  }, {
-    key: "aggregates",
-    value: function aggregates(list) {
-      var counts = {};
-      return list.map(function (i) {
-        if (counts[i.taskId]) {
-          counts[i.taskId] += 1;
-          i.multiple = counts[i.taskId];
-        } else {
-          counts[i.taskId] = 1;
-        }
-
-        return i;
-      });
-    }
-  }, {
     key: "handleClearDone",
     value: function handleClearDone() {
       var list = this.state.mine.map(function (i) {
@@ -84637,10 +84773,15 @@ function (_React$Component) {
       });
     }
   }, {
+    key: "resetList",
+    value: function resetList() {
+      return App.aggregates(App.flatten(_settings.DEFAULTLIST));
+    }
+  }, {
     key: "handleReset",
     value: function handleReset() {
       this.setState({
-        mine: this.aggregates(this.flatten(_settings.DEFAULTLIST))
+        mine: this.resetList()
       });
     }
   }, {
@@ -84656,12 +84797,16 @@ function (_React$Component) {
       });
     }
   }, {
-    key: "render",
-    value: function render() {
+    key: "save",
+    value: function save() {
       _storage.default.save({
         mine: this.state.mine
       });
-
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      this.save();
       return _react.default.createElement("div", {
         className: "app"
       }, _react.default.createElement("h1", null, "everyday"), _react.default.createElement("div", {
@@ -84671,11 +84816,35 @@ function (_React$Component) {
         updateList: this.updateList
       }), _react.default.createElement(_Mine.default, {
         list: this.state.mine,
+        updateList: this.updateList,
         handleAction: this.handleSetActive,
         handleClearDone: this.handleClearDone
       }), _react.default.createElement(_Theirs.default, {
         list: _settings.TASKS
       })));
+    }
+  }], [{
+    key: "flatten",
+    value: function flatten(list) {
+      return list.map(function (i) {
+        i.task = _settings.TASKS[i.taskId - 1];
+        return i;
+      });
+    }
+  }, {
+    key: "aggregates",
+    value: function aggregates(list) {
+      var counts = {};
+      return list.map(function (i) {
+        if (counts[i.taskId]) {
+          counts[i.taskId] += 1;
+          i.multiple = counts[i.taskId];
+        } else {
+          counts[i.taskId] = 1;
+        }
+
+        return i;
+      });
     }
   }]);
 
@@ -84799,7 +84968,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56915" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51272" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

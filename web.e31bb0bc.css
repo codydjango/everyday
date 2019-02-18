@@ -40,7 +40,7 @@
     order: 2;
   }
 }
-.noselect, body {
+.noselect {
   -webkit-touch-callout: none;
   /* iOS Safari */
   -webkit-user-select: none;
@@ -98,6 +98,13 @@ sub {
   list-style: none;
   padding: 0 0 1em 0;
   margin: 0;
+}
+
+.taskList.edit {
+  background-color: orange;
+}
+.taskList .drag {
+  cursor: move;
 }
 
 .duration {
