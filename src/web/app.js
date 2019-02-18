@@ -25,7 +25,9 @@ class App extends React.Component {
             state = storage.load()
         } catch (err) {
             console.log('err', err)
-            state = { mine: App.resetList() }
+            let list = App.resetList()
+            list[0].active = true
+            state = { mine: list }
         }
 
         this.state = state

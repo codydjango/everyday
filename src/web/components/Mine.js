@@ -13,12 +13,19 @@ export default props => {
         props.updateList(list)
     }
 
+    const getEditInstruction = () => {
+        return (<ul className="instruction"><li>drag to reorder</li><li>click to delete</li></ul>)
+    }
+
     return (<div className="mine">
         <h2>my routine</h2>
         <TaskList { ...props } editMode={ edit } onUpdate={ onUpdate } />
         <footer>
-            <Link text={ (edit) ? 'done' : 'edit' } action={ toggleEdit } />
-            <Link text="reset" action={ props.handleClearDone } />
+            <div>
+                <Link text={ (edit) ? 'done' : 'edit' } action={ toggleEdit } />
+                <Link text="reset" action={ props.handleClearDone } />
+            </div>
+            { (edit) ? getEditInstruction() : '' }
         </footer>
     </div>)
 }
