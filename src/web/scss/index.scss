@@ -15,7 +15,7 @@ body {
     font-family: 'Cutive Mono', sans-serif;
     font-size: 14;
     background-color: yellow;
-    // @extend .noselect;
+    @extend .noselect;
 }
 
 h1 {
@@ -44,10 +44,9 @@ sub {
     top: 2px;
 }
 
-.clearfix::after {
-  content: "";
-  clear: both;
-  display: table;
+.link {
+    display: inline-block;
+    padding: 2px;
 }
 
 .list {
@@ -63,14 +62,18 @@ sub {
         background-color: orange;
     }
 
+    .task {
+        border: 1px solid transparent;
+        display: block;
+    }
+
+    .dragged .task {
+        border: 1px dashed black;
+    }
+
     .drag {
-        // margin-right: 15px;
         cursor: move;
     }
-}
-
-.task {
-    @extend .clearfix;
 }
 
 .duration {

@@ -13,12 +13,12 @@ class App extends React.Component {
         try {
             state = storage.load()
         } catch (err) {
-            state = { mine: this.aggregates(this.flatten(DEFAULTLIST))}
+            console.log('err', err)
+            state = { mine: App.resetList() }
         }
 
         this.state = state
-
-        window.ttt = this
+        this.doneRef = React.createRef()
 
         // handlers
         this.handleReset = this.handleReset.bind(this)
@@ -27,6 +27,10 @@ class App extends React.Component {
 
         // callback
         this.updateList = this.updateList.bind(this)
+    }
+
+    static resetList() {
+        return App.aggregates(App.flatten(DEFAULTLIST))
     }
 
     static flatten(list) {
@@ -66,21 +70,19 @@ class App extends React.Component {
         this.setState({ mine: list })
     }
 
-    resetList() {
-        return App.aggregates(App.flatten(DEFAULTLIST))
-    }
-
     handleReset() {
-        this.setState({ mine: this.resetList() })
+        this.setState({ mine: App.resetList() })
     }
 
     handleSetActive(id) {
-        this.setState((state) => {
+        this.setState(state => {
             return { mine: state.mine.map(i => {
                 i.active = (i.id == id)
                 return i
             })}
         })
+
+        this.doneRef.current.focus()
     }
 
     save() {
@@ -90,17 +92,23 @@ class App extends React.Component {
     render() {
         this.save()
 
+        const doneRef = this.doneRef
+
         return (
             <div className="app">
                 <h1>everyday</h1>
                 <div className="container">
-                    <Next list={ this.state.mine }
-                          updateList={ this.updateList }/>
-                    <Mine list={ this.state.mine }
-                          updateList={ this.updateList }
-                          handleAction={ this.handleSetActive }
-                          handleClearDone={ this.handleClearDone }/>
-                    <Theirs list={ TASKS } />
+                    <Next
+                        doneRef={ doneRef }
+                        list={ this.state.mine }
+                        updateList={ this.updateList }/>
+                    <Mine
+                        list={ this.state.mine }
+                        updateList={ this.updateList }
+                        handleAction={ this.handleSetActive }
+                        handleClearDone={ this.handleClearDone }/>
+                    <Theirs
+                        list={ TASKS } />
                 </div>
             </div>
         )

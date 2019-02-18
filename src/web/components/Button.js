@@ -1,3 +1,8 @@
 import React from 'react'
 
-export default ({ action, ...props }) => <button onClick={ action } {...props}>{ props.text }</button>
+export default React.forwardRef(( props, ref) => {
+    return (<button
+        ref={ ref }
+        id={ props.id }
+        onClick={ props.action }>{ props.text }</button>)
+})

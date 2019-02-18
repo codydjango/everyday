@@ -17,7 +17,9 @@ export default props => {
     return (<div className="mine">
         <h2>mine</h2>
         <TaskList { ...props } editMode={ edit } onUpdate={ onUpdate } />
-        <Link text={ (edit) ? 'done' : 'edit' } action={ toggleEdit } />
-        <Link text="reset" action={ props.handleClearDone } />
+        <footer>
+            <Link text={ (edit) ? 'done' : 'edit' } action={ toggleEdit } />
+            <Link text="reset" action={ props.handleClearDone } />
+        </footer>
     </div>)
 }

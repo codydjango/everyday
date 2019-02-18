@@ -10,13 +10,14 @@ export default props => {
     })
 
     const editTask = item => <Task handleAction={ () => {}} item={ item } />
-    const normalTask = item => <Task handleAction={ props.handleAction } item={ item } />
+    const normalTask = item => <Task tabIndex="0" handleAction={ props.handleAction } item={ item } />
     const getTask = item => (props.editMode) ? editTask(item) : normalTask(item)
 
     const onDragStart = (e, i) => {
         let dragged = state.list[i]
 
         e.dataTransfer.effectAllowed = 'move'
+        e.target.parentNode.classList.add('dragged')
         e.dataTransfer.setData('text/html', e.target.parentNode)
         e.dataTransfer.setDragImage(e.target.parentNode, 20, 20)
 
@@ -26,7 +27,9 @@ export default props => {
         })
     }
 
-    const onDragEnd = () => {
+    const onDragEnd = (e) => {
+        e.target.parentNode.classList.remove('dragged')
+
         setState({
             list: state.list,
             dragged: undefined
@@ -52,12 +55,11 @@ export default props => {
             { state.list.map((item, i) => {
                 return (<li
                     onDragOver={ () => { throttle(onDragOver, 50)(i) } }
-                    key={ `lik_${i}` }
-                    >
+                    key={ getKey(item) }>
                     <div className="drag"
                         draggable
                         onDragStart={ (e) => { onDragStart(e, i) }}
-                        onDragEnd={ (e) => { onDragEnd() }}>
+                        onDragEnd={ (e) => { onDragEnd(e) }}>
                         { editTask(item) }
                     </div>
                 </li>)
@@ -68,8 +70,9 @@ export default props => {
         <ul className={'list taskList'}>
             { state.list.map((item, i) => (<li
                 className={ (props.editMode) ? 'drag': '' }
-                key={ `lik_${i}` }
-            >{ normalTask(item) }</li>))}
+                key={ getKey(item) }>
+                { normalTask(item) }
+            </li>))}
         </ul>)
 
     return ((props.editMode) ? returnEdit() : returnNormal())

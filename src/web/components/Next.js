@@ -54,7 +54,6 @@ class Next extends React.Component {
         this.handleUndo = this.handleUndo.bind(this)
         this.handleNotNow = this.handleNotNow.bind(this)
         this.handleToggleTimer = this.handleToggleTimer.bind(this)
-
     }
 
     get activeTask() {
@@ -88,18 +87,18 @@ class Next extends React.Component {
         this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1))
     }
 
+    handleToggleTimer(e) {
+        e.preventDefault()
+
+        ;(this.timer.active) ? this.timer.stop() : this.timer.start(this.activeTask.duration || null)
+    }
+
     getTotals() {
         let list = this.props.list
         return {
             total: list.length,
             done: list.filter(i => i.checked).length
         }
-    }
-
-    handleToggleTimer(e) {
-        e.preventDefault()
-
-        ;(this.timer.active) ? this.timer.stop() : this.timer.start(this.activeTask.duration || null)
     }
 
     render() {
@@ -109,8 +108,8 @@ class Next extends React.Component {
                     <h2>next</h2>
                     <p><strong>{ this.activeTask.task.text }</strong></p>
                     { (this.activeTask.checked)
-                        ? (<Button action={ this.handleUndo } text="undo" />)
-                        : (<Button action={ this.handleDone } text="done" />)}
+                        ? (<Button id="undo" ref={ this.props.doneRef } action={ this.handleUndo } text="undo" />)
+                        : (<Button id="done" ref={ this.props.doneRef } action={ this.handleDone } text="done" />)}
 
                     <Button action={ this.handleNotNow } text="not now" />
                     <Button action={ this.handleToggleTimer } text={ this.state.time } />

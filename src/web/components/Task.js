@@ -1,21 +1,26 @@
 import React from 'react'
 
-export default props => (
-    <div className="task" onClick={ (e) => { e.preventDefault(); props.handleAction(props.item.id) }}>
+export default ({ handleAction, item, ...props }) => (
+    <div className="task"
+        role="button"
+        aria-pressed={ item.active ? 'true' : 'false' }
+        onClick={ (e) => { e.preventDefault(); handleAction(item.id) }}
+        onKeyPress={ ({ key }) => { if (key === 'Enter') handleAction(item.id) }}
+        { ...props } >
         <span className="ascii-box" style={{ marginRight: '0px' }}>
             <input  type="checkbox"
-                    id={ `taskId_${ props.item.id }` }
-                    data-id={ props.item.id }
+                    id={ `taskId_${ item.id }` }
+                    data-id={ item.id }
                     readOnly
-                    type="checkbox" checked={ props.item.checked }/>
-            <div className="visible">
+                    type="checkbox" checked={ item.checked }/>
+            <span className="visible">
                 <label
-                    htmlFor={ `taskId_${ props.item.id }`}
+                    htmlFor={ `taskId_${ item.id }`}
                     onClick={ (e) => { e.preventDefault() } }>
-                    <span className={ (props.item.active) ? 'taskText active' : 'taskText' } style={{ marginRight: '2px' }}>{ props.item.task.text }</span>
-                    { (props.item.duration) ? (<sub className="duration">{ props.item.duration }</sub>) : '' }
-                    { (props.item.multiple) ? (<sup className="multiple">{ props.item.multiple }x</sup>) : '' }
+                    <span className={ (item.active) ? 'taskText active' : 'taskText' } style={{ marginRight: '2px' }}>{ item.task.text }</span>
+                    { (item.duration) ? (<sub className="duration">{ item.duration }</sub>) : '' }
+                    { (item.multiple) ? (<sup className="multiple">{ item.multiple }x</sup>) : '' }
                 </label>
-            </div>
+            </span>
         </span>
     </div>)
