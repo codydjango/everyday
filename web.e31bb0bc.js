@@ -83735,7 +83735,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.EARLY = exports.DEFAULTLIST = exports.TASKS = exports.TIMERINITIAL = exports.NAMESPACE = exports.DEBUG = void 0;
 var DEBUG = true;
 exports.DEBUG = DEBUG;
-var NAMESPACE = 'erryday';
+var NAMESPACE = 'everyday';
 exports.NAMESPACE = NAMESPACE;
 var TIMERINITIAL = 'start timer';
 exports.TIMERINITIAL = TIMERINITIAL;
@@ -84154,7 +84154,119 @@ function totalsHaveChangedDecorator(fn) {
     return previousMsg;
   };
 }
-},{"react":"../../node_modules/react/index.js","~/components/Task":"components/Task.js"}],"components/Next.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Task":"components/Task.js"}],"utilities/Timer.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var SECOND = 1000;
+
+var Timer =
+/*#__PURE__*/
+function () {
+  function Timer(callback, initial) {
+    _classCallCheck(this, Timer);
+
+    this.callback = callback;
+    this.initial = initial;
+  }
+
+  _createClass(Timer, [{
+    key: "getCountdownDate",
+    value: function getCountdownDate(duration) {
+      var milliseconds, seconds, minutes;
+      milliseconds = 1000;
+      seconds = 60;
+      minutes = 60;
+      minutes = parseInt(duration) * minutes;
+      return new Date(Date.now() + milliseconds * seconds * minutes);
+    }
+  }, {
+    key: "updateCountdownTime",
+    value: function updateCountdownTime(now) {
+      var distance, hours, minutes, seconds;
+      distance = this.date - now;
+      hours = Math.floor(distance % (1000 * 60 * 60 * 24) / (1000 * 60 * 60));
+      minutes = Math.floor(distance % (1000 * 60 * 60) / (1000 * 60));
+      seconds = Math.floor(distance % (1000 * 60) / 1000);
+      if (distance <= 0) return this.stop('time\'s up!');
+      return this.formatTime(hours, minutes, seconds);
+    }
+  }, {
+    key: "updateCountupTime",
+    value: function updateCountupTime(now) {
+      var distance, hours, minutes, seconds;
+      distance = now - this.date;
+      hours = Math.floor(distance % (1000 * 60 * 60 * 24) / (1000 * 60 * 60));
+      minutes = Math.floor(distance % (1000 * 60 * 60) / (1000 * 60));
+      seconds = Math.floor(distance % (1000 * 60) / 1000);
+      if (distance >= 1000 * 60 * 60) return this.stop('time\'s up!');
+      return this.formatTime(hours, minutes, seconds);
+    }
+  }, {
+    key: "formatTime",
+    value: function formatTime(hours, minutes, seconds) {
+      var pad = function pad(num, size) {
+        return ('000000000' + num).substr(-size);
+      };
+
+      return "".concat(pad(hours, 2), ":").concat(pad(minutes, 2), ":").concat(pad(seconds, 2));
+    }
+  }, {
+    key: "start",
+    value: function start() {
+      var _this = this;
+
+      var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      if (duration) {
+        this.date = this.getCountdownDate(duration);
+        this.timerId = setInterval(function () {
+          _this.callback(_this.updateCountdownTime(new Date().getTime()));
+        }, SECOND);
+        this.callback(this.updateCountdownTime(new Date().getTime()));
+      } else {
+        this.date = Date.now();
+        this.timerId = setInterval(function () {
+          _this.callback(_this.updateCountupTime(new Date().getTime()));
+        }, SECOND);
+        this.callback(this.updateCountupTime(new Date().getTime()));
+      }
+    }
+  }, {
+    key: "stop",
+    value: function stop(msg) {
+      clearInterval(this.timerId);
+      delete this.date;
+      delete this.timerId;
+      this.callback(this.initial);
+      if (msg) setTimeout(function () {
+        alert(msg);
+      }, 1);
+    }
+  }, {
+    key: "active",
+    get: function get() {
+      console.log('get active', !!this.timerId, this.timerId);
+      return !!this.timerId;
+    }
+  }]);
+
+  return Timer;
+}();
+
+var _default = Timer;
+exports.default = _default;
+},{}],"components/Next.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -84167,6 +84279,8 @@ var _react = _interopRequireDefault(require("react"));
 var _Button = _interopRequireDefault(require("~/components/Button"));
 
 var _Totals = _interopRequireDefault(require("~/components/Totals"));
+
+var _Timer = _interopRequireDefault(require("~/utilities/Timer"));
 
 var _settings = require("~/settings");
 
@@ -84215,8 +84329,8 @@ function (_React$Component) {
       return Next.hasTasks(list) && Next.nothingActive(list) === false;
     }
   }, {
-    key: "bumpActive",
-    value: function bumpActive(list) {
+    key: "bumpActiveIndex",
+    value: function bumpActiveIndex(list) {
       var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
       var nextIndex, task; // loop through the list starting at the active index until there are
       // no tasks left to be completed
@@ -84236,6 +84350,14 @@ function (_React$Component) {
 
       return list;
     }
+  }, {
+    key: "activeIndex",
+    value: function activeIndex(list) {
+      var index = list.indexOf(list.filter(function (i) {
+        return i.active;
+      })[0]);
+      return index !== -1 ? index : null;
+    }
   }]);
 
   function Next(props) {
@@ -84249,17 +84371,20 @@ function (_React$Component) {
     };
 
     if (Next.nothingActive(props.list) && Next.hasTasks(props.list)) {
-      _this.state.list = Next.bumpActive(props.list);
+      _this.state.list = Next.bumpActiveIndex(props.list);
     } else {
       _this.state.list = props.list;
     }
 
+    _this.timer = new _Timer.default(function (time) {
+      return _this.setState({
+        time: time
+      });
+    }, _settings.TIMERINITIAL);
     _this.handleDone = _this.handleDone.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.handleUndo = _this.handleUndo.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.handleNotNow = _this.handleNotNow.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.handleToggleTimer = _this.handleToggleTimer.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.updateCountdownTime = _this.updateCountdownTime.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.updateTimerTime = _this.updateTimerTime.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
 
@@ -84269,30 +84394,25 @@ function (_React$Component) {
       this.state.list.filter(function (i) {
         return i.active;
       })[0].checked = false;
-      window.setState({
-        mine: this.state.list
-      });
+      this.props.updateList(this.state.list);
     }
   }, {
     key: "handleDone",
     value: function handleDone() {
-      var activeIndex = this.getActiveIndex();
+      var activeIndex = Next.activeIndex(this.state.list);
       var list = this.state.list;
       list[activeIndex].checked = true;
       list[activeIndex].active = false;
-      window.setState({
-        mine: Next.bumpActive(list, activeIndex + 1)
-      });
+      this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1));
     }
   }, {
     key: "handleNotNow",
-    value: function handleNotNow() {
-      var activeIndex = this.getActiveIndex();
+    value: function handleNotNow(e) {
+      e.preventDefault();
+      var activeIndex = Next.activeIndex(this.state.list);
       var list = this.state.list;
       list[activeIndex].active = false;
-      window.setState({
-        mine: Next.bumpActive(list, activeIndex + 1)
-      });
+      this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1));
     }
   }, {
     key: "getTotals",
@@ -84305,110 +84425,17 @@ function (_React$Component) {
       };
     }
   }, {
-    key: "getCountdownDate",
-    value: function getCountdownDate(duration) {
-      var milliseconds, seconds, minutes;
-      milliseconds = 1000;
-      seconds = 60;
-      minutes = 60;
-      minutes = parseInt(duration) * minutes;
-      return new Date(Date.now() + milliseconds * seconds * minutes);
-    }
-  }, {
-    key: "updateCountdownTime",
-    value: function updateCountdownTime(now) {
-      var distance, hours, minutes, seconds;
-      distance = this.futureDate - now;
-      hours = Math.floor(distance % (1000 * 60 * 60 * 24) / (1000 * 60 * 60));
-      minutes = Math.floor(distance % (1000 * 60 * 60) / (1000 * 60));
-      seconds = Math.floor(distance % (1000 * 60) / 1000);
-      if (distance <= 0) return this.stopTimer('time\'s up!');
-      return this.formatTime(hours, minutes, seconds);
-    }
-  }, {
-    key: "updateTimerTime",
-    value: function updateTimerTime(now) {
-      var distance, hours, minutes, seconds;
-      distance = now - this.startDate;
-      hours = Math.floor(distance % (1000 * 60 * 60 * 24) / (1000 * 60 * 60));
-      minutes = Math.floor(distance % (1000 * 60 * 60) / (1000 * 60));
-      seconds = Math.floor(distance % (1000 * 60) / 1000);
-      if (distance >= 1000 * 60 * 60) return this.stopTimer('time\'s up!');
-      return this.formatTime(hours, minutes, seconds);
-    }
-  }, {
-    key: "formatTime",
-    value: function formatTime(hours, minutes, seconds) {
-      var pad = function pad(num, size) {
-        return ('000000000' + num).substr(-size);
-      };
-
-      return "".concat(pad(hours, 2), ":").concat(pad(minutes, 2), ":").concat(pad(seconds, 2));
-    }
-  }, {
-    key: "startTimer",
-    value: function startTimer() {
-      var _this2 = this;
-
-      var task = this.getActiveTask();
-
-      if (task.duration) {
-        this.futureDate = this.getCountdownDate(task.duration);
-        this.timer = setInterval(function () {
-          _this2.setState({
-            time: _this2.updateCountdownTime(new Date().getTime())
-          });
-        }, 1000);
-        this.setState({
-          time: this.updateCountdownTime(new Date().getTime())
-        });
-      } else {
-        this.startDate = Date.now();
-        this.timer = setInterval(function () {
-          _this2.setState({
-            time: _this2.updateTimerTime(new Date().getTime())
-          });
-        }, 1000);
-        this.setState({
-          time: this.updateTimerTime(new Date().getTime())
-        });
-      }
-    }
-  }, {
-    key: "stopTimer",
-    value: function stopTimer(msg) {
-      clearInterval(this.timer);
-      this.timer = undefined;
-      this.setState({
-        time: _settings.TIMERINITIAL
-      });
-      if (msg) alert(msg);
-    }
-  }, {
     key: "handleToggleTimer",
-    value: function handleToggleTimer() {
-      ;
-      this.timer ? this.stopTimer() : this.startTimer();
-    }
-  }, {
-    key: "getActiveIndex",
-    value: function getActiveIndex() {
-      var index = this.state.list.indexOf(this.state.list.filter(function (i) {
-        return i.active;
-      })[0]);
-      return index !== -1 ? index : null;
-    }
-  }, {
-    key: "getActiveTask",
-    value: function getActiveTask() {
-      return this.state.list[this.getActiveIndex()];
+    value: function handleToggleTimer(e) {
+      e.preventDefault();
+      this.timer.active ? this.timer.stop() : this.timer.start(this.activeTask.duration || null);
     }
   }, {
     key: "render",
     value: function render() {
       return _react.default.createElement("div", {
         className: "next"
-      }, Next.hasTasksAndActive(this.state.list) ? _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "next"), _react.default.createElement("p", null, _react.default.createElement("strong", null, this.getActiveTask().task.text)), this.getActiveTask().checked ? _react.default.createElement(_Button.default, {
+      }, Next.hasTasksAndActive(this.state.list) ? _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "next"), _react.default.createElement("p", null, _react.default.createElement("strong", null, this.activeTask.task.text)), this.activeTask.checked ? _react.default.createElement(_Button.default, {
         action: this.handleUndo,
         text: "undo"
       }) : _react.default.createElement(_Button.default, {
@@ -84424,6 +84451,11 @@ function (_React$Component) {
         totals: this.getTotals()
       })) : _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "you are so good. your brain is so strong."), _react.default.createElement("p", null, _react.default.createElement("small", null, "Go drink some water."))));
     }
+  }, {
+    key: "activeTask",
+    get: function get() {
+      return this.state.list[Next.activeIndex(this.state.list)];
+    }
   }]);
 
   return Next;
@@ -84431,7 +84463,7 @@ function (_React$Component) {
 
 var _default = Next;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Button":"components/Button.js","~/components/Totals":"components/Totals.js","~/settings":"settings.js"}],"storage.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Button":"components/Button.js","~/components/Totals":"components/Totals.js","~/utilities/Timer":"utilities/Timer.js","~/settings":"settings.js"}],"storage.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -84523,12 +84555,6 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-window.setState = function (state) {
-  setTimeout(function () {
-    window.everyday.setState(state);
-  }, 1);
-};
-
 var App =
 /*#__PURE__*/
 function (_React$Component) {
@@ -84550,11 +84576,13 @@ function (_React$Component) {
       };
     }
 
-    window.everyday = _assertThisInitialized(_assertThisInitialized(_this));
-    _this.state = state;
+    _this.state = state; // handlers
+
     _this.handleReset = _this.handleReset.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.handleClearDone = _this.handleClearDone.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.handleSetActive = _this.handleSetActive.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.handleSetActive = _this.handleSetActive.bind(_assertThisInitialized(_assertThisInitialized(_this))); // callback
+
+    _this.updateList = _this.updateList.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
 
@@ -84602,6 +84630,13 @@ function (_React$Component) {
       });
     }
   }, {
+    key: "updateList",
+    value: function updateList(list) {
+      this.setState({
+        mine: list
+      });
+    }
+  }, {
     key: "handleReset",
     value: function handleReset() {
       this.setState({
@@ -84632,7 +84667,8 @@ function (_React$Component) {
       }, _react.default.createElement("h1", null, "everyday"), _react.default.createElement("div", {
         className: "container"
       }, _react.default.createElement(_Next.default, {
-        list: this.state.mine
+        list: this.state.mine,
+        updateList: this.updateList
       }), _react.default.createElement(_Mine.default, {
         list: this.state.mine,
         handleAction: this.handleSetActive,
@@ -84763,7 +84799,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49313" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56915" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
