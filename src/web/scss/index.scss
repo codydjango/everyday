@@ -15,7 +15,7 @@ body {
     font-family: 'Cutive Mono', sans-serif;
     font-size: 14;
     background-color: yellow;
-    @extend .noselect;
+    // @extend .noselect;
 }
 
 h1 {
@@ -58,6 +58,15 @@ sub {
 
 .taskList {
     @extend .list;
+
+    &.edit {
+        background-color: orange;
+    }
+
+    .drag {
+        // margin-right: 15px;
+        cursor: move;
+    }
 }
 
 .task {

@@ -18,6 +18,8 @@ class App extends React.Component {
 
         this.state = state
 
+        window.ttt = this
+
         // handlers
         this.handleReset = this.handleReset.bind(this)
         this.handleClearDone = this.handleClearDone.bind(this)
@@ -27,18 +29,14 @@ class App extends React.Component {
         this.updateList = this.updateList.bind(this)
     }
 
-    getTask(taskId) {
-        return TASKS[taskId - 1]
-    }
-
-    flatten(list) {
+    static flatten(list) {
         return list.map(i => {
-            i.task = this.getTask(i.taskId)
+            i.task = TASKS[i.taskId - 1]
             return i
         })
     }
 
-    aggregates(list) {
+    static aggregates(list) {
         const counts = {}
         return list.map(i => {
             if (counts[i.taskId]) {
@@ -68,8 +66,12 @@ class App extends React.Component {
         this.setState({ mine: list })
     }
 
+    resetList() {
+        return App.aggregates(App.flatten(DEFAULTLIST))
+    }
+
     handleReset() {
-        this.setState({ mine: this.aggregates(this.flatten(DEFAULTLIST)) })
+        this.setState({ mine: this.resetList() })
     }
 
     handleSetActive(id) {
@@ -81,8 +83,12 @@ class App extends React.Component {
         })
     }
 
-    render() {
+    save() {
         storage.save({ mine: this.state.mine })
+    }
+
+    render() {
+        this.save()
 
         return (
             <div className="app">
@@ -91,6 +97,7 @@ class App extends React.Component {
                     <Next list={ this.state.mine }
                           updateList={ this.updateList }/>
                     <Mine list={ this.state.mine }
+                          updateList={ this.updateList }
                           handleAction={ this.handleSetActive }
                           handleClearDone={ this.handleClearDone }/>
                     <Theirs list={ TASKS } />

@@ -1,7 +1,7 @@
 import React from 'react'
 
 export default props => (
-    <div className="task" onClick={ (e) => { e.preventDefault(); props.handleAction(props.item.id) } }>
+    <div className="task" onClick={ (e) => { e.preventDefault(); props.handleAction(props.item.id) }}>
         <span className="ascii-box" style={{ marginRight: '0px' }}>
             <input  type="checkbox"
                     id={ `taskId_${ props.item.id }` }

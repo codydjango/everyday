@@ -48,13 +48,6 @@ class Next extends React.Component {
         super(props)
 
         this.state = { 'time': TIMERINITIAL }
-
-        if (Next.nothingActive(props.list) && Next.hasTasks(props.list)) {
-            this.state.list = Next.bumpActiveIndex(props.list)
-        } else {
-            this.state.list = props.list
-        }
-
         this.timer = new Timer(time => this.setState({ time }), TIMERINITIAL)
 
         this.handleDone = this.handleDone.bind(this)
@@ -65,17 +58,18 @@ class Next extends React.Component {
     }
 
     get activeTask() {
-        return this.state.list[Next.activeIndex(this.state.list)]
+        return this.props.list[Next.activeIndex(this.props.list)]
     }
 
     handleUndo() {
-        this.state.list.filter(i=>i.active)[0].checked = false
-        this.props.updateList(this.state.list)
+        let list = this.props.list.slice(0)
+        list.filter(i=>i.active)[0].checked = false
+        this.props.updateList(list)
     }
 
     handleDone() {
-        const activeIndex = Next.activeIndex(this.state.list)
-        const list = this.state.list
+        const list = this.props.list.slice(0)
+        const activeIndex = Next.activeIndex(list)
 
         list[activeIndex].checked = true
         list[activeIndex].active = false
@@ -86,8 +80,8 @@ class Next extends React.Component {
     handleNotNow(e) {
         e.preventDefault()
 
-        const activeIndex = Next.activeIndex(this.state.list)
-        const list = this.state.list
+        const list = this.props.list.slice(0)
+        const activeIndex = Next.activeIndex(list)
 
         list[activeIndex].active = false
 
@@ -95,9 +89,10 @@ class Next extends React.Component {
     }
 
     getTotals() {
+        let list = this.props.list
         return {
-            total: this.state.list.length,
-            done: this.state.list.filter(i => i.checked).length
+            total: list.length,
+            done: list.filter(i => i.checked).length
         }
     }
 
@@ -109,7 +104,7 @@ class Next extends React.Component {
 
     render() {
         return (<div className="next">
-            { (Next.hasTasksAndActive(this.state.list)) ? (
+            { (Next.hasTasksAndActive(this.props.list)) ? (
                 <React.Fragment>
                     <h2>next</h2>
                     <p><strong>{ this.activeTask.task.text }</strong></p>

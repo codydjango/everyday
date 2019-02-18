@@ -7,7 +7,6 @@ class Timer {
     }
 
     get active() {
-        console.log('get active', !!this.timerId, this.timerId)
         return !!this.timerId
     }
 
