@@ -29,7 +29,7 @@
     order: 1;
   }
   .container .mine {
-    width: 200px;
+    width: 300px;
     order: 0;
   }
   .container .theirs {
@@ -58,7 +58,11 @@
 
 body {
   font-family: "Cutive Mono", sans-serif;
-  font-size: 14;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  font-weight: 400;
+  font-size: 16px;
   background-color: yellow;
 }
 
@@ -99,6 +103,11 @@ sub {
   margin: 0;
 }
 
+.instruction {
+  padding: 0px;
+  margin: 15px 0 0 3px;
+  list-style-position: inside;
+}
 .instruction li {
   font-style: italic;
 }
@@ -118,11 +127,11 @@ sub {
 
 .duration {
   margin-right: 2px;
-  color: #ffb632;
+  color: green;
 }
 
 .multiple {
-  color: blue;
+  color: red;
   padding: 0em;
   margin-left: 2px;
 }
