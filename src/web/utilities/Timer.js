@@ -4,7 +4,11 @@ class Timer {
     constructor({ onUpdate, onDone, initial }) {
         this.onUpdate = onUpdate,
         this.onDone = onDone,
-        this.initial = initial
+        this.initial = initial,
+        this.timerCount
+
+        this.TIMER_IN_MINUTES = 60 * 1
+        this.TIMER_IN_SECONDS = 1
     }
 
     get active() {
@@ -30,7 +34,7 @@ class Timer {
         minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
         seconds = Math.floor((distance % (1000 * 60)) / 1000)
 
-        if (distance <= 0) return this.stop(true)
+        if (distance <= 0) return this.done()
         return this.formatTime(hours, minutes, seconds)
     }
 
@@ -42,7 +46,7 @@ class Timer {
         minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
         seconds = Math.floor((distance % (1000 * 60)) / 1000)
 
-        if (distance >= (1000 * 60 * 60)) return this.stop(true)
+        if (distance >= (1000 * this.TIMER_IN_SECONDS)) return this.done()
         return this.formatTime(hours, minutes, seconds)
     }
 
@@ -67,13 +71,19 @@ class Timer {
         }
     }
 
-    stop(done) {
+    stop() {
         clearInterval(this.timerId)
         delete this.date
         delete this.timerId
         this.onUpdate(this.initial)
+    }
 
-        if (done) this.onDone()
+    done() {
+        clearInterval(this.timerId)
+        delete this.date
+        delete this.timerId
+        setTimeout(() => {this.onDone()}, 1)
+        return this.initial
     }
 }
 

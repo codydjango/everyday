@@ -6,11 +6,7 @@ class Audios {
     }
 
     playBeep() {
-        this.synth.triggerAttack('C4', '0.02')
-        this.synth.triggerAttackRelease('C4', 0.1, 0)
-        this.synth.triggerAttackRelease('C5', 0.1, 0.2)
-        this.synth.triggerAttackRelease('E4', 0.1, 0.2)
-        this.synth.triggerAttackRelease('F4', 0.1, 0.3)
+        this.synth.triggerAttackRelease('E4', 0.5)
     }
 }
 

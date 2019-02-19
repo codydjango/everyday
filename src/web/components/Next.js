@@ -49,8 +49,8 @@ class Next extends React.Component {
         super(props)
 
         this.timer = new Timer({
-            onUpdate: time => this.setState({ time }),
-            onDone: () => (audios.playBeep()),
+            onUpdate: time => this.setState(state => ({ time: time })),
+            onDone: () => audios.playBeep(),
             initial: TIMERINITIAL,
         })
 
