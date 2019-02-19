@@ -6,9 +6,7 @@ class Timer {
         this.onDone = onDone,
         this.initial = initial,
         this.timerCount
-
-        this.TIMER_IN_MINUTES = 60 * 1
-        this.TIMER_IN_SECONDS = 1
+        this.TIMER_IN_SECONDS = 60 * 60 // one hour
     }
 
     get active() {
