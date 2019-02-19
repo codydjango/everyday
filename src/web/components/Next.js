@@ -1,9 +1,10 @@
 import React from 'react'
 
+import { TIMERINITIAL } from '~/settings'
 import Button from '~/components/Button'
 import Totals from '~/components/Totals'
 import Timer from '~/utilities/Timer'
-import { TIMERINITIAL } from '~/settings'
+import audios from '~/utilities/audios'
 
 class Next extends React.Component {
     static nothingActive(list) {
@@ -47,9 +48,13 @@ class Next extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { 'time': TIMERINITIAL }
-        this.timer = new Timer(time => this.setState({ time }), TIMERINITIAL)
+        this.timer = new Timer({
+            onUpdate: time => this.setState({ time }),
+            onDone: () => (audios.playBeep()),
+            initial: TIMERINITIAL,
+        })
 
+        this.state = { 'time': TIMERINITIAL }
         this.handleDone = this.handleDone.bind(this)
         this.handleUndo = this.handleUndo.bind(this)
         this.handleNotNow = this.handleNotNow.bind(this)

@@ -1,8 +1,9 @@
 const SECOND = 1000
 
 class Timer {
-    constructor(callback, initial) {
-        this.callback = callback
+    constructor({ onUpdate, onDone, initial }) {
+        this.onUpdate = onUpdate,
+        this.onDone = onDone,
         this.initial = initial
     }
 
@@ -29,7 +30,7 @@ class Timer {
         minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
         seconds = Math.floor((distance % (1000 * 60)) / 1000)
 
-        if (distance <= 0) return this.stop('time\'s up!')
+        if (distance <= 0) return this.stop(true)
         return this.formatTime(hours, minutes, seconds)
     }
 
@@ -41,7 +42,7 @@ class Timer {
         minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
         seconds = Math.floor((distance % (1000 * 60)) / 1000)
 
-        if (distance >= (1000 * 60 * 60)) return this.stop('time\'s up!')
+        if (distance >= (1000 * 60 * 60)) return this.stop(true)
         return this.formatTime(hours, minutes, seconds)
     }
 
@@ -54,24 +55,25 @@ class Timer {
         if (duration) {
             this.date = this.getCountdownDate(duration)
             this.timerId = setInterval(() => {
-                this.callback(this.updateCountdownTime(new Date().getTime()))
+                this.onUpdate(this.updateCountdownTime(new Date().getTime()))
             }, SECOND)
-            this.callback(this.updateCountdownTime(new Date().getTime()))
+            this.onUpdate(this.updateCountdownTime(new Date().getTime()))
         } else {
             this.date = Date.now()
             this.timerId = setInterval(() => {
-                this.callback(this.updateCountupTime(new Date().getTime()))
+                this.onUpdate(this.updateCountupTime(new Date().getTime()))
             }, SECOND)
-            this.callback(this.updateCountupTime(new Date().getTime()))
+            this.onUpdate(this.updateCountupTime(new Date().getTime()))
         }
     }
 
-    stop(msg) {
+    stop(done) {
         clearInterval(this.timerId)
         delete this.date
         delete this.timerId
-        this.callback(this.initial)
-        if (msg) setTimeout(() => { alert(msg) }, 1)
+        this.onUpdate(this.initial)
+
+        if (done) this.onDone()
     }
 }
 
