@@ -97,16 +97,16 @@ sub {
   top: 2px;
 }
 
-.instruction {
+.messageScreen {
   display: flex;
   height: 98%;
   align-items: center;
   justify-content: center;
 }
-.instruction .message {
+.messageScreen .message {
   text-align: center;
 }
-.instruction .message .message-line {
+.messageScreen .message .messageLine {
   display: block;
 }
 
