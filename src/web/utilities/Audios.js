@@ -1,12 +1,13 @@
-import Tone from 'tone'
+// import Tone from 'tone'
 
 class Audios {
     constructor() {
-        this.synth = new Tone.Synth().toMaster()
+        // this.synth = new Tone.Synth().toMaster()
     }
 
     playBeep() {
-        this.synth.triggerAttackRelease('E4', 0.5)
+        alert('beep!')
+        // this.synth.triggerAttackRelease('E4', 0.5)
     }
 }
 
