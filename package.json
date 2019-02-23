@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "private": false,
     "dependencies": {
+        "babel-polyfill": "^6.26.0",
         "components": "^0.1.0",
         "pretty-checkbox": "^3.0.3",
         "react": "^16.8.0",

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Theirs from '~/components/Theirs'
 import Mine from '~/components/Mine'
 import Next from '~/components/Next'
