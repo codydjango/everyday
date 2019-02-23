@@ -53,7 +53,7 @@ sub {
     top: 2px;
 }
 
-.instruction {
+.messageScreen {
     display: flex;
     height: 98%;
     align-items: center;
@@ -62,7 +62,7 @@ sub {
     .message {
         text-align: center;
 
-        .message-line {
+        .messageLine {
             display: block;
         }
     }
