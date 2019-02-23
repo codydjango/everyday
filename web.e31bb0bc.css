@@ -56,6 +56,11 @@
      supported by Chrome and Opera */
 }
 
+html, body {
+  border: 0;
+  padding: 0;
+}
+
 body {
   font-family: "Cutive Mono", sans-serif;
   -moz-osx-font-smoothing: grayscale;
@@ -90,6 +95,19 @@ sub {
   position: relative;
   vertical-align: top;
   top: 2px;
+}
+
+.instruction {
+  display: flex;
+  height: 98%;
+  align-items: center;
+  justify-content: center;
+}
+.instruction .message {
+  text-align: center;
+}
+.instruction .message .message-line {
+  display: block;
 }
 
 .link {
