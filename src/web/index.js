@@ -18,9 +18,19 @@ import './scss/index.scss'
     let networkType
     try {
         networkType = await web3.eth.net.getNetworkType()
+        console.log(`network type: ${ networkType }`)
     } catch (err) {
         console.log('can\'t detect web3 network type')
         networkType = 'unknown'
+    }
+
+    let userAccount
+    try {
+        userAccount = (await web3.eth.getAccounts())[0]
+        console.log(`user account: ${ userAccount }`)
+    } catch (err) {
+        console.log('can\'t detect user account')
+        userAccount = null
     }
 
     render((networkType === 'main') ? (<App web3={web3} />) : (<PleaseSwitch />), document.getElementById('root'))
