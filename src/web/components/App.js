@@ -1,4 +1,5 @@
 import React from 'react'
+import Auth from '~/components/Auth'
 import Theirs from '~/components/Theirs'
 import Mine from '~/components/Mine'
 import Next from '~/components/Next'
@@ -32,6 +33,7 @@ class App extends React.Component {
 
         this.state = state
         this.doneRef = React.createRef()
+        this.web3 = props.web3
 
         // handlers
         this.handleReset = this.handleReset.bind(this)
@@ -97,6 +99,7 @@ class App extends React.Component {
                     <Theirs
                         list={ TASKS } />
                 </div>
+                <Auth web3={ this.props.web3 } />
             </div>
         )
     }

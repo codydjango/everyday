@@ -1,8 +1,9 @@
 import React from 'react'
 import { render } from 'react-dom'
-import App from './app'
+import App from './Components/App'
 import PleaseSwitch from './components/PleaseSwitch'
 import web3Init from './web3init'
+import { DEBUG } from './settings'
 
 import 'babel-polyfill'
 import './scss/index.scss'
@@ -33,5 +34,11 @@ import './scss/index.scss'
         userAccount = null
     }
 
-    render((networkType === 'main') ? (<App web3={web3} />) : (<PleaseSwitch />), document.getElementById('root'))
+    console.log(`debug: ${ DEBUG }`)
+
+    if (DEBUG) {
+        render(<App web3={web3} />, document.getElementById('root'))
+    } else {
+        render((networkType === 'main') ? (<App web3={web3} />) : (<PleaseSwitch />), document.getElementById('root'))
+    }
 })()

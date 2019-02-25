@@ -22,7 +22,7 @@ export default props => {
     }
 
     return (<div className="mine">
-        <h2>my routine</h2>
+        <h2>routine</h2>
         <TaskList { ...props } editMode={ edit } onUpdate={ onUpdate } />
         <footer>
             <div>
