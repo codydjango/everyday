@@ -21,6 +21,8 @@ class App extends React.Component {
     constructor(props) {
         super(props)
 
+        console.log('props.user', props.user)
+
         let state
         try {
             state = storage.load()
@@ -99,7 +101,7 @@ class App extends React.Component {
                     <Theirs
                         list={ TASKS } />
                 </div>
-                <Auth web3={ this.props.web3 } />
+                <Auth web3={ this.props.web3 } user={ this.props.user } />
             </div>
         )
     }

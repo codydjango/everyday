@@ -34,11 +34,13 @@ import './scss/index.scss'
         userAccount = null
     }
 
+    const user = 'unknown'
+
     console.log(`debug: ${ DEBUG }`)
 
     if (DEBUG) {
-        render(<App web3={web3} />, document.getElementById('root'))
+        render(<App web3={ web3 } user={ user } />, document.getElementById('root'))
     } else {
-        render((networkType === 'main') ? (<App web3={web3} />) : (<PleaseSwitch />), document.getElementById('root'))
+        render((networkType === 'main') ? (<App web3={ web3 } user={ user }/>) : (<PleaseSwitch />), document.getElementById('root'))
     }
 })()
