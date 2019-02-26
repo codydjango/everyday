@@ -88,23 +88,25 @@ class App extends React.Component {
         return (
             <div className="app">
                 <h1>everyday</h1>
-                <div className="container">
-                    <Next
-                        doneRef={ doneRef }
-                        list={ this.state.mine }
-                        updateList={ this.updateList }/>
-                    <Mine
-                        list={ this.state.mine }
-                        updateList={ this.updateList }
-                        handleAction={ this.handleSetActive }
-                        handleClearDone={ this.handleClearDone }/>
-                    <Theirs
-                        list={ TASKS } />
-                </div>
-                <Auth web3={ this.props.web3 } user={ this.props.user } />
+                <Auth web3={ this.props.web3 } />
             </div>
         )
     }
 }
+
+
+/* <div className="container">
+<Next
+    doneRef={ doneRef }
+    list={ this.state.mine }
+    updateList={ this.updateList }/>
+<Mine
+    list={ this.state.mine }
+    updateList={ this.updateList }
+    handleAction={ this.handleSetActive }
+    handleClearDone={ this.handleClearDone }/>
+<Theirs
+    list={ TASKS } />
+</div> */
 
 export default App
