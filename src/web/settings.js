@@ -52,6 +52,11 @@ const DEFAULTLIST = [
     { id: 24, taskId: 17, checked: false },
 ]
 
+console.log(`NAMESPACE ${NAMESPACE}`)
+console.log(`DEBUG ${DEBUG}`)
+console.log(`ENVIRONMENT ${ENVIRONMENT}`)
+console.log(`ENDPOINT ${ENDPOINT}`)
+
 export {
     DEBUG,
     NAMESPACE,
