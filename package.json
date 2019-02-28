@@ -13,7 +13,7 @@
     "scripts": {
         "start": "./node_modules/.bin/parcel src/web/index.html --open",
         "develop": "./node_modules/.bin/parcel src/web/index.html",
-        "build": "./node_modules/.bin/parcel build src/web/index.html --no-cache --no-minify --experimental-scope-hoisting --public-url /everyday/ ",
+        "build": "./node_modules/.bin/parcel build src/web/index.html --no-cache --no-minify --public-url /everyday/ ",
         "deploy": "node ./bin/deploy.js"
     },
     "devDependencies": {
