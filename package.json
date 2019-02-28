@@ -14,7 +14,6 @@
         "start": "./node_modules/.bin/parcel src/web/index.html --open",
         "develop": "./node_modules/.bin/parcel src/web/index.html",
         "build": "./node_modules/.bin/parcel build src/web/index.html --no-minify --public-url /everyday/ ",
-        "server": "python src/backend/server.py",
         "deploy": "node ./bin/deploy.js"
     },
     "devDependencies": {
