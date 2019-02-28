@@ -1,5 +1,6 @@
 const ENVIRONMENT = process.env.ENVIRONMENT
 const ENDPOINT = process.env.ENDPOINT
+const NODE_ENV = process.env.NODE_ENV
 const DEBUG = (ENVIRONMENT === 'development')
 const NAMESPACE = 'everyday'
 const TIMERINITIAL = 'start timer'
@@ -56,6 +57,7 @@ console.log(`NAMESPACE ${NAMESPACE}`)
 console.log(`DEBUG ${DEBUG}`)
 console.log(`ENVIRONMENT ${ENVIRONMENT}`)
 console.log(`ENDPOINT ${ENDPOINT}`)
+console.log(`NODE_ENV: ${NODE_ENV}`)
 
 export {
     DEBUG,
