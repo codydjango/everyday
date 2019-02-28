@@ -27378,6 +27378,10 @@ var DEFAULTLIST = [{
   checked: false
 }];
 exports.DEFAULTLIST = DEFAULTLIST;
+console.log("NAMESPACE ".concat(NAMESPACE));
+console.log("DEBUG ".concat(DEBUG));
+console.log("ENVIRONMENT ".concat(ENVIRONMENT));
+console.log("ENDPOINT ".concat(ENDPOINT));
 },{}],"../../node_modules/core-js/modules/_global.js":[function(require,module,exports) {
 
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
@@ -95999,7 +96003,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49238" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49894" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
