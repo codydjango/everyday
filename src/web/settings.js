@@ -1,4 +1,6 @@
-const DEBUG = true
+const ENVIRONMENT = process.env.ENVIRONMENT
+const ENDPOINT = process.env.ENDPOINT
+const DEBUG = (ENVIRONMENT === 'development')
 const NAMESPACE = 'everyday'
 const TIMERINITIAL = 'start timer'
 const EARLY = false
@@ -56,5 +58,7 @@ export {
     TIMERINITIAL,
     TASKS,
     DEFAULTLIST,
-    EARLY
+    EARLY,
+    ENDPOINT,
+    ENVIRONMENT
 }

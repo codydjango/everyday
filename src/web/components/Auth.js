@@ -1,6 +1,7 @@
 import axios from 'axios'
 import React from 'react'
 import Button from '~/components/Button'
+import { ENDPOINT } from '~/settings'
 
 import 'babel-polyfill'
 
@@ -17,7 +18,7 @@ class Auth extends React.Component {
     constructor(props) {
         super(props)
 
-        this.url = 'http://localhost:3001'
+        this.url = ENDPOINT
         this.state = { publicAddress: null }
         this.web3 = props.web3
         this.loginWithMetamask = this.loginWithMetamask.bind(this)
