@@ -5,13 +5,6 @@ import { ENDPOINT } from '~/settings'
 
 import 'babel-polyfill'
 
-class User {
-    constructor(none, publicAddress) {
-        this.nonce
-        this.publicAddress
-    }
-}
-
 const noAccountError = new Error('no accounts')
 
 function getOrdinal(nonce) {
@@ -41,7 +34,7 @@ class Auth extends React.Component {
         this.url = ENDPOINT
         this.state = { publicAddress: null }
         this.web3 = props.web3
-        this.loginWithMetamask = this.loginWithMetamask.bind(this)
+        this.login = this.login.bind(this)
 
         this.checkIfNewAccount = this.checkIfNewAccount.bind(this)
     }
@@ -108,7 +101,9 @@ class Auth extends React.Component {
         return response.data
     }
 
-    async loginWithMetamask() {
+    async login(e) {
+        e.preventDefault()
+
         let nonce, signature, session
         let publicAddress = this.state.publicAddress
         try {
@@ -121,20 +116,44 @@ class Auth extends React.Component {
         }
     }
 
+    isLoggedIn() {
+        return false
+    }
+
+    hasAccount() {
+        return (!!this.state.publicAddress)
+    }
+
+    getShortAddress() {
+        let publicAddress = this.state.publicAddress
+        let start = publicAddress.slice(0, 4)
+        let end = publicAddress.slice(-4)
+
+        return `${ start }...${ end }`
+    }
+
     render() {
-        const showUser = () => {
-            if (this.state.publicAddress) {
-                return (<h3>Active ethereum account: { this.state.publicAddress }</h3>)
+        const showMetamaskPrompt = () => (<span className="authInfo">Log in to MetaMask</span>)
+        const showLoggedInName = () => (<span className="authInfo">{ this.state.name }</span>)
+        const showLoginWithActiveMetamaskAccount = () => (<div className="loginActive">
+            <span className="loginWith">Login with</span>
+            <span className="loginAddress"><a href="#" onClick={ this.login }>{ this.getShortAddress() }</a></span>
+        </div>)
+
+        let show
+
+        if (this.hasAccount()) {
+            if (this.isLoggedIn()) {
+                show = showLoggedInName
             } else {
-                return (<h3>No active ethereum account: please login to your Metamask</h3>)
+                show = showLoginWithActiveMetamaskAccount
             }
+        } else {
+            show = showMetamaskPrompt
         }
-        const showPrompt = () => (<Button action={ this.loginWithMetamask } text="Login" />)
 
         return (<div className="auth">
-            <h2>Authentication</h2>
-            { showUser() }
-            { (this.state.publicAddress) ? showPrompt() : '' }
+            { show() }
         </div>)
     }
 }

@@ -23,8 +23,6 @@ $breakpoints: (
     }
 }
 
-
-
 .container {
     min-width: 300px;
     display: block;
@@ -43,6 +41,34 @@ $breakpoints: (
     .theirs {
         width: auto;
         display: none;
+    }
+}
+
+.header {
+    min-width: 300px;
+    display: block;
+    position: relative;
+
+    .logo {
+        display: block;
+        h1 {
+            display: block
+        }
+    }
+}
+
+.header {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+
+    .logo {
+        flex: 0;
+    }
+
+    .auth {
+        text-align: right;
+        flex: 1;
     }
 }
 
@@ -73,16 +99,4 @@ $breakpoints: (
             order: 2;
         }
     }
-}
-
-@include respond-above(sm) {
-    .container {}
-}
-
-@include respond-above(md) {
-    .container {}
-}
-
-@include respond-above(lg) {
-    .container {}
 }

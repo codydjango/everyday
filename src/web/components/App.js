@@ -1,8 +1,8 @@
 import React from 'react'
-import Auth from '~/components/Auth'
 import Theirs from '~/components/Theirs'
 import Mine from '~/components/Mine'
 import Next from '~/components/Next'
+import Header from '~/components/Header'
 import storage from '~/storage'
 import { TASKS, DEFAULTLIST } from '~/settings'
 
@@ -85,26 +85,23 @@ class App extends React.Component {
 
         return (
             <div className="app">
-                <h1>everyday</h1>
-                <Auth web3={ this.props.web3 } />
+                <Header web3={ this.props.web3 } />
+                <div className="container">
+                    <Next
+                        doneRef={ doneRef }
+                        list={ this.state.mine }
+                        updateList={ this.updateList }/>
+                    <Mine
+                        list={ this.state.mine }
+                        updateList={ this.updateList }
+                        handleAction={ this.handleSetActive }
+                        handleClearDone={ this.handleClearDone }/>
+                    <Theirs
+                        list={ TASKS } />
+                </div>
             </div>
         )
     }
 }
-
-
-/* <div className="container">
-<Next
-    doneRef={ doneRef }
-    list={ this.state.mine }
-    updateList={ this.updateList }/>
-<Mine
-    list={ this.state.mine }
-    updateList={ this.updateList }
-    handleAction={ this.handleSetActive }
-    handleClearDone={ this.handleClearDone }/>
-<Theirs
-    list={ TASKS } />
-</div> */
 
 export default App
