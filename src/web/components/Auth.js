@@ -14,6 +14,26 @@ class User {
 
 const noAccountError = new Error('no accounts')
 
+function getOrdinal(nonce) {
+    let i = parseInt(nonce)
+    let j = i % 10
+    let k = i % 100
+
+    if (j == 1 && k != 11) {
+        return "st"
+    }
+
+    if (j == 2 && k != 12) {
+        return "nd"
+    }
+
+    if (j == 3 && k != 13) {
+        return "rd"
+    }
+
+    return "th"
+}
+
 class Auth extends React.Component {
     constructor(props) {
         super(props)
@@ -35,7 +55,6 @@ class Auth extends React.Component {
         let publicAddress = (await web3.eth.getAccounts())[0]
         if (!publicAddress) throw noAccountError
         if (publicAddress !== this.state.publicAddress) {
-            console.log(`set new: ${ publicAddress }`)
             this.setState(state => {
                 state.publicAddress = publicAddress
                 return state
@@ -67,26 +86,36 @@ class Auth extends React.Component {
     }
 
     async signMessage(publicAddress, nonce) {
-        // let signinMessage = `I'm signing into my everyday account using my one-time nonce: ${ nonce }`
-        let signinMessage = `I'm signing into my everyday account with my special key: ${ nonce }`
-        let hexMessage = this.web3.utils.utf8ToHex(signinMessage)
-        let signature = await this.web3.eth.personal.sign(hexMessage, publicAddress, nonce)
+        let ordinal = getOrdinal(nonce)
+        let challenge = `I'm signing into my everyday account for the ${ nonce }${ ordinal } time`
+        let hexChallenge = this.web3.utils.utf8ToHex(challenge)
+        let signature = await this.web3.eth.personal.sign(hexChallenge, publicAddress, null)
 
         return signature
     }
 
     async fetchNonce(publicAddress) {
-        const response = await axios.get(`${this.url}/${ publicAddress }/nonce`)
+        const response = await axios.get(`${ this.url }/address/${ publicAddress }/nonce`)
         return response.data.nonce
     }
 
+    async authenticate(publicAddress, signature) {
+        const response = await axios.post(`${ this.url }/authentication/`, {
+            publicAddress,
+            signature
+        })
+
+        return response.data
+    }
+
     async loginWithMetamask() {
-        let nonce, signature
+        let nonce, signature, session
         let publicAddress = this.state.publicAddress
         try {
             nonce = await this.fetchNonce(publicAddress)
             signature = await this.signMessage(publicAddress, nonce)
-            console.log('signature', nonce, signature)
+            session = await this.authenticate(publicAddress, signature)
+            console.log('result', nonce, signature, session)
         } catch (err) {
             console.log('error login with metamask', err)
         }
