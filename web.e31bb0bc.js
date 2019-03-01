@@ -25534,7 +25534,1063 @@ if ("development" === 'production') {
 } else {
   module.exports = require('./cjs/react-dom.development.js');
 }
-},{"./cjs/react-dom.development.js":"../../node_modules/react-dom/cjs/react-dom.development.js"}],"../../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
+},{"./cjs/react-dom.development.js":"../../node_modules/react-dom/cjs/react-dom.development.js"}],"utilities/getKey.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var map = new WeakMap();
+var index = 0;
+
+function weakKey(obj) {
+  var key = map.get(obj);
+  if (key) return key;
+  key = 'weak-key-' + index++;
+  map.set(obj, key);
+  return key;
+}
+
+var _default = weakKey;
+exports.default = _default;
+},{}],"components/List.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _getKey = _interopRequireDefault(require("~/utilities/getKey"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = function _default(props) {
+  return _react.default.createElement("ul", {
+    className: "list"
+  }, props.list.map(function (item) {
+    return _react.default.createElement("li", {
+      key: (0, _getKey.default)(item)
+    }, _react.default.createElement("div", null, _react.default.createElement("span", null, item.text)));
+  }));
+};
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js","~/utilities/getKey":"utilities/getKey.js"}],"settings.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ENVIRONMENT = exports.ENDPOINT = exports.EARLY = exports.DEFAULTLIST = exports.TASKS = exports.TIMERINITIAL = exports.NAMESPACE = exports.DEBUG = void 0;
+var ENVIRONMENT = "development";
+exports.ENVIRONMENT = ENVIRONMENT;
+var ENDPOINT = "http://127.0.0.1:3001/api";
+exports.ENDPOINT = ENDPOINT;
+var NODE_ENV = "development";
+var DEBUG = ENVIRONMENT === 'development';
+exports.DEBUG = DEBUG;
+var NAMESPACE = 'everyday';
+exports.NAMESPACE = NAMESPACE;
+var TIMERINITIAL = 'start timer';
+exports.TIMERINITIAL = TIMERINITIAL;
+var EARLY = false;
+exports.EARLY = EARLY;
+var TASKS = [{
+  id: 1,
+  text: 'Drink water'
+}, {
+  id: 2,
+  text: 'Make bed'
+}, {
+  id: 3,
+  text: '50 crunches'
+}, {
+  id: 4,
+  text: '50 pushups'
+}, {
+  id: 5,
+  text: 'Commit a line of code'
+}, {
+  id: 6,
+  text: 'Read a chapter'
+}, {
+  id: 7,
+  text: 'Solve HackerRank challenge'
+}, {
+  id: 8,
+  text: 'Solve LeetCode challenge'
+}, {
+  id: 9,
+  text: 'Apply for employment'
+}, {
+  id: 10,
+  text: 'Code'
+}, {
+  id: 11,
+  text: 'Process email'
+}, {
+  id: 12,
+  text: 'Break for lunch'
+}, {
+  id: 13,
+  text: 'Break for snack'
+}, {
+  id: 14,
+  text: 'Do dishes'
+}, {
+  id: 15,
+  text: 'Check voicemail'
+}, {
+  id: 16,
+  text: 'Peruse social media'
+}, {
+  id: 17,
+  text: 'Post on social media'
+}, {
+  id: 17,
+  text: '50 squats'
+}];
+exports.TASKS = TASKS;
+var DEFAULTLIST = [{
+  id: 1,
+  taskId: 1,
+  checked: false
+}, {
+  id: 2,
+  taskId: 2,
+  checked: false
+}, {
+  id: 3,
+  taskId: 3,
+  checked: false
+}, {
+  id: 4,
+  taskId: 18,
+  checked: false
+}, {
+  id: 5,
+  taskId: 4,
+  checked: false
+}, {
+  id: 6,
+  taskId: 5,
+  checked: false
+}, {
+  id: 7,
+  taskId: 10,
+  checked: false,
+  duration: '1h'
+}, {
+  id: 8,
+  taskId: 1,
+  checked: false
+}, {
+  id: 9,
+  taskId: 6,
+  checked: false
+}, {
+  id: 10,
+  taskId: 7,
+  checked: false
+}, {
+  id: 11,
+  taskId: 1,
+  checked: false
+}, {
+  id: 12,
+  taskId: 10,
+  checked: false,
+  duration: '1h'
+}, {
+  id: 13,
+  taskId: 11,
+  checked: false
+}, {
+  id: 14,
+  taskId: 1,
+  checked: false
+}, {
+  id: 15,
+  taskId: 12,
+  checked: false
+}, {
+  id: 16,
+  taskId: 13,
+  checked: false
+}, {
+  id: 17,
+  taskId: 1,
+  checked: false
+}, {
+  id: 18,
+  taskId: 14,
+  checked: false
+}, {
+  id: 19,
+  taskId: 10,
+  checked: false,
+  duration: '1h'
+}, {
+  id: 20,
+  taskId: 15,
+  checked: false
+}, {
+  id: 21,
+  taskId: 1,
+  checked: false
+}, {
+  id: 22,
+  taskId: 16,
+  checked: false
+}, {
+  id: 23,
+  taskId: 10,
+  checked: false,
+  duration: '1h'
+}, {
+  id: 24,
+  taskId: 17,
+  checked: false
+}];
+exports.DEFAULTLIST = DEFAULTLIST;
+console.log("NAMESPACE ".concat(NAMESPACE));
+console.log("DEBUG ".concat(DEBUG));
+console.log("ENVIRONMENT ".concat(ENVIRONMENT));
+console.log("ENDPOINT ".concat(ENDPOINT));
+console.log("NODE_ENV: ".concat(NODE_ENV));
+},{}],"components/Theirs.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _List = _interopRequireDefault(require("~/components/List"));
+
+var _settings = require("~/settings");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = function _default(props) {
+  return _settings.EARLY ? _react.default.createElement("div", {
+    className: "theirs"
+  }, _react.default.createElement("h2", null, "everyone else"), _react.default.createElement(_List.default, {
+    list: props.list
+  })) : '';
+};
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js","~/components/List":"components/List.js","~/settings":"settings.js"}],"components/Task.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+var _default = function _default(_ref) {
+  var _React$createElement;
+
+  var handleAction = _ref.handleAction,
+      item = _ref.item,
+      props = _objectWithoutProperties(_ref, ["handleAction", "item"]);
+
+  return _react.default.createElement("div", _extends({
+    className: "task",
+    role: "button",
+    "aria-pressed": item.active ? 'true' : 'false',
+    onClick: function onClick(e) {
+      e.preventDefault();
+      handleAction(item.id);
+    },
+    onKeyPress: function onKeyPress(_ref2) {
+      var key = _ref2.key;
+      if (key === 'Enter') handleAction(item.id);
+    }
+  }, props), _react.default.createElement("span", {
+    className: "ascii-box",
+    style: {
+      marginRight: '0px'
+    }
+  }, _react.default.createElement("input", (_React$createElement = {
+    type: "checkbox",
+    id: "taskId_".concat(item.id),
+    "data-id": item.id,
+    readOnly: true
+  }, _defineProperty(_React$createElement, "type", "checkbox"), _defineProperty(_React$createElement, "checked", item.checked), _React$createElement)), _react.default.createElement("span", {
+    className: "visible"
+  }, _react.default.createElement("label", {
+    htmlFor: "taskId_".concat(item.id),
+    onClick: function onClick(e) {
+      e.preventDefault();
+    }
+  }, _react.default.createElement("span", {
+    className: item.active ? 'taskText active' : 'taskText',
+    style: {
+      marginRight: '2px'
+    }
+  }, item.task.text), item.duration ? _react.default.createElement("sub", {
+    className: "duration"
+  }, item.duration) : '', item.multiple ? _react.default.createElement("sup", {
+    className: "multiple"
+  }, "x", item.multiple) : ''))));
+};
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js"}],"utilities/throttle.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _default;
+
+function _default(fn, duration) {
+  var timer = false;
+  return function () {
+    if (timer) return;
+    fn.apply(void 0, arguments);
+    timer = true;
+    setTimeout(function () {
+      return timer = false;
+    }, duration);
+  };
+}
+},{}],"components/TaskList.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+var _Task = _interopRequireDefault(require("~/components/Task"));
+
+var _getKey = _interopRequireDefault(require("~/utilities/getKey"));
+
+var _throttle = _interopRequireDefault(require("~/utilities/throttle"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function aggregates(list) {
+  var counts = {};
+  return list.slice(0).map(function (i) {
+    delete i.multiple;
+
+    if (Number.isInteger(counts[i.taskId])) {
+      counts[i.taskId] += 1;
+      i.multiple = counts[i.taskId];
+    } else {
+      counts[i.taskId] = 1;
+    }
+
+    return i;
+  });
+}
+
+var _default = function _default(props) {
+  var _useState = (0, _react.useState)({
+    list: aggregates(props.list),
+    dragged: undefined
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      state = _useState2[0],
+      setState = _useState2[1];
+
+  var editTask = function editTask(item) {
+    return _react.default.createElement(_Task.default, {
+      handleAction: function handleAction() {},
+      item: item
+    });
+  };
+
+  var normalTask = function normalTask(item) {
+    return _react.default.createElement(_Task.default, {
+      tabIndex: "0",
+      handleAction: props.handleAction,
+      item: item
+    });
+  };
+
+  var _onDragStart = function onDragStart(e, i) {
+    var dragged = state.list[i];
+    e.dataTransfer.effectAllowed = 'move';
+    e.target.parentNode.classList.add('dragged');
+    e.dataTransfer.setData('text/html', e.target.parentNode);
+    e.dataTransfer.setDragImage(e.target.parentNode, 20, 20);
+    setState({
+      list: state.list,
+      dragged: dragged
+    });
+  };
+
+  var _onDragEnd = function onDragEnd(e) {
+    e.target.parentNode.classList.remove('dragged');
+    var newlist = aggregates(state.list);
+    setState({
+      dragged: undefined,
+      list: newlist
+    });
+    props.onUpdate(newlist);
+  };
+
+  var _onDragOver = function onDragOver(i) {
+    if (state.dragged === state.list[i]) return;
+    var newlist = state.list.filter(function (i) {
+      return i.id != state.dragged.id;
+    });
+    newlist.splice(i, 0, state.dragged);
+    newlist = aggregates(newlist);
+    setState({
+      dragged: state.dragged,
+      list: newlist
+    });
+  };
+
+  var _onClick = function onClick(e, i) {
+    var newlist = state.list.splice(0);
+    newlist.splice(i, 1);
+    newlist = aggregates(newlist);
+    setState({
+      dragged: state.dragged,
+      list: newlist
+    });
+    props.onUpdate(newlist);
+  };
+
+  return props.editMode ? _react.default.createElement("ul", {
+    className: 'list taskList edit'
+  }, state.list.map(function (item, i) {
+    return _react.default.createElement("li", {
+      onDragOver: function onDragOver() {
+        (0, _throttle.default)(_onDragOver, 100)(i);
+      },
+      key: (0, _getKey.default)(item)
+    }, _react.default.createElement("div", {
+      className: "drag",
+      draggable: true,
+      onDragStart: function onDragStart(e) {
+        _onDragStart(e, i);
+      },
+      onDragEnd: function onDragEnd(e) {
+        _onDragEnd(e);
+      },
+      onClick: function onClick(e) {
+        return _onClick(e, i);
+      }
+    }, editTask(item)));
+  })) : _react.default.createElement("ul", {
+    className: 'list taskList'
+  }, state.list.map(function (item, i) {
+    return _react.default.createElement("li", {
+      className: props.editMode ? 'drag' : '',
+      key: (0, _getKey.default)(item)
+    }, normalTask(item));
+  }));
+};
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js","~/components/Task":"components/Task.js","~/utilities/getKey":"utilities/getKey.js","~/utilities/throttle":"utilities/throttle.js"}],"components/Link.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+var _default = function _default(_ref) {
+  var action = _ref.action,
+      props = _objectWithoutProperties(_ref, ["action"]);
+
+  return _react.default.createElement("a", {
+    href: "#",
+    className: "link",
+    onClick: function onClick(e) {
+      action();
+    }
+  }, props.text);
+};
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js"}],"components/Mine.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+var _TaskList = _interopRequireDefault(require("~/components/TaskList"));
+
+var _Link = _interopRequireDefault(require("~/components/Link"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+var _default = function _default(props) {
+  var _useState = (0, _react.useState)({
+    list: props.list,
+    edit: false
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      _useState2$ = _useState2[0],
+      list = _useState2$.list,
+      edit = _useState2$.edit,
+      setEditState = _useState2[1];
+
+  var toggleEdit = function toggleEdit() {
+    ;
+    edit ? endEdit() : startEdit();
+  };
+
+  var onUpdate = function onUpdate(newlist) {
+    setEditState({
+      list: newlist,
+      edit: edit
+    });
+  };
+
+  var startEdit = function startEdit() {
+    setEditState({
+      list: list,
+      edit: true
+    });
+  };
+
+  var endEdit = function endEdit() {
+    setEditState({
+      list: list,
+      edit: false
+    });
+    props.updateList(list);
+  };
+
+  var getEditInstruction = function getEditInstruction() {
+    return _react.default.createElement("ul", {
+      className: "instruction"
+    }, _react.default.createElement("li", null, _react.default.createElement("small", null, "drag item to reorder")), _react.default.createElement("li", null, _react.default.createElement("small", null, "click item to delete")), _react.default.createElement("li", null, _react.default.createElement("small", null, "click \"done\" to exit editing mode")));
+  };
+
+  return _react.default.createElement("div", {
+    className: "mine"
+  }, _react.default.createElement("h2", null, "routine"), _react.default.createElement(_TaskList.default, _extends({}, props, {
+    editMode: edit,
+    onUpdate: onUpdate
+  })), _react.default.createElement("footer", null, _react.default.createElement("div", null, _react.default.createElement(_Link.default, {
+    text: edit ? 'done' : 'edit',
+    action: toggleEdit
+  }), _react.default.createElement(_Link.default, {
+    text: "reset",
+    action: props.handleClearDone
+  })), edit ? getEditInstruction() : ''));
+};
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js","~/components/TaskList":"components/TaskList.js","~/components/Link":"components/Link.js"}],"components/Button.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = _react.default.forwardRef(function (props, ref) {
+  return _react.default.createElement("button", {
+    ref: ref,
+    id: props.id,
+    onClick: props.action
+  }, props.text);
+});
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js"}],"components/Totals.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _Task = _interopRequireDefault(require("~/components/Task"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var percentage = function percentage(totals) {
+  return totals.done / totals.total * 100;
+};
+
+var isHalfway = function isHalfway(totals) {
+  return percentage(totals) > 40;
+};
+
+var isAlmostDone = function isAlmostDone(totals) {
+  return percentage(totals) > 80;
+};
+
+var randomFromList = function randomFromList(list) {
+  return list[Math.floor(Math.random() * list.length)];
+};
+
+var almostDone = ['Oh wow, you\'re almost done!', 'I believe in you!', 'You\'re almost there!', 'Let\'s do this.'];
+var halfway = ['You are so focused!', 'Have you had a break lately?', 'Can I interest you in a nice cup of water?', 'You\'re a beast!'];
+var beginning = ['Wow, so many tasks... You are very ambitious!', 'You look so smart today!', 'What a good day to get a thing done :D'];
+var memoizedGetMessageFor = totalsHaveChangedDecorator(getMessageFor);
+var previousTotals = null;
+var previousMsg = null; // <div><span>{ `${props.totals.done}/${props.totals.total}` }</span></div>
+
+var _default = function _default(props) {
+  return _react.default.createElement("div", {
+    className: "totals"
+  }, _react.default.createElement("p", null, _react.default.createElement("small", null, memoizedGetMessageFor(props.totals))));
+};
+
+exports.default = _default;
+
+function getMessageFor(totals) {
+  if (totals == previousTotals) if (isAlmostDone(totals)) return randomFromList(almostDone);
+  if (isHalfway(totals)) return randomFromList(halfway);
+  return randomFromList(beginning);
+}
+
+function totalsHaveChangedDecorator(fn) {
+  return function (totals) {
+    if (previousMsg && previousTotals.done == totals.done) return previousMsg;
+    previousTotals = totals;
+
+    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    previousMsg = fn.apply(void 0, [totals].concat(args));
+    return previousMsg;
+  };
+}
+},{"react":"../../node_modules/react/index.js","~/components/Task":"components/Task.js"}],"utilities/Timer.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var SECOND = 1000;
+
+var Timer =
+/*#__PURE__*/
+function () {
+  function Timer(_ref) {
+    var onUpdate = _ref.onUpdate,
+        onDone = _ref.onDone,
+        initial = _ref.initial;
+
+    _classCallCheck(this, Timer);
+
+    this.onUpdate = onUpdate, this.onDone = onDone, this.initial = initial, this.timerCount;
+    this.TIMER_IN_SECONDS = 60 * 60; // one hour
+  }
+
+  _createClass(Timer, [{
+    key: "getCountdownDate",
+    value: function getCountdownDate(duration) {
+      var milliseconds, seconds, minutes;
+      milliseconds = 1000;
+      seconds = 60;
+      minutes = 60;
+      minutes = parseInt(duration) * minutes;
+      return new Date(Date.now() + milliseconds * seconds * minutes);
+    }
+  }, {
+    key: "updateCountdownTime",
+    value: function updateCountdownTime(now) {
+      var distance, hours, minutes, seconds;
+      distance = this.date - now;
+      hours = Math.floor(distance % (1000 * 60 * 60 * 24) / (1000 * 60 * 60));
+      minutes = Math.floor(distance % (1000 * 60 * 60) / (1000 * 60));
+      seconds = Math.floor(distance % (1000 * 60) / 1000);
+      if (distance <= 0) return this.done();
+      return this.formatTime(hours, minutes, seconds);
+    }
+  }, {
+    key: "updateCountupTime",
+    value: function updateCountupTime(now) {
+      var distance, hours, minutes, seconds;
+      distance = now - this.date;
+      hours = Math.floor(distance % (1000 * 60 * 60 * 24) / (1000 * 60 * 60));
+      minutes = Math.floor(distance % (1000 * 60 * 60) / (1000 * 60));
+      seconds = Math.floor(distance % (1000 * 60) / 1000);
+      if (distance >= 1000 * this.TIMER_IN_SECONDS) return this.done();
+      return this.formatTime(hours, minutes, seconds);
+    }
+  }, {
+    key: "formatTime",
+    value: function formatTime(hours, minutes, seconds) {
+      var pad = function pad(num, size) {
+        return ('000000000' + num).substr(-size);
+      };
+
+      return "".concat(pad(hours, 2), ":").concat(pad(minutes, 2), ":").concat(pad(seconds, 2));
+    }
+  }, {
+    key: "start",
+    value: function start() {
+      var _this = this;
+
+      var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      if (duration) {
+        this.date = this.getCountdownDate(duration);
+        this.timerId = setInterval(function () {
+          _this.onUpdate(_this.updateCountdownTime(new Date().getTime()));
+        }, SECOND);
+        this.onUpdate(this.updateCountdownTime(new Date().getTime()));
+      } else {
+        this.date = Date.now();
+        this.timerId = setInterval(function () {
+          _this.onUpdate(_this.updateCountupTime(new Date().getTime()));
+        }, SECOND);
+        this.onUpdate(this.updateCountupTime(new Date().getTime()));
+      }
+    }
+  }, {
+    key: "stop",
+    value: function stop() {
+      clearInterval(this.timerId);
+      delete this.date;
+      delete this.timerId;
+      this.onUpdate(this.initial);
+    }
+  }, {
+    key: "done",
+    value: function done() {
+      var _this2 = this;
+
+      clearInterval(this.timerId);
+      delete this.date;
+      delete this.timerId;
+      setTimeout(function () {
+        _this2.onDone();
+      }, 1);
+      return this.initial;
+    }
+  }, {
+    key: "active",
+    get: function get() {
+      return !!this.timerId;
+    }
+  }]);
+
+  return Timer;
+}();
+
+var _default = Timer;
+exports.default = _default;
+},{}],"utilities/audios.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// import Tone from 'tone'
+var Audios =
+/*#__PURE__*/
+function () {
+  function Audios() {// this.synth = new Tone.Synth().toMaster()
+
+    _classCallCheck(this, Audios);
+  }
+
+  _createClass(Audios, [{
+    key: "playBeep",
+    value: function playBeep() {
+      alert('beep!'); // this.synth.triggerAttackRelease('E4', 0.5)
+    }
+  }]);
+
+  return Audios;
+}();
+
+var _default = new Audios();
+
+exports.default = _default;
+},{}],"components/Next.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _settings = require("~/settings");
+
+var _Button = _interopRequireDefault(require("~/components/Button"));
+
+var _Totals = _interopRequireDefault(require("~/components/Totals"));
+
+var _Timer = _interopRequireDefault(require("~/utilities/Timer"));
+
+var _audios = _interopRequireDefault(require("~/utilities/audios"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+var Next =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(Next, _React$Component);
+
+  _createClass(Next, null, [{
+    key: "nothingActive",
+    value: function nothingActive(list) {
+      return list.filter(function (i) {
+        return i.active;
+      }).length === 0;
+    }
+  }, {
+    key: "hasTasks",
+    value: function hasTasks(list) {
+      return list.filter(function (i) {
+        return i && i.checked === false;
+      }).length > 0;
+    }
+  }, {
+    key: "hasTasksAndActive",
+    value: function hasTasksAndActive(list) {
+      return Next.hasTasks(list) && Next.nothingActive(list) === false;
+    }
+  }, {
+    key: "bumpActiveIndex",
+    value: function bumpActiveIndex(list) {
+      var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var nextIndex, task; // loop through the list starting at the active index until there are
+      // no tasks left to be completed
+
+      while (list.filter(function (i) {
+        return i.checked === false;
+      }).length > 0) {
+        task = list[index];
+
+        if (task && task.checked === false) {
+          task.active = true;
+          break;
+        }
+
+        index = index + 1 < list.length ? index + 1 : 0;
+      }
+
+      return list;
+    }
+  }, {
+    key: "activeIndex",
+    value: function activeIndex(list) {
+      var index = list.indexOf(list.filter(function (i) {
+        return i.active;
+      })[0]);
+      return index !== -1 ? index : null;
+    }
+  }]);
+
+  function Next(props) {
+    var _this;
+
+    _classCallCheck(this, Next);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Next).call(this, props));
+    _this.timer = new _Timer.default({
+      onUpdate: function onUpdate(time) {
+        return _this.setState(function (state) {
+          return {
+            time: time
+          };
+        });
+      },
+      onDone: function onDone() {
+        return _audios.default.playBeep();
+      },
+      initial: _settings.TIMERINITIAL
+    });
+    _this.state = {
+      'time': _settings.TIMERINITIAL
+    };
+    _this.handleDone = _this.handleDone.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.handleUndo = _this.handleUndo.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.handleNotNow = _this.handleNotNow.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.handleToggleTimer = _this.handleToggleTimer.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    return _this;
+  }
+
+  _createClass(Next, [{
+    key: "handleUndo",
+    value: function handleUndo() {
+      var list = this.props.list.slice(0);
+      list.filter(function (i) {
+        return i.active;
+      })[0].checked = false;
+      this.props.updateList(list);
+    }
+  }, {
+    key: "handleDone",
+    value: function handleDone() {
+      var list = this.props.list.slice(0);
+      var activeIndex = Next.activeIndex(list);
+      list[activeIndex].checked = true;
+      list[activeIndex].active = false;
+      this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1));
+    }
+  }, {
+    key: "handleNotNow",
+    value: function handleNotNow(e) {
+      e.preventDefault();
+      var list = this.props.list.slice(0);
+      var activeIndex = Next.activeIndex(list);
+      list[activeIndex].active = false;
+      this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1));
+    }
+  }, {
+    key: "handleToggleTimer",
+    value: function handleToggleTimer(e) {
+      e.preventDefault();
+      this.timer.active ? this.timer.stop() : this.timer.start(this.activeTask.duration || null);
+    }
+  }, {
+    key: "getTotals",
+    value: function getTotals() {
+      var list = this.props.list;
+      return {
+        total: list.length,
+        done: list.filter(function (i) {
+          return i.checked;
+        }).length
+      };
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return _react.default.createElement("div", {
+        className: "next"
+      }, Next.hasTasksAndActive(this.props.list) ? _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "next up"), _react.default.createElement("p", null, _react.default.createElement("strong", null, this.activeTask.task.text)), this.activeTask.checked ? _react.default.createElement(_Button.default, {
+        id: "undo",
+        ref: this.props.doneRef,
+        action: this.handleUndo,
+        text: "undo"
+      }) : _react.default.createElement(_Button.default, {
+        id: "done",
+        ref: this.props.doneRef,
+        action: this.handleDone,
+        text: "done"
+      }), _react.default.createElement(_Button.default, {
+        action: this.handleNotNow,
+        text: "not now"
+      }), _react.default.createElement(_Button.default, {
+        action: this.handleToggleTimer,
+        text: this.state.time
+      }), _react.default.createElement(_Totals.default, {
+        totals: this.getTotals()
+      })) : _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "you are so good. your brain is so strong."), _react.default.createElement("p", null, _react.default.createElement("small", null, "Go drink some water."))));
+    }
+  }, {
+    key: "activeTask",
+    get: function get() {
+      return this.props.list[Next.activeIndex(this.props.list)];
+    }
+  }]);
+
+  return Next;
+}(_react.default.Component);
+
+var _default = Next;
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js","~/settings":"settings.js","~/components/Button":"components/Button.js","~/components/Totals":"components/Totals.js","~/utilities/Timer":"utilities/Timer.js","~/utilities/audios":"utilities/audios.js"}],"../../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -27180,211 +28236,7 @@ module.exports.default = axios;
 
 },{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/bind":"../../node_modules/axios/lib/helpers/bind.js","./core/Axios":"../../node_modules/axios/lib/core/Axios.js","./defaults":"../../node_modules/axios/lib/defaults.js","./cancel/Cancel":"../../node_modules/axios/lib/cancel/Cancel.js","./cancel/CancelToken":"../../node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"../../node_modules/axios/lib/cancel/isCancel.js","./helpers/spread":"../../node_modules/axios/lib/helpers/spread.js"}],"../../node_modules/axios/index.js":[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":"../../node_modules/axios/lib/axios.js"}],"components/Button.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var _default = _react.default.forwardRef(function (props, ref) {
-  return _react.default.createElement("button", {
-    ref: ref,
-    id: props.id,
-    onClick: props.action
-  }, props.text);
-});
-
-exports.default = _default;
-},{"react":"../../node_modules/react/index.js"}],"settings.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ENVIRONMENT = exports.ENDPOINT = exports.EARLY = exports.DEFAULTLIST = exports.TASKS = exports.TIMERINITIAL = exports.NAMESPACE = exports.DEBUG = void 0;
-var ENVIRONMENT = "development";
-exports.ENVIRONMENT = ENVIRONMENT;
-var ENDPOINT = "http://127.0.0.1:3001/api";
-exports.ENDPOINT = ENDPOINT;
-var NODE_ENV = "development";
-var DEBUG = ENVIRONMENT === 'development';
-exports.DEBUG = DEBUG;
-var NAMESPACE = 'everyday';
-exports.NAMESPACE = NAMESPACE;
-var TIMERINITIAL = 'start timer';
-exports.TIMERINITIAL = TIMERINITIAL;
-var EARLY = false;
-exports.EARLY = EARLY;
-var TASKS = [{
-  id: 1,
-  text: 'Drink water'
-}, {
-  id: 2,
-  text: 'Make bed'
-}, {
-  id: 3,
-  text: '50 crunches'
-}, {
-  id: 4,
-  text: '50 pushups'
-}, {
-  id: 5,
-  text: 'Commit a line of code'
-}, {
-  id: 6,
-  text: 'Read a chapter'
-}, {
-  id: 7,
-  text: 'Solve HackerRank challenge'
-}, {
-  id: 8,
-  text: 'Solve LeetCode challenge'
-}, {
-  id: 9,
-  text: 'Apply for employment'
-}, {
-  id: 10,
-  text: 'Code'
-}, {
-  id: 11,
-  text: 'Process email'
-}, {
-  id: 12,
-  text: 'Break for lunch'
-}, {
-  id: 13,
-  text: 'Break for snack'
-}, {
-  id: 14,
-  text: 'Do dishes'
-}, {
-  id: 15,
-  text: 'Check voicemail'
-}, {
-  id: 16,
-  text: 'Peruse social media'
-}, {
-  id: 17,
-  text: 'Post on social media'
-}, {
-  id: 17,
-  text: '50 squats'
-}];
-exports.TASKS = TASKS;
-var DEFAULTLIST = [{
-  id: 1,
-  taskId: 1,
-  checked: false
-}, {
-  id: 2,
-  taskId: 2,
-  checked: false
-}, {
-  id: 3,
-  taskId: 3,
-  checked: false
-}, {
-  id: 4,
-  taskId: 18,
-  checked: false
-}, {
-  id: 5,
-  taskId: 4,
-  checked: false
-}, {
-  id: 6,
-  taskId: 5,
-  checked: false
-}, {
-  id: 7,
-  taskId: 10,
-  checked: false,
-  duration: '1h'
-}, {
-  id: 8,
-  taskId: 1,
-  checked: false
-}, {
-  id: 9,
-  taskId: 6,
-  checked: false
-}, {
-  id: 10,
-  taskId: 7,
-  checked: false
-}, {
-  id: 11,
-  taskId: 1,
-  checked: false
-}, {
-  id: 12,
-  taskId: 10,
-  checked: false,
-  duration: '1h'
-}, {
-  id: 13,
-  taskId: 11,
-  checked: false
-}, {
-  id: 14,
-  taskId: 1,
-  checked: false
-}, {
-  id: 15,
-  taskId: 12,
-  checked: false
-}, {
-  id: 16,
-  taskId: 13,
-  checked: false
-}, {
-  id: 17,
-  taskId: 1,
-  checked: false
-}, {
-  id: 18,
-  taskId: 14,
-  checked: false
-}, {
-  id: 19,
-  taskId: 10,
-  checked: false,
-  duration: '1h'
-}, {
-  id: 20,
-  taskId: 15,
-  checked: false
-}, {
-  id: 21,
-  taskId: 1,
-  checked: false
-}, {
-  id: 22,
-  taskId: 16,
-  checked: false
-}, {
-  id: 23,
-  taskId: 10,
-  checked: false,
-  duration: '1h'
-}, {
-  id: 24,
-  taskId: 17,
-  checked: false
-}];
-exports.DEFAULTLIST = DEFAULTLIST;
-console.log("NAMESPACE ".concat(NAMESPACE));
-console.log("DEBUG ".concat(DEBUG));
-console.log("ENVIRONMENT ".concat(ENVIRONMENT));
-console.log("ENDPOINT ".concat(ENDPOINT));
-console.log("NODE_ENV: ".concat(NODE_ENV));
-},{}],"../../node_modules/core-js/modules/_global.js":[function(require,module,exports) {
+},{"./lib/axios":"../../node_modules/axios/lib/axios.js"}],"../../node_modules/core-js/modules/_global.js":[function(require,module,exports) {
 
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
@@ -35378,6 +36230,8 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
@@ -35391,15 +36245,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var User = function User(none, publicAddress) {
-  _classCallCheck(this, User);
-
-  this.nonce;
-  this.publicAddress;
-};
 
 var noAccountError = new Error('no accounts');
 
@@ -35439,7 +36284,7 @@ function (_React$Component) {
       publicAddress: null
     };
     _this.web3 = props.web3;
-    _this.loginWithMetamask = _this.loginWithMetamask.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.login = _this.login.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.checkIfNewAccount = _this.checkIfNewAccount.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
@@ -35667,79 +36512,120 @@ function (_React$Component) {
       return authenticate;
     }()
   }, {
-    key: "loginWithMetamask",
+    key: "login",
     value: function () {
-      var _loginWithMetamask = _asyncToGenerator(
+      var _login = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee7() {
+      regeneratorRuntime.mark(function _callee7(e) {
         var nonce, signature, session, publicAddress;
         return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
+                e.preventDefault();
                 publicAddress = this.state.publicAddress;
-                _context7.prev = 1;
-                _context7.next = 4;
+                _context7.prev = 2;
+                _context7.next = 5;
                 return this.fetchNonce(publicAddress);
 
-              case 4:
+              case 5:
                 nonce = _context7.sent;
-                _context7.next = 7;
+                _context7.next = 8;
                 return this.signMessage(publicAddress, nonce);
 
-              case 7:
+              case 8:
                 signature = _context7.sent;
-                _context7.next = 10;
+                _context7.next = 11;
                 return this.authenticate(publicAddress, signature);
 
-              case 10:
+              case 11:
                 session = _context7.sent;
                 console.log('result', nonce, signature, session);
-                _context7.next = 17;
+                _context7.next = 18;
                 break;
 
-              case 14:
-                _context7.prev = 14;
-                _context7.t0 = _context7["catch"](1);
+              case 15:
+                _context7.prev = 15;
+                _context7.t0 = _context7["catch"](2);
                 console.log('error login with metamask', _context7.t0);
 
-              case 17:
+              case 18:
               case "end":
                 return _context7.stop();
             }
           }
-        }, _callee7, this, [[1, 14]]);
+        }, _callee7, this, [[2, 15]]);
       }));
 
-      function loginWithMetamask() {
-        return _loginWithMetamask.apply(this, arguments);
+      function login(_x8) {
+        return _login.apply(this, arguments);
       }
 
-      return loginWithMetamask;
+      return login;
     }()
+  }, {
+    key: "isLoggedIn",
+    value: function isLoggedIn() {
+      return false;
+    }
+  }, {
+    key: "hasAccount",
+    value: function hasAccount() {
+      return !!this.state.publicAddress;
+    }
+  }, {
+    key: "getShortAddress",
+    value: function getShortAddress() {
+      var publicAddress = this.state.publicAddress;
+      var start = publicAddress.slice(0, 4);
+      var end = publicAddress.slice(-4);
+      return "".concat(start, "...").concat(end);
+    }
   }, {
     key: "render",
     value: function render() {
       var _this3 = this;
 
-      var showUser = function showUser() {
-        if (_this3.state.publicAddress) {
-          return _react.default.createElement("h3", null, "Active ethereum account: ", _this3.state.publicAddress);
-        } else {
-          return _react.default.createElement("h3", null, "No active ethereum account: please login to your Metamask");
-        }
+      var showMetamaskPrompt = function showMetamaskPrompt() {
+        return _react.default.createElement("span", {
+          className: "authInfo"
+        }, "Log in to MetaMask");
       };
 
-      var showPrompt = function showPrompt() {
-        return _react.default.createElement(_Button.default, {
-          action: _this3.loginWithMetamask,
-          text: "Login"
-        });
+      var showLoggedInName = function showLoggedInName() {
+        return _react.default.createElement("span", {
+          className: "authInfo"
+        }, _this3.state.name);
       };
+
+      var showLoginWithActiveMetamaskAccount = function showLoginWithActiveMetamaskAccount() {
+        return _react.default.createElement("div", {
+          className: "loginActive"
+        }, _react.default.createElement("span", {
+          className: "loginWith"
+        }, "Login with"), _react.default.createElement("span", {
+          className: "loginAddress"
+        }, _react.default.createElement("a", {
+          href: "#",
+          onClick: _this3.login
+        }, _this3.getShortAddress())));
+      };
+
+      var show;
+
+      if (this.hasAccount()) {
+        if (this.isLoggedIn()) {
+          show = showLoggedInName;
+        } else {
+          show = showLoginWithActiveMetamaskAccount;
+        }
+      } else {
+        show = showMetamaskPrompt;
+      }
 
       return _react.default.createElement("div", {
         className: "auth"
-      }, _react.default.createElement("h2", null, "Authentication"), showUser(), this.state.publicAddress ? showPrompt() : '');
+      }, show());
     }
   }]);
 
@@ -35748,27 +36634,7 @@ function (_React$Component) {
 
 var _default = Auth;
 exports.default = _default;
-},{"axios":"../../node_modules/axios/index.js","react":"../../node_modules/react/index.js","~/components/Button":"components/Button.js","~/settings":"settings.js","babel-polyfill":"../../node_modules/babel-polyfill/lib/index.js"}],"utilities/getKey.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var map = new WeakMap();
-var index = 0;
-
-function weakKey(obj) {
-  var key = map.get(obj);
-  if (key) return key;
-  key = 'weak-key-' + index++;
-  map.set(obj, key);
-  return key;
-}
-
-var _default = weakKey;
-exports.default = _default;
-},{}],"components/List.js":[function(require,module,exports) {
+},{"axios":"../../node_modules/axios/index.js","react":"../../node_modules/react/index.js","~/components/Button":"components/Button.js","~/settings":"settings.js","babel-polyfill":"../../node_modules/babel-polyfill/lib/index.js"}],"components/Logo.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35778,829 +36644,41 @@ exports.default = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
-var _getKey = _interopRequireDefault(require("~/utilities/getKey"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = function _default() {
+  return _react.default.createElement("div", {
+    className: "logo"
+  }, _react.default.createElement("h1", null, "everyday"));
+};
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js"}],"components/Header.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _Auth = _interopRequireDefault(require("~/components/Auth"));
+
+var _Logo = _interopRequireDefault(require("~/components/Logo"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var _default = function _default(props) {
-  return _react.default.createElement("ul", {
-    className: "list"
-  }, props.list.map(function (item) {
-    return _react.default.createElement("li", {
-      key: (0, _getKey.default)(item)
-    }, _react.default.createElement("div", null, _react.default.createElement("span", null, item.text)));
+  return _react.default.createElement("header", {
+    className: "header"
+  }, _react.default.createElement(_Logo.default, null), _react.default.createElement(_Auth.default, {
+    web3: props.web3
   }));
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/utilities/getKey":"utilities/getKey.js"}],"components/Theirs.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _List = _interopRequireDefault(require("~/components/List"));
-
-var _settings = require("~/settings");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var _default = function _default(props) {
-  return _settings.EARLY ? _react.default.createElement("div", {
-    className: "theirs"
-  }, _react.default.createElement("h2", null, "everyone else"), _react.default.createElement(_List.default, {
-    list: props.list
-  })) : '';
-};
-
-exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/List":"components/List.js","~/settings":"settings.js"}],"components/Task.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
-
-function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
-
-var _default = function _default(_ref) {
-  var _React$createElement;
-
-  var handleAction = _ref.handleAction,
-      item = _ref.item,
-      props = _objectWithoutProperties(_ref, ["handleAction", "item"]);
-
-  return _react.default.createElement("div", _extends({
-    className: "task",
-    role: "button",
-    "aria-pressed": item.active ? 'true' : 'false',
-    onClick: function onClick(e) {
-      e.preventDefault();
-      handleAction(item.id);
-    },
-    onKeyPress: function onKeyPress(_ref2) {
-      var key = _ref2.key;
-      if (key === 'Enter') handleAction(item.id);
-    }
-  }, props), _react.default.createElement("span", {
-    className: "ascii-box",
-    style: {
-      marginRight: '0px'
-    }
-  }, _react.default.createElement("input", (_React$createElement = {
-    type: "checkbox",
-    id: "taskId_".concat(item.id),
-    "data-id": item.id,
-    readOnly: true
-  }, _defineProperty(_React$createElement, "type", "checkbox"), _defineProperty(_React$createElement, "checked", item.checked), _React$createElement)), _react.default.createElement("span", {
-    className: "visible"
-  }, _react.default.createElement("label", {
-    htmlFor: "taskId_".concat(item.id),
-    onClick: function onClick(e) {
-      e.preventDefault();
-    }
-  }, _react.default.createElement("span", {
-    className: item.active ? 'taskText active' : 'taskText',
-    style: {
-      marginRight: '2px'
-    }
-  }, item.task.text), item.duration ? _react.default.createElement("sub", {
-    className: "duration"
-  }, item.duration) : '', item.multiple ? _react.default.createElement("sup", {
-    className: "multiple"
-  }, "x", item.multiple) : ''))));
-};
-
-exports.default = _default;
-},{"react":"../../node_modules/react/index.js"}],"utilities/throttle.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = _default;
-
-function _default(fn, duration) {
-  var timer = false;
-  return function () {
-    if (timer) return;
-    fn.apply(void 0, arguments);
-    timer = true;
-    setTimeout(function () {
-      return timer = false;
-    }, duration);
-  };
-}
-},{}],"components/TaskList.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireWildcard(require("react"));
-
-var _Task = _interopRequireDefault(require("~/components/Task"));
-
-var _getKey = _interopRequireDefault(require("~/utilities/getKey"));
-
-var _throttle = _interopRequireDefault(require("~/utilities/throttle"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
-
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
-
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-function aggregates(list) {
-  var counts = {};
-  return list.slice(0).map(function (i) {
-    delete i.multiple;
-
-    if (Number.isInteger(counts[i.taskId])) {
-      counts[i.taskId] += 1;
-      i.multiple = counts[i.taskId];
-    } else {
-      counts[i.taskId] = 1;
-    }
-
-    return i;
-  });
-}
-
-var _default = function _default(props) {
-  var _useState = (0, _react.useState)({
-    list: aggregates(props.list),
-    dragged: undefined
-  }),
-      _useState2 = _slicedToArray(_useState, 2),
-      state = _useState2[0],
-      setState = _useState2[1];
-
-  var editTask = function editTask(item) {
-    return _react.default.createElement(_Task.default, {
-      handleAction: function handleAction() {},
-      item: item
-    });
-  };
-
-  var normalTask = function normalTask(item) {
-    return _react.default.createElement(_Task.default, {
-      tabIndex: "0",
-      handleAction: props.handleAction,
-      item: item
-    });
-  };
-
-  var _onDragStart = function onDragStart(e, i) {
-    var dragged = state.list[i];
-    e.dataTransfer.effectAllowed = 'move';
-    e.target.parentNode.classList.add('dragged');
-    e.dataTransfer.setData('text/html', e.target.parentNode);
-    e.dataTransfer.setDragImage(e.target.parentNode, 20, 20);
-    setState({
-      list: state.list,
-      dragged: dragged
-    });
-  };
-
-  var _onDragEnd = function onDragEnd(e) {
-    e.target.parentNode.classList.remove('dragged');
-    var newlist = aggregates(state.list);
-    setState({
-      dragged: undefined,
-      list: newlist
-    });
-    props.onUpdate(newlist);
-  };
-
-  var _onDragOver = function onDragOver(i) {
-    if (state.dragged === state.list[i]) return;
-    var newlist = state.list.filter(function (i) {
-      return i.id != state.dragged.id;
-    });
-    newlist.splice(i, 0, state.dragged);
-    newlist = aggregates(newlist);
-    setState({
-      dragged: state.dragged,
-      list: newlist
-    });
-  };
-
-  var _onClick = function onClick(e, i) {
-    var newlist = state.list.splice(0);
-    newlist.splice(i, 1);
-    newlist = aggregates(newlist);
-    setState({
-      dragged: state.dragged,
-      list: newlist
-    });
-    props.onUpdate(newlist);
-  };
-
-  return props.editMode ? _react.default.createElement("ul", {
-    className: 'list taskList edit'
-  }, state.list.map(function (item, i) {
-    return _react.default.createElement("li", {
-      onDragOver: function onDragOver() {
-        (0, _throttle.default)(_onDragOver, 100)(i);
-      },
-      key: (0, _getKey.default)(item)
-    }, _react.default.createElement("div", {
-      className: "drag",
-      draggable: true,
-      onDragStart: function onDragStart(e) {
-        _onDragStart(e, i);
-      },
-      onDragEnd: function onDragEnd(e) {
-        _onDragEnd(e);
-      },
-      onClick: function onClick(e) {
-        return _onClick(e, i);
-      }
-    }, editTask(item)));
-  })) : _react.default.createElement("ul", {
-    className: 'list taskList'
-  }, state.list.map(function (item, i) {
-    return _react.default.createElement("li", {
-      className: props.editMode ? 'drag' : '',
-      key: (0, _getKey.default)(item)
-    }, normalTask(item));
-  }));
-};
-
-exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Task":"components/Task.js","~/utilities/getKey":"utilities/getKey.js","~/utilities/throttle":"utilities/throttle.js"}],"components/Link.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
-
-function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
-
-var _default = function _default(_ref) {
-  var action = _ref.action,
-      props = _objectWithoutProperties(_ref, ["action"]);
-
-  return _react.default.createElement("a", {
-    href: "#",
-    className: "link",
-    onClick: function onClick(e) {
-      action();
-    }
-  }, props.text);
-};
-
-exports.default = _default;
-},{"react":"../../node_modules/react/index.js"}],"components/Mine.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireWildcard(require("react"));
-
-var _TaskList = _interopRequireDefault(require("~/components/TaskList"));
-
-var _Link = _interopRequireDefault(require("~/components/Link"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
-
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
-
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-var _default = function _default(props) {
-  var _useState = (0, _react.useState)({
-    list: props.list,
-    edit: false
-  }),
-      _useState2 = _slicedToArray(_useState, 2),
-      _useState2$ = _useState2[0],
-      list = _useState2$.list,
-      edit = _useState2$.edit,
-      setEditState = _useState2[1];
-
-  var toggleEdit = function toggleEdit() {
-    ;
-    edit ? endEdit() : startEdit();
-  };
-
-  var onUpdate = function onUpdate(newlist) {
-    setEditState({
-      list: newlist,
-      edit: edit
-    });
-  };
-
-  var startEdit = function startEdit() {
-    setEditState({
-      list: list,
-      edit: true
-    });
-  };
-
-  var endEdit = function endEdit() {
-    setEditState({
-      list: list,
-      edit: false
-    });
-    props.updateList(list);
-  };
-
-  var getEditInstruction = function getEditInstruction() {
-    return _react.default.createElement("ul", {
-      className: "instruction"
-    }, _react.default.createElement("li", null, _react.default.createElement("small", null, "drag item to reorder")), _react.default.createElement("li", null, _react.default.createElement("small", null, "click item to delete")), _react.default.createElement("li", null, _react.default.createElement("small", null, "click \"done\" to exit editing mode")));
-  };
-
-  return _react.default.createElement("div", {
-    className: "mine"
-  }, _react.default.createElement("h2", null, "routine"), _react.default.createElement(_TaskList.default, _extends({}, props, {
-    editMode: edit,
-    onUpdate: onUpdate
-  })), _react.default.createElement("footer", null, _react.default.createElement("div", null, _react.default.createElement(_Link.default, {
-    text: edit ? 'done' : 'edit',
-    action: toggleEdit
-  }), _react.default.createElement(_Link.default, {
-    text: "reset",
-    action: props.handleClearDone
-  })), edit ? getEditInstruction() : ''));
-};
-
-exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/TaskList":"components/TaskList.js","~/components/Link":"components/Link.js"}],"components/Totals.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _Task = _interopRequireDefault(require("~/components/Task"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var percentage = function percentage(totals) {
-  return totals.done / totals.total * 100;
-};
-
-var isHalfway = function isHalfway(totals) {
-  return percentage(totals) > 40;
-};
-
-var isAlmostDone = function isAlmostDone(totals) {
-  return percentage(totals) > 80;
-};
-
-var randomFromList = function randomFromList(list) {
-  return list[Math.floor(Math.random() * list.length)];
-};
-
-var almostDone = ['Oh wow, you\'re almost done!', 'I believe in you!', 'You\'re almost there!', 'Let\'s do this.'];
-var halfway = ['You are so focused!', 'Have you had a break lately?', 'Can I interest you in a nice cup of water?', 'You\'re a beast!'];
-var beginning = ['Wow, so many tasks... You are very ambitious!', 'You look so smart today!', 'What a good day to get a thing done :D'];
-var memoizedGetMessageFor = totalsHaveChangedDecorator(getMessageFor);
-var previousTotals = null;
-var previousMsg = null; // <div><span>{ `${props.totals.done}/${props.totals.total}` }</span></div>
-
-var _default = function _default(props) {
-  return _react.default.createElement("div", {
-    className: "totals"
-  }, _react.default.createElement("p", null, _react.default.createElement("small", null, memoizedGetMessageFor(props.totals))));
-};
-
-exports.default = _default;
-
-function getMessageFor(totals) {
-  if (totals == previousTotals) if (isAlmostDone(totals)) return randomFromList(almostDone);
-  if (isHalfway(totals)) return randomFromList(halfway);
-  return randomFromList(beginning);
-}
-
-function totalsHaveChangedDecorator(fn) {
-  return function (totals) {
-    if (previousMsg && previousTotals.done == totals.done) return previousMsg;
-    previousTotals = totals;
-
-    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-
-    previousMsg = fn.apply(void 0, [totals].concat(args));
-    return previousMsg;
-  };
-}
-},{"react":"../../node_modules/react/index.js","~/components/Task":"components/Task.js"}],"utilities/Timer.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var SECOND = 1000;
-
-var Timer =
-/*#__PURE__*/
-function () {
-  function Timer(_ref) {
-    var onUpdate = _ref.onUpdate,
-        onDone = _ref.onDone,
-        initial = _ref.initial;
-
-    _classCallCheck(this, Timer);
-
-    this.onUpdate = onUpdate, this.onDone = onDone, this.initial = initial, this.timerCount;
-    this.TIMER_IN_SECONDS = 60 * 60; // one hour
-  }
-
-  _createClass(Timer, [{
-    key: "getCountdownDate",
-    value: function getCountdownDate(duration) {
-      var milliseconds, seconds, minutes;
-      milliseconds = 1000;
-      seconds = 60;
-      minutes = 60;
-      minutes = parseInt(duration) * minutes;
-      return new Date(Date.now() + milliseconds * seconds * minutes);
-    }
-  }, {
-    key: "updateCountdownTime",
-    value: function updateCountdownTime(now) {
-      var distance, hours, minutes, seconds;
-      distance = this.date - now;
-      hours = Math.floor(distance % (1000 * 60 * 60 * 24) / (1000 * 60 * 60));
-      minutes = Math.floor(distance % (1000 * 60 * 60) / (1000 * 60));
-      seconds = Math.floor(distance % (1000 * 60) / 1000);
-      if (distance <= 0) return this.done();
-      return this.formatTime(hours, minutes, seconds);
-    }
-  }, {
-    key: "updateCountupTime",
-    value: function updateCountupTime(now) {
-      var distance, hours, minutes, seconds;
-      distance = now - this.date;
-      hours = Math.floor(distance % (1000 * 60 * 60 * 24) / (1000 * 60 * 60));
-      minutes = Math.floor(distance % (1000 * 60 * 60) / (1000 * 60));
-      seconds = Math.floor(distance % (1000 * 60) / 1000);
-      if (distance >= 1000 * this.TIMER_IN_SECONDS) return this.done();
-      return this.formatTime(hours, minutes, seconds);
-    }
-  }, {
-    key: "formatTime",
-    value: function formatTime(hours, minutes, seconds) {
-      var pad = function pad(num, size) {
-        return ('000000000' + num).substr(-size);
-      };
-
-      return "".concat(pad(hours, 2), ":").concat(pad(minutes, 2), ":").concat(pad(seconds, 2));
-    }
-  }, {
-    key: "start",
-    value: function start() {
-      var _this = this;
-
-      var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-      if (duration) {
-        this.date = this.getCountdownDate(duration);
-        this.timerId = setInterval(function () {
-          _this.onUpdate(_this.updateCountdownTime(new Date().getTime()));
-        }, SECOND);
-        this.onUpdate(this.updateCountdownTime(new Date().getTime()));
-      } else {
-        this.date = Date.now();
-        this.timerId = setInterval(function () {
-          _this.onUpdate(_this.updateCountupTime(new Date().getTime()));
-        }, SECOND);
-        this.onUpdate(this.updateCountupTime(new Date().getTime()));
-      }
-    }
-  }, {
-    key: "stop",
-    value: function stop() {
-      clearInterval(this.timerId);
-      delete this.date;
-      delete this.timerId;
-      this.onUpdate(this.initial);
-    }
-  }, {
-    key: "done",
-    value: function done() {
-      var _this2 = this;
-
-      clearInterval(this.timerId);
-      delete this.date;
-      delete this.timerId;
-      setTimeout(function () {
-        _this2.onDone();
-      }, 1);
-      return this.initial;
-    }
-  }, {
-    key: "active",
-    get: function get() {
-      return !!this.timerId;
-    }
-  }]);
-
-  return Timer;
-}();
-
-var _default = Timer;
-exports.default = _default;
-},{}],"utilities/audios.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-// import Tone from 'tone'
-var Audios =
-/*#__PURE__*/
-function () {
-  function Audios() {// this.synth = new Tone.Synth().toMaster()
-
-    _classCallCheck(this, Audios);
-  }
-
-  _createClass(Audios, [{
-    key: "playBeep",
-    value: function playBeep() {
-      alert('beep!'); // this.synth.triggerAttackRelease('E4', 0.5)
-    }
-  }]);
-
-  return Audios;
-}();
-
-var _default = new Audios();
-
-exports.default = _default;
-},{}],"components/Next.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _settings = require("~/settings");
-
-var _Button = _interopRequireDefault(require("~/components/Button"));
-
-var _Totals = _interopRequireDefault(require("~/components/Totals"));
-
-var _Timer = _interopRequireDefault(require("~/utilities/Timer"));
-
-var _audios = _interopRequireDefault(require("~/utilities/audios"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-var Next =
-/*#__PURE__*/
-function (_React$Component) {
-  _inherits(Next, _React$Component);
-
-  _createClass(Next, null, [{
-    key: "nothingActive",
-    value: function nothingActive(list) {
-      return list.filter(function (i) {
-        return i.active;
-      }).length === 0;
-    }
-  }, {
-    key: "hasTasks",
-    value: function hasTasks(list) {
-      return list.filter(function (i) {
-        return i && i.checked === false;
-      }).length > 0;
-    }
-  }, {
-    key: "hasTasksAndActive",
-    value: function hasTasksAndActive(list) {
-      return Next.hasTasks(list) && Next.nothingActive(list) === false;
-    }
-  }, {
-    key: "bumpActiveIndex",
-    value: function bumpActiveIndex(list) {
-      var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      var nextIndex, task; // loop through the list starting at the active index until there are
-      // no tasks left to be completed
-
-      while (list.filter(function (i) {
-        return i.checked === false;
-      }).length > 0) {
-        task = list[index];
-
-        if (task && task.checked === false) {
-          task.active = true;
-          break;
-        }
-
-        index = index + 1 < list.length ? index + 1 : 0;
-      }
-
-      return list;
-    }
-  }, {
-    key: "activeIndex",
-    value: function activeIndex(list) {
-      var index = list.indexOf(list.filter(function (i) {
-        return i.active;
-      })[0]);
-      return index !== -1 ? index : null;
-    }
-  }]);
-
-  function Next(props) {
-    var _this;
-
-    _classCallCheck(this, Next);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Next).call(this, props));
-    _this.timer = new _Timer.default({
-      onUpdate: function onUpdate(time) {
-        return _this.setState(function (state) {
-          return {
-            time: time
-          };
-        });
-      },
-      onDone: function onDone() {
-        return _audios.default.playBeep();
-      },
-      initial: _settings.TIMERINITIAL
-    });
-    _this.state = {
-      'time': _settings.TIMERINITIAL
-    };
-    _this.handleDone = _this.handleDone.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.handleUndo = _this.handleUndo.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.handleNotNow = _this.handleNotNow.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.handleToggleTimer = _this.handleToggleTimer.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    return _this;
-  }
-
-  _createClass(Next, [{
-    key: "handleUndo",
-    value: function handleUndo() {
-      var list = this.props.list.slice(0);
-      list.filter(function (i) {
-        return i.active;
-      })[0].checked = false;
-      this.props.updateList(list);
-    }
-  }, {
-    key: "handleDone",
-    value: function handleDone() {
-      var list = this.props.list.slice(0);
-      var activeIndex = Next.activeIndex(list);
-      list[activeIndex].checked = true;
-      list[activeIndex].active = false;
-      this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1));
-    }
-  }, {
-    key: "handleNotNow",
-    value: function handleNotNow(e) {
-      e.preventDefault();
-      var list = this.props.list.slice(0);
-      var activeIndex = Next.activeIndex(list);
-      list[activeIndex].active = false;
-      this.props.updateList(Next.bumpActiveIndex(list, activeIndex + 1));
-    }
-  }, {
-    key: "handleToggleTimer",
-    value: function handleToggleTimer(e) {
-      e.preventDefault();
-      this.timer.active ? this.timer.stop() : this.timer.start(this.activeTask.duration || null);
-    }
-  }, {
-    key: "getTotals",
-    value: function getTotals() {
-      var list = this.props.list;
-      return {
-        total: list.length,
-        done: list.filter(function (i) {
-          return i.checked;
-        }).length
-      };
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      return _react.default.createElement("div", {
-        className: "next"
-      }, Next.hasTasksAndActive(this.props.list) ? _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "next up"), _react.default.createElement("p", null, _react.default.createElement("strong", null, this.activeTask.task.text)), this.activeTask.checked ? _react.default.createElement(_Button.default, {
-        id: "undo",
-        ref: this.props.doneRef,
-        action: this.handleUndo,
-        text: "undo"
-      }) : _react.default.createElement(_Button.default, {
-        id: "done",
-        ref: this.props.doneRef,
-        action: this.handleDone,
-        text: "done"
-      }), _react.default.createElement(_Button.default, {
-        action: this.handleNotNow,
-        text: "not now"
-      }), _react.default.createElement(_Button.default, {
-        action: this.handleToggleTimer,
-        text: this.state.time
-      }), _react.default.createElement(_Totals.default, {
-        totals: this.getTotals()
-      })) : _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "you are so good. your brain is so strong."), _react.default.createElement("p", null, _react.default.createElement("small", null, "Go drink some water."))));
-    }
-  }, {
-    key: "activeTask",
-    get: function get() {
-      return this.props.list[Next.activeIndex(this.props.list)];
-    }
-  }]);
-
-  return Next;
-}(_react.default.Component);
-
-var _default = Next;
-exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/settings":"settings.js","~/components/Button":"components/Button.js","~/components/Totals":"components/Totals.js","~/utilities/Timer":"utilities/Timer.js","~/utilities/audios":"utilities/audios.js"}],"storage.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Auth":"components/Auth.js","~/components/Logo":"components/Logo.js"}],"storage.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36660,13 +36738,13 @@ exports.default = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
-var _Auth = _interopRequireDefault(require("~/components/Auth"));
-
 var _Theirs = _interopRequireDefault(require("~/components/Theirs"));
 
 var _Mine = _interopRequireDefault(require("~/components/Mine"));
 
 var _Next = _interopRequireDefault(require("~/components/Next"));
+
+var _Header = _interopRequireDefault(require("~/components/Header"));
 
 var _storage = _interopRequireDefault(require("~/storage"));
 
@@ -36799,32 +36877,31 @@ function (_React$Component) {
       var doneRef = this.doneRef;
       return _react.default.createElement("div", {
         className: "app"
-      }, _react.default.createElement("h1", null, "everyday"), _react.default.createElement(_Auth.default, {
+      }, _react.default.createElement(_Header.default, {
         web3: this.props.web3
-      }));
+      }), _react.default.createElement("div", {
+        className: "container"
+      }, _react.default.createElement(_Next.default, {
+        doneRef: doneRef,
+        list: this.state.mine,
+        updateList: this.updateList
+      }), _react.default.createElement(_Mine.default, {
+        list: this.state.mine,
+        updateList: this.updateList,
+        handleAction: this.handleSetActive,
+        handleClearDone: this.handleClearDone
+      }), _react.default.createElement(_Theirs.default, {
+        list: _settings.TASKS
+      })));
     }
   }]);
 
   return App;
 }(_react.default.Component);
-/* <div className="container">
-<Next
-    doneRef={ doneRef }
-    list={ this.state.mine }
-    updateList={ this.updateList }/>
-<Mine
-    list={ this.state.mine }
-    updateList={ this.updateList }
-    handleAction={ this.handleSetActive }
-    handleClearDone={ this.handleClearDone }/>
-<Theirs
-    list={ TASKS } />
-</div> */
-
 
 var _default = App;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Auth":"components/Auth.js","~/components/Theirs":"components/Theirs.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/storage":"storage.js","~/settings":"settings.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Theirs":"components/Theirs.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/components/Header":"components/Header.js","~/storage":"storage.js","~/settings":"settings.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -96064,7 +96141,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52188" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52810" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

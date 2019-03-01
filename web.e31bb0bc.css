@@ -18,6 +18,31 @@
   display: none;
 }
 
+.header {
+  min-width: 300px;
+  display: block;
+  position: relative;
+}
+.header .logo {
+  display: block;
+}
+.header .logo h1 {
+  display: block;
+}
+
+.header {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+}
+.header .logo {
+  flex: 0;
+}
+.header .auth {
+  text-align: right;
+  flex: 1;
+}
+
 @media screen and (min-width: 576px) {
   .container {
     display: flex;
@@ -65,7 +90,6 @@ body {
   font-family: "Cutive Mono", sans-serif;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  font-smoothing: antialiased;
   font-weight: 400;
   font-size: 16px;
   background-color: yellow;
@@ -74,8 +98,23 @@ body {
 h1 {
   font-style: italic;
   padding: 0;
-  margin: 0 0 1em 0;
+  margin: 0 0 0 0;
   line-height: 1em;
+  font-size: 32px;
+}
+
+.auth .loginActive .loginWith {
+  font-size: 12px;
+  line-height: 12px;
+  height: 12px;
+  display: block;
+}
+.auth .loginActive .loginAddress {
+  font-size: 18px;
+  line-height: 20px;
+  font-weight: 700;
+  height: 20px;
+  display: block;
 }
 
 h2 {
@@ -95,6 +134,14 @@ sub {
   position: relative;
   vertical-align: top;
   top: 2px;
+}
+
+a {
+  color: black;
+}
+
+header {
+  margin-bottom: 20px;
 }
 
 .messageScreen {
