@@ -27210,7 +27210,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.ENVIRONMENT = exports.ENDPOINT = exports.EARLY = exports.DEFAULTLIST = exports.TASKS = exports.TIMERINITIAL = exports.NAMESPACE = exports.DEBUG = void 0;
 var ENVIRONMENT = "development";
 exports.ENVIRONMENT = ENVIRONMENT;
-var ENDPOINT = "http://127.0.0.1:3001";
+var ENDPOINT = "http://127.0.0.1:3001/api";
 exports.ENDPOINT = ENDPOINT;
 var NODE_ENV = "development";
 var DEBUG = ENVIRONMENT === 'development';
@@ -35403,6 +35403,26 @@ var User = function User(none, publicAddress) {
 
 var noAccountError = new Error('no accounts');
 
+function getOrdinal(nonce) {
+  var i = parseInt(nonce);
+  var j = i % 10;
+  var k = i % 100;
+
+  if (j == 1 && k != 11) {
+    return "st";
+  }
+
+  if (j == 2 && k != 12) {
+    return "nd";
+  }
+
+  if (j == 3 && k != 13) {
+    return "rd";
+  }
+
+  return "th";
+}
+
 var Auth =
 /*#__PURE__*/
 function (_React$Component) {
@@ -35456,7 +35476,6 @@ function (_React$Component) {
 
               case 6:
                 if (publicAddress !== this.state.publicAddress) {
-                  console.log("set new: ".concat(publicAddress));
                   this.setState(function (state) {
                     state.publicAddress = publicAddress;
                     return state;
@@ -35551,22 +35570,22 @@ function (_React$Component) {
       var _signMessage = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee4(publicAddress, nonce) {
-        var signinMessage, hexMessage, signature;
+        var ordinal, challenge, hexChallenge, signature;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                // let signinMessage = `I'm signing into my everyday account using my one-time nonce: ${ nonce }`
-                signinMessage = "I'm signing into my everyday account with my special key: ".concat(nonce);
-                hexMessage = this.web3.utils.utf8ToHex(signinMessage);
-                _context4.next = 4;
-                return this.web3.eth.personal.sign(hexMessage, publicAddress, nonce);
+                ordinal = getOrdinal(nonce);
+                challenge = "I'm signing into my everyday account for the ".concat(nonce).concat(ordinal, " time");
+                hexChallenge = this.web3.utils.utf8ToHex(challenge);
+                _context4.next = 5;
+                return this.web3.eth.personal.sign(hexChallenge, publicAddress, null);
 
-              case 4:
+              case 5:
                 signature = _context4.sent;
                 return _context4.abrupt("return", signature);
 
-              case 6:
+              case 7:
               case "end":
                 return _context4.stop();
             }
@@ -35592,7 +35611,7 @@ function (_React$Component) {
             switch (_context5.prev = _context5.next) {
               case 0:
                 _context5.next = 2;
-                return _axios.default.get("".concat(this.url, "/").concat(publicAddress, "/nonce"));
+                return _axios.default.get("".concat(this.url, "/address/").concat(publicAddress, "/nonce"));
 
               case 2:
                 response = _context5.sent;
@@ -35613,43 +35632,83 @@ function (_React$Component) {
       return fetchNonce;
     }()
   }, {
-    key: "loginWithMetamask",
+    key: "authenticate",
     value: function () {
-      var _loginWithMetamask = _asyncToGenerator(
+      var _authenticate = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee6() {
-        var nonce, signature, publicAddress;
+      regeneratorRuntime.mark(function _callee6(publicAddress, signature) {
+        var response;
         return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                publicAddress = this.state.publicAddress;
-                _context6.prev = 1;
-                _context6.next = 4;
-                return this.fetchNonce(publicAddress);
+                _context6.next = 2;
+                return _axios.default.post("".concat(this.url, "/authentication/"), {
+                  publicAddress: publicAddress,
+                  signature: signature
+                });
+
+              case 2:
+                response = _context6.sent;
+                return _context6.abrupt("return", response.data);
 
               case 4:
-                nonce = _context6.sent;
-                _context6.next = 7;
-                return this.signMessage(publicAddress, nonce);
-
-              case 7:
-                signature = _context6.sent;
-                console.log('signature', nonce, signature);
-                _context6.next = 14;
-                break;
-
-              case 11:
-                _context6.prev = 11;
-                _context6.t0 = _context6["catch"](1);
-                console.log('error login with metamask', _context6.t0);
-
-              case 14:
               case "end":
                 return _context6.stop();
             }
           }
-        }, _callee6, this, [[1, 11]]);
+        }, _callee6, this);
+      }));
+
+      function authenticate(_x6, _x7) {
+        return _authenticate.apply(this, arguments);
+      }
+
+      return authenticate;
+    }()
+  }, {
+    key: "loginWithMetamask",
+    value: function () {
+      var _loginWithMetamask = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee7() {
+        var nonce, signature, session, publicAddress;
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                publicAddress = this.state.publicAddress;
+                _context7.prev = 1;
+                _context7.next = 4;
+                return this.fetchNonce(publicAddress);
+
+              case 4:
+                nonce = _context7.sent;
+                _context7.next = 7;
+                return this.signMessage(publicAddress, nonce);
+
+              case 7:
+                signature = _context7.sent;
+                _context7.next = 10;
+                return this.authenticate(publicAddress, signature);
+
+              case 10:
+                session = _context7.sent;
+                console.log('result', nonce, signature, session);
+                _context7.next = 17;
+                break;
+
+              case 14:
+                _context7.prev = 14;
+                _context7.t0 = _context7["catch"](1);
+                console.log('error login with metamask', _context7.t0);
+
+              case 17:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this, [[1, 14]]);
       }));
 
       function loginWithMetamask() {
@@ -96005,7 +96064,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50105" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52188" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
