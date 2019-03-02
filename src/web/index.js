@@ -26,10 +26,14 @@ async function getNetworkType(web3) {
     // if they don't have their own provider set up.
     window.web3 = web3Init(window)
 
-    console.log('web3', window.web3.version.api || window.web3.version)
+    const web3Version = window.web3.version.api || window.web3.version
+    const isMetamask = window.web3.currentProvider.isMetaMask
+
+    console.log('web3 version', web3Version)
+    console.log('metamask', isMetamask)
 
     // if no metamask ask to install
-    if (!window.web3) return render(<InstallMetamask />, document.getElementById('root'))
+    if (!isMetamask) return render(<InstallMetamask />, document.getElementById('root'))
 
     // figure out network. If it's not on the mainnet give them a little prompt.
     const networkType = await getNetworkType(window.web3)
