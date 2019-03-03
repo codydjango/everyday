@@ -26,7 +26,7 @@ async function getNetworkType(web3) {
 }
 
 export default async function web3Init() {
-    let provider, web3, enabled, defaultAccount
+    let provider, web3, enabled, defaultAccount, otherDefaultAccount
 
     // https://metamask.github.io/metamask-docs/Advanced_Concepts/Provider_API
     if (typeof window.ethereum !== 'undefined'
@@ -41,9 +41,13 @@ export default async function web3Init() {
     window.web3 = web3 = new Web3(provider)
 
     if (window.ethereum) {
-        enabled = await window.ethereum.enable()
-        defaultAccount = enabled[0]
+        defaultAccount = (await window.ethereum.enable())[0]
+        otherDefaultAccount = (await web3.eth.getAccounts())[0]
+
         console.log(`web3 enabled with default account: ${ defaultAccount }`)
+        console.log(`web3 enabled with other default account: ${ otherDefaultAccount }`)
+        // use the checksum address
+        defaultAccount = otherDefaultAccount
     }
 
     const web3Version = web3.version.api || web3.version
