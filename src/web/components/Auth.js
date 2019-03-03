@@ -1,57 +1,41 @@
-import axios from 'axios'
 import React from 'react'
-import Button from '~/components/Button'
-import { ENDPOINT } from '~/settings'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import { ENDPOINT, ENVIRONMENT } from '~/settings'
+import { getOrdinal } from '~/utilities'
 
 import 'babel-polyfill'
 
 const noAccountError = new Error('no accounts')
-
-function getOrdinal(nonce) {
-    let i = parseInt(nonce)
-    let j = i % 10
-    let k = i % 100
-
-    if (j == 1 && k != 11) {
-        return "st"
-    }
-
-    if (j == 2 && k != 12) {
-        return "nd"
-    }
-
-    if (j == 3 && k != 13) {
-        return "rd"
-    }
-
-    return "th"
-}
 
 class Auth extends React.Component {
     constructor(props) {
         super(props)
 
         this.url = ENDPOINT
-        this.state = { publicAddress: null }
         this.web3 = props.web3
-        this.login = this.login.bind(this)
 
+        // upstream callbacks
+        this.callback = props.callback
+
+        // handlers
+        this.login = this.login.bind(this)
+        this.logout = this.logout.bind(this)
+        this.attemptSwitchAccount = this.attemptSwitchAccount.bind(this)
         this.checkIfNewAccount = this.checkIfNewAccount.bind(this)
     }
 
     componentDidMount() {
-        this.pingForActiveAccount()
+        setTimeout(() => {
+            this.pingForActiveAccount()
+        }, 1)
     }
 
     async checkIfNewAccount() {
-        const web3 = this.web3
-        let publicAddress = (await web3.eth.getAccounts())[0]
-        if (!publicAddress) throw noAccountError
-        if (publicAddress !== this.state.publicAddress) {
-            this.setState(state => {
-                state.publicAddress = publicAddress
-                return state
-            })
+        let account = (await this.web3.eth.getAccounts())[0]
+        if (!account) throw noAccountError
+        if (account !== this.props.account) {
+            this.callback(account, this.attemptSwitchAccount(account))
         }
     }
 
@@ -68,80 +52,121 @@ class Auth extends React.Component {
 
         promise.catch(err => {
             if (err === noAccountError) {
-                this.setState(state => {
-                    delete state['publicAddress']
-                    return state
-                })
+                this.callback(undefined, undefined)
             } else {
-                console.log('err', err)
+                console.error('err', err)
             }
         })
     }
 
-    async signMessage(publicAddress, nonce) {
+    async signMessage(account, nonce) {
         let ordinal = getOrdinal(nonce)
         let challenge = `I'm signing into my everyday account for the ${ nonce }${ ordinal } time`
         let hexChallenge = this.web3.utils.utf8ToHex(challenge)
-        let signature = await this.web3.eth.personal.sign(hexChallenge, publicAddress, null)
+        let signature = await this.web3.eth.personal.sign(hexChallenge, account, null)
 
         return signature
     }
 
-    async fetchNonce(publicAddress) {
-        const response = await axios.get(`${ this.url }/address/${ publicAddress }/nonce`)
+    async fetchNonce(account) {
+        const response = await axios.get(`${ this.url }/account/${ account }/nonce/`)
         return response.data.nonce
     }
 
-    async authenticate(publicAddress, signature) {
+    async authenticate(account, signature) {
         const response = await axios.post(`${ this.url }/authentication/`, {
-            publicAddress,
+            account,
             signature
         })
 
-        return response.data
+        return response.data.token
     }
 
     async login(e) {
         e.preventDefault()
 
-        let nonce, signature, session
-        let publicAddress = this.state.publicAddress
+        let nonce, signature, session, token = false
+        let account = this.props.account
+
         try {
-            nonce = await this.fetchNonce(publicAddress)
-            signature = await this.signMessage(publicAddress, nonce)
-            session = await this.authenticate(publicAddress, signature)
-            console.log('result', nonce, signature, session)
+            nonce = await this.fetchNonce(account)
+            signature = await this.signMessage(account, nonce)
+            token = await this.authenticate(account, signature)
         } catch (err) {
-            console.log('error login with metamask', err)
+            console.error('error login with metamask', err)
+            alert('error logging in with metamask')
+            return
+        }
+
+        this.setToken(account, token)
+        this.callback(account, token)
+    }
+
+    logout(e) {
+        e.preventDefault()
+        const account = this.props.account
+        Cookies.remove(account)
+        delete axios.defaults.headers.common['Authorization']
+        this.callback(account, null)
+    }
+
+    attemptSwitchAccount(account) {
+        const oldAccount = this.props.account
+        Cookies.remove(oldAccount)
+        delete axios.defaults.headers.common['Authorization']
+
+        const token = Cookies.get(account)
+
+        if (token) {
+            Cookies.set(account, token, { secure: (ENVIRONMENT === 'production') })
+            axios.defaults.headers.common['Authorization'] = token
+        }
+
+        return token
+    }
+
+    setToken(account, token) {
+        const oldAccount = this.props.account
+
+        Cookies.remove(oldAccount)
+        delete axios.defaults.headers.common['Authorization']
+
+        if (account && token) {
+            Cookies.set(account, token, { secure: (ENVIRONMENT === 'production') })
+            axios.defaults.headers.common['Authorization'] = token
         }
     }
 
     isLoggedIn() {
-        return false
+        return (!!this.props.token)
     }
 
     hasAccount() {
-        return (!!this.state.publicAddress)
+        return (!!this.props.account)
     }
 
-    getShortAddress() {
-        let publicAddress = this.state.publicAddress
-        let start = publicAddress.slice(0, 4)
-        let end = publicAddress.slice(-4)
+    getShortAccount() {
+        let account = this.props.account
+        let start = account.slice(0, 4)
+        let end = account.slice(-4)
 
         return `${ start }...${ end }`
     }
 
     render() {
         const showMetamaskPrompt = () => (<span className="authInfo">Log in to MetaMask</span>)
-        const showLoggedInName = () => (<span className="authInfo">{ this.state.name }</span>)
-        const showLoginWithActiveMetamaskAccount = () => (<div className="loginActive">
+
+        const showLoggedInName = () => (<span className="authInfo">
+            <span className="loginWith">Logout from</span>
+            <span className="loginAddress"><a href="#" onClick={ this.logout }>{ this.getShortAccount() }</a></span>
+        </span>)
+
+        const showLoginWithActiveMetamaskAccount = () => (<div className="authInfo">
             <span className="loginWith">Login with</span>
-            <span className="loginAddress"><a href="#" onClick={ this.login }>{ this.getShortAddress() }</a></span>
+            <span className="loginAddress"><a href="#" onClick={ this.login }>{ this.getShortAccount() }</a></span>
         </div>)
 
         let show
-
         if (this.hasAccount()) {
             if (this.isLoggedIn()) {
                 show = showLoggedInName
