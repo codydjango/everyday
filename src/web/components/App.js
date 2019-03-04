@@ -56,6 +56,8 @@ class App extends React.Component {
     }
 
     async load() {
+        this.store = (this.state.token) ? remote : local
+
         try {
             this.setState({ message: 'Loading...' })
             let data = await this.store.load(this.state.account)
@@ -87,32 +89,7 @@ class App extends React.Component {
         }
     }
 
-    async testOpen() {
-        try {
-            const response = await axios.get(`${ process.env.ENDPOINT }/test/`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-        } catch (err) {
-            console.log('err', err)
-        }
-    }
-
-    async testRestricted() {
-        try {
-            const response = await axios.get(`${ process.env.ENDPOINT }/auth/test/`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-        } catch (err) {
-            console.log('err', err)
-        }
-    }
-
     componentDidMount() {
-        this.store = (this.state.token) ? remote : local
         this.load()
 
         setInterval(() => {
@@ -120,10 +97,6 @@ class App extends React.Component {
                 message: randomFromList(messages.working)
             })
         }, 1000 * 60 * 60);
-    }
-
-    componentDidUpdate() {
-        this.store = (this.state.token) ? remote : local
     }
 
     handleClearDone() {
