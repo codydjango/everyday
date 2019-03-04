@@ -1,5 +1,21 @@
 @charset "UTF-8";
 @import url("https://fonts.googleapis.com/css?family=Cutive+Mono");
+#root {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.container {
+  flex: 1;
+}
+
+.footer {
+  height: 16px;
+}
+
 .container {
   min-width: 300px;
   display: block;
@@ -15,7 +31,6 @@
 }
 .container .theirs {
   width: auto;
-  display: none;
 }
 
 .header {
@@ -58,7 +73,6 @@
     order: 0;
   }
   .container .theirs {
-    display: none;
     width: auto;
     text-align: right;
     flex: 1;
@@ -84,6 +98,7 @@
 html, body {
   border: 0;
   padding: 0;
+  margin: 0;
 }
 
 body {
@@ -91,7 +106,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 14px;
   background-color: yellow;
 }
 
@@ -103,13 +118,13 @@ h1 {
   font-size: 32px;
 }
 
-.auth .loginActive .loginWith {
+.auth .authInfo .loginWith {
   font-size: 12px;
   line-height: 12px;
   height: 12px;
   display: block;
 }
-.auth .loginActive .loginAddress {
+.auth .authInfo .loginAddress {
   font-size: 18px;
   line-height: 20px;
   font-weight: 700;
@@ -142,6 +157,23 @@ a {
 
 header {
   margin-bottom: 20px;
+}
+
+footer {
+  position: relative;
+}
+footer .messageLeft {
+  position: absolute;
+  font-style: italic;
+  text-align: left;
+  width: 100%;
+  font-weight: 700;
+}
+footer .messageRight {
+  position: absolute;
+  font-style: italic;
+  text-align: right;
+  width: 100%;
 }
 
 .messageScreen {

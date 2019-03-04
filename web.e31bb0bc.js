@@ -25534,7 +25534,175 @@ if ("development" === 'production') {
 } else {
   module.exports = require('./cjs/react-dom.development.js');
 }
-},{"./cjs/react-dom.development.js":"../../node_modules/react-dom/cjs/react-dom.development.js"}],"utilities/getKey.js":[function(require,module,exports) {
+},{"./cjs/react-dom.development.js":"../../node_modules/react-dom/cjs/react-dom.development.js"}],"../../node_modules/js-cookie/src/js.cookie.js":[function(require,module,exports) {
+var define;
+/*!
+ * JavaScript Cookie v2.2.0
+ * https://github.com/js-cookie/js-cookie
+ *
+ * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
+ * Released under the MIT license
+ */
+;(function (factory) {
+	var registeredInModuleLoader = false;
+	if (typeof define === 'function' && define.amd) {
+		define(factory);
+		registeredInModuleLoader = true;
+	}
+	if (typeof exports === 'object') {
+		module.exports = factory();
+		registeredInModuleLoader = true;
+	}
+	if (!registeredInModuleLoader) {
+		var OldCookies = window.Cookies;
+		var api = window.Cookies = factory();
+		api.noConflict = function () {
+			window.Cookies = OldCookies;
+			return api;
+		};
+	}
+}(function () {
+	function extend () {
+		var i = 0;
+		var result = {};
+		for (; i < arguments.length; i++) {
+			var attributes = arguments[ i ];
+			for (var key in attributes) {
+				result[key] = attributes[key];
+			}
+		}
+		return result;
+	}
+
+	function init (converter) {
+		function api (key, value, attributes) {
+			var result;
+			if (typeof document === 'undefined') {
+				return;
+			}
+
+			// Write
+
+			if (arguments.length > 1) {
+				attributes = extend({
+					path: '/'
+				}, api.defaults, attributes);
+
+				if (typeof attributes.expires === 'number') {
+					var expires = new Date();
+					expires.setMilliseconds(expires.getMilliseconds() + attributes.expires * 864e+5);
+					attributes.expires = expires;
+				}
+
+				// We're using "expires" because "max-age" is not supported by IE
+				attributes.expires = attributes.expires ? attributes.expires.toUTCString() : '';
+
+				try {
+					result = JSON.stringify(value);
+					if (/^[\{\[]/.test(result)) {
+						value = result;
+					}
+				} catch (e) {}
+
+				if (!converter.write) {
+					value = encodeURIComponent(String(value))
+						.replace(/%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g, decodeURIComponent);
+				} else {
+					value = converter.write(value, key);
+				}
+
+				key = encodeURIComponent(String(key));
+				key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
+				key = key.replace(/[\(\)]/g, escape);
+
+				var stringifiedAttributes = '';
+
+				for (var attributeName in attributes) {
+					if (!attributes[attributeName]) {
+						continue;
+					}
+					stringifiedAttributes += '; ' + attributeName;
+					if (attributes[attributeName] === true) {
+						continue;
+					}
+					stringifiedAttributes += '=' + attributes[attributeName];
+				}
+				return (document.cookie = key + '=' + value + stringifiedAttributes);
+			}
+
+			// Read
+
+			if (!key) {
+				result = {};
+			}
+
+			// To prevent the for loop in the first place assign an empty array
+			// in case there are no cookies at all. Also prevents odd result when
+			// calling "get()"
+			var cookies = document.cookie ? document.cookie.split('; ') : [];
+			var rdecode = /(%[0-9A-Z]{2})+/g;
+			var i = 0;
+
+			for (; i < cookies.length; i++) {
+				var parts = cookies[i].split('=');
+				var cookie = parts.slice(1).join('=');
+
+				if (!this.json && cookie.charAt(0) === '"') {
+					cookie = cookie.slice(1, -1);
+				}
+
+				try {
+					var name = parts[0].replace(rdecode, decodeURIComponent);
+					cookie = converter.read ?
+						converter.read(cookie, name) : converter(cookie, name) ||
+						cookie.replace(rdecode, decodeURIComponent);
+
+					if (this.json) {
+						try {
+							cookie = JSON.parse(cookie);
+						} catch (e) {}
+					}
+
+					if (key === name) {
+						result = cookie;
+						break;
+					}
+
+					if (!key) {
+						result[name] = cookie;
+					}
+				} catch (e) {}
+			}
+
+			return result;
+		}
+
+		api.set = api;
+		api.get = function (key) {
+			return api.call(api, key);
+		};
+		api.getJSON = function () {
+			return api.apply({
+				json: true
+			}, [].slice.call(arguments));
+		};
+		api.defaults = {};
+
+		api.remove = function (key, attributes) {
+			api(key, '', extend(attributes, {
+				expires: -1
+			}));
+		};
+
+		api.withConverter = init;
+
+		return api;
+	}
+
+	return init(function () {});
+}));
+
+},{}],"utilities/getKey.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -25779,11 +25947,11 @@ var _settings = require("~/settings");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var _default = function _default(props) {
-  return _settings.EARLY ? _react.default.createElement("div", {
+  return _react.default.createElement("div", {
     className: "theirs"
   }, _react.default.createElement("h2", null, "everyone else"), _react.default.createElement(_List.default, {
     list: props.list
-  })) : '';
+  }));
 };
 
 exports.default = _default;
@@ -25883,7 +26051,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _react = _interopRequireWildcard(require("react"));
+var _react = _interopRequireDefault(require("react"));
 
 var _Task = _interopRequireDefault(require("~/components/Task"));
 
@@ -25892,16 +26060,6 @@ var _getKey = _interopRequireDefault(require("~/utilities/getKey"));
 var _throttle = _interopRequireDefault(require("~/utilities/throttle"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
-
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
-
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function aggregates(list) {
   var counts = {};
@@ -25920,13 +26078,13 @@ function aggregates(list) {
 }
 
 var _default = function _default(props) {
-  var _useState = (0, _react.useState)({
-    list: aggregates(props.list),
-    dragged: undefined
-  }),
-      _useState2 = _slicedToArray(_useState, 2),
-      state = _useState2[0],
-      setState = _useState2[1];
+  var normalTask = function normalTask(item) {
+    return _react.default.createElement(_Task.default, {
+      tabIndex: "0",
+      handleAction: props.onClick,
+      item: item
+    });
+  };
 
   var editTask = function editTask(item) {
     return _react.default.createElement(_Task.default, {
@@ -25935,63 +26093,57 @@ var _default = function _default(props) {
     });
   };
 
-  var normalTask = function normalTask(item) {
-    return _react.default.createElement(_Task.default, {
-      tabIndex: "0",
-      handleAction: props.handleAction,
-      item: item
-    });
-  };
-
   var _onDragStart = function onDragStart(e, i) {
-    var dragged = state.list[i];
+    var list = props.list;
+    var dragged = props.list[i];
     e.dataTransfer.effectAllowed = 'move';
     e.target.parentNode.classList.add('dragged');
     e.dataTransfer.setData('text/html', e.target.parentNode);
     e.dataTransfer.setDragImage(e.target.parentNode, 20, 20);
-    setState({
-      list: state.list,
+    props.onUpdate({
+      list: list,
       dragged: dragged
     });
   };
 
   var _onDragEnd = function onDragEnd(e) {
     e.target.parentNode.classList.remove('dragged');
-    var newlist = aggregates(state.list);
-    setState({
-      dragged: undefined,
-      list: newlist
+    var list = props.list;
+    var dragged = null;
+    props.onUpdate({
+      list: list,
+      dragged: dragged
     });
-    props.onUpdate(newlist);
   };
 
   var _onDragOver = function onDragOver(i) {
-    if (state.dragged === state.list[i]) return;
-    var newlist = state.list.filter(function (i) {
-      return i.id != state.dragged.id;
+    if (props.dragged === props.list[i]) return;
+    var dragged = props.dragged;
+    var list = props.list.filter(function (i) {
+      return i.id != props.dragged.id;
     });
-    newlist.splice(i, 0, state.dragged);
-    newlist = aggregates(newlist);
-    setState({
-      dragged: state.dragged,
-      list: newlist
+    list.splice(i, 0, props.dragged);
+    props.onUpdate({
+      list: list,
+      dragged: dragged
     });
   };
 
   var _onClick = function onClick(e, i) {
-    var newlist = state.list.splice(0);
-    newlist.splice(i, 1);
-    newlist = aggregates(newlist);
-    setState({
-      dragged: state.dragged,
-      list: newlist
+    var dragged = props.dragged;
+    var list = props.list.slice(0);
+    list.splice(i, 1);
+    console.log('update the parent with the smaller list', list);
+    props.onUpdate({
+      list: list,
+      dragged: dragged
     });
-    props.onUpdate(newlist);
   };
 
-  return props.editMode ? _react.default.createElement("ul", {
+  var calculatedList = aggregates(props.list);
+  return props.edit ? _react.default.createElement("ul", {
     className: 'list taskList edit'
-  }, state.list.map(function (item, i) {
+  }, calculatedList.map(function (item, i) {
     return _react.default.createElement("li", {
       onDragOver: function onDragOver() {
         (0, _throttle.default)(_onDragOver, 100)(i);
@@ -26012,9 +26164,9 @@ var _default = function _default(props) {
     }, editTask(item)));
   })) : _react.default.createElement("ul", {
     className: 'list taskList'
-  }, state.list.map(function (item, i) {
+  }, calculatedList.map(function (item, i) {
     return _react.default.createElement("li", {
-      className: props.editMode ? 'drag' : '',
+      className: props.edit ? 'drag' : '',
       key: (0, _getKey.default)(item)
     }, normalTask(item));
   }));
@@ -26069,74 +26221,135 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
-var _default = function _default(props) {
-  var _useState = (0, _react.useState)({
-    list: props.list,
-    edit: false
-  }),
-      _useState2 = _slicedToArray(_useState, 2),
-      _useState2$ = _useState2[0],
-      list = _useState2$.list,
-      edit = _useState2$.edit,
-      setEditState = _useState2[1];
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-  var toggleEdit = function toggleEdit() {
-    ;
-    edit ? endEdit() : startEdit();
-  };
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
-  var onUpdate = function onUpdate(newlist) {
-    setEditState({
-      list: newlist,
-      edit: edit
-    });
-  };
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-  var startEdit = function startEdit() {
-    setEditState({
-      list: list,
-      edit: true
-    });
-  };
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-  var endEdit = function endEdit() {
-    setEditState({
-      list: list,
-      edit: false
-    });
-    props.updateList(list);
-  };
+var Mine =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(Mine, _React$Component);
 
-  var getEditInstruction = function getEditInstruction() {
-    return _react.default.createElement("ul", {
-      className: "instruction"
-    }, _react.default.createElement("li", null, _react.default.createElement("small", null, "drag item to reorder")), _react.default.createElement("li", null, _react.default.createElement("small", null, "click item to delete")), _react.default.createElement("li", null, _react.default.createElement("small", null, "click \"done\" to exit editing mode")));
-  };
+  function Mine(props) {
+    var _this;
 
-  return _react.default.createElement("div", {
-    className: "mine"
-  }, _react.default.createElement("h2", null, "routine"), _react.default.createElement(_TaskList.default, _extends({}, props, {
-    editMode: edit,
-    onUpdate: onUpdate
-  })), _react.default.createElement("footer", null, _react.default.createElement("div", null, _react.default.createElement(_Link.default, {
-    text: edit ? 'done' : 'edit',
-    action: toggleEdit
-  }), _react.default.createElement(_Link.default, {
-    text: "reset",
-    action: props.handleClearDone
-  })), edit ? getEditInstruction() : ''));
-};
+    _classCallCheck(this, Mine);
 
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Mine).call(this, props));
+    _this.state = {
+      list: props.list,
+      edit: false,
+      dragged: null
+    };
+    _this.onUpdate = _this.onUpdate.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.toggleEdit = _this.toggleEdit.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.startEdit = _this.startEdit.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.stopEdit = _this.stopEdit.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.handleAction = props.handleAction;
+    _this.handleClearDone = props.handleClearDone;
+    _this.updateList = props.updateList;
+    return _this;
+  }
+
+  _createClass(Mine, [{
+    key: "startEdit",
+    value: function startEdit() {
+      this.setState(function (state) {
+        state.edit = true;
+        state.dragged = null;
+        return state;
+      });
+    }
+  }, {
+    key: "stopEdit",
+    value: function stopEdit() {
+      this.updateList(this.state.list);
+      this.setState(function (state) {
+        state.edit = false;
+        state.dragged = null;
+        return state;
+      });
+    }
+  }, {
+    key: "toggleEdit",
+    value: function toggleEdit() {
+      if (this.state.edit) {
+        this.stopEdit();
+      } else {
+        this.startEdit();
+      }
+    }
+  }, {
+    key: "onUpdate",
+    value: function onUpdate(_ref) {
+      var list = _ref.list,
+          dragged = _ref.dragged;
+      this.setState(function (state) {
+        console.log('onUpdate', state.list, list);
+        state.list = list;
+        state.dragged = dragged;
+        return state;
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var getEditInstruction = function getEditInstruction() {
+        return _react.default.createElement("ul", {
+          className: "instruction"
+        }, _react.default.createElement("li", null, _react.default.createElement("small", null, "drag item to reorder")), _react.default.createElement("li", null, _react.default.createElement("small", null, "click item to delete")), _react.default.createElement("li", null, _react.default.createElement("small", null, "click \"done\" to exit editing mode")));
+      };
+
+      return _react.default.createElement("div", {
+        className: "mine"
+      }, _react.default.createElement("h2", null, "routine"), _react.default.createElement(_TaskList.default, {
+        list: this.state.list,
+        edit: this.state.edit,
+        dragged: this.state.dragged,
+        onUpdate: this.onUpdate,
+        onClick: this.handleAction
+      }), _react.default.createElement("footer", null, _react.default.createElement("div", null, _react.default.createElement(_Link.default, {
+        text: this.state.edit ? 'done' : 'edit',
+        action: this.toggleEdit
+      }), _react.default.createElement(_Link.default, {
+        text: "reset",
+        action: this.handleClearDone
+      })), this.state.edit ? getEditInstruction() : ''));
+    }
+  }], [{
+    key: "getDerivedStateFromProps",
+    value: function getDerivedStateFromProps(props, state) {
+      if (state.edit) return null;
+
+      if (props.list !== state.list) {
+        state.list = props.list;
+        state.edit = false;
+        state.dragged = null;
+        return state;
+      }
+
+      return null;
+    }
+  }]);
+
+  return Mine;
+}(_react.default.Component);
+
+var _default = Mine;
 exports.default = _default;
 },{"react":"../../node_modules/react/index.js","~/components/TaskList":"components/TaskList.js","~/components/Link":"components/Link.js"}],"components/Button.js":[function(require,module,exports) {
 "use strict";
@@ -26159,7 +26372,33 @@ var _default = _react.default.forwardRef(function (props, ref) {
 });
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js"}],"components/Totals.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js"}],"services/messages.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.randomFromList = exports.messages = void 0;
+var almostDone = ['Oh wow, you\'re almost done!', 'I believe in you!', 'You\'re almost there!', 'Let\'s do this.'];
+var halfway = ['You are so focused!', 'Have you had a break lately?', 'Can I interest you in a nice cup of water?', 'You\'re a beast!'];
+var beginning = ['Wow, so many tasks... You are very ambitious!', 'You look so smart today!', 'What a good day to get a thing done :D'];
+var hello = ['I knew you\'d be back! :)', 'You look so smart today.', 'It really makes me happy to see you so motivated and studious.', 'What a diligent person you are!', 'Welcome back! It\'s so nice to see you.'];
+var working = ['Feelings check...', 'Time for water...', 'A wet brain is a happy brain...', 'One day at a time...', 'Slow breaths...', 'Slow and steady...'];
+
+var randomFromList = function randomFromList(list) {
+  return list[Math.floor(Math.random() * list.length)];
+};
+
+exports.randomFromList = randomFromList;
+var messages = {
+  almostDone: almostDone,
+  halfway: halfway,
+  beginning: beginning,
+  hello: hello,
+  working: working
+};
+exports.messages = messages;
+},{}],"components/Totals.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -26169,7 +26408,7 @@ exports.default = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
-var _Task = _interopRequireDefault(require("~/components/Task"));
+var _messages = require("~/services/messages");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -26185,16 +26424,9 @@ var isAlmostDone = function isAlmostDone(totals) {
   return percentage(totals) > 80;
 };
 
-var randomFromList = function randomFromList(list) {
-  return list[Math.floor(Math.random() * list.length)];
-};
-
-var almostDone = ['Oh wow, you\'re almost done!', 'I believe in you!', 'You\'re almost there!', 'Let\'s do this.'];
-var halfway = ['You are so focused!', 'Have you had a break lately?', 'Can I interest you in a nice cup of water?', 'You\'re a beast!'];
-var beginning = ['Wow, so many tasks... You are very ambitious!', 'You look so smart today!', 'What a good day to get a thing done :D'];
 var memoizedGetMessageFor = totalsHaveChangedDecorator(getMessageFor);
 var previousTotals = null;
-var previousMsg = null; // <div><span>{ `${props.totals.done}/${props.totals.total}` }</span></div>
+var previousMsg = null;
 
 var _default = function _default(props) {
   return _react.default.createElement("div", {
@@ -26205,9 +26437,9 @@ var _default = function _default(props) {
 exports.default = _default;
 
 function getMessageFor(totals) {
-  if (totals == previousTotals) if (isAlmostDone(totals)) return randomFromList(almostDone);
-  if (isHalfway(totals)) return randomFromList(halfway);
-  return randomFromList(beginning);
+  if (isAlmostDone(totals)) return (0, _messages.randomFromList)(_messages.messages.almostDone);
+  if (isHalfway(totals)) return (0, _messages.randomFromList)(_messages.messages.halfway);
+  return (0, _messages.randomFromList)(_messages.messages.beginning);
 }
 
 function totalsHaveChangedDecorator(fn) {
@@ -26223,7 +26455,7 @@ function totalsHaveChangedDecorator(fn) {
     return previousMsg;
   };
 }
-},{"react":"../../node_modules/react/index.js","~/components/Task":"components/Task.js"}],"utilities/Timer.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/services/messages":"services/messages.js"}],"utilities/Timer.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28236,7 +28468,34 @@ module.exports.default = axios;
 
 },{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/bind":"../../node_modules/axios/lib/helpers/bind.js","./core/Axios":"../../node_modules/axios/lib/core/Axios.js","./defaults":"../../node_modules/axios/lib/defaults.js","./cancel/Cancel":"../../node_modules/axios/lib/cancel/Cancel.js","./cancel/CancelToken":"../../node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"../../node_modules/axios/lib/cancel/isCancel.js","./helpers/spread":"../../node_modules/axios/lib/helpers/spread.js"}],"../../node_modules/axios/index.js":[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":"../../node_modules/axios/lib/axios.js"}],"../../node_modules/core-js/modules/_global.js":[function(require,module,exports) {
+},{"./lib/axios":"../../node_modules/axios/lib/axios.js"}],"utilities.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getOrdinal = getOrdinal;
+
+function getOrdinal(nonce) {
+  var i = parseInt(nonce);
+  var j = i % 10;
+  var k = i % 100;
+
+  if (j == 1 && k != 11) {
+    return "st";
+  }
+
+  if (j == 2 && k != 12) {
+    return "nd";
+  }
+
+  if (j == 3 && k != 13) {
+    return "rd";
+  }
+
+  return "th";
+}
+},{}],"../../node_modules/core-js/modules/_global.js":[function(require,module,exports) {
 
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
@@ -36212,13 +36471,15 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _axios = _interopRequireDefault(require("axios"));
-
 var _react = _interopRequireDefault(require("react"));
 
-var _Button = _interopRequireDefault(require("~/components/Button"));
+var _axios = _interopRequireDefault(require("axios"));
+
+var _jsCookie = _interopRequireDefault(require("js-cookie"));
 
 var _settings = require("~/settings");
+
+var _utilities = require("~/utilities");
 
 require("babel-polyfill");
 
@@ -36248,26 +36509,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 
 var noAccountError = new Error('no accounts');
 
-function getOrdinal(nonce) {
-  var i = parseInt(nonce);
-  var j = i % 10;
-  var k = i % 100;
-
-  if (j == 1 && k != 11) {
-    return "st";
-  }
-
-  if (j == 2 && k != 12) {
-    return "nd";
-  }
-
-  if (j == 3 && k != 13) {
-    return "rd";
-  }
-
-  return "th";
-}
-
 var Auth =
 /*#__PURE__*/
 function (_React$Component) {
@@ -36280,11 +36521,13 @@ function (_React$Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Auth).call(this, props));
     _this.url = _settings.ENDPOINT;
-    _this.state = {
-      publicAddress: null
-    };
-    _this.web3 = props.web3;
+    _this.web3 = props.web3; // upstream callbacks
+
+    _this.callback = props.callback; // handlers
+
     _this.login = _this.login.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.logout = _this.logout.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.attemptSwitchAccount = _this.attemptSwitchAccount.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.checkIfNewAccount = _this.checkIfNewAccount.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
@@ -36292,7 +36535,11 @@ function (_React$Component) {
   _createClass(Auth, [{
     key: "componentDidMount",
     value: function componentDidMount() {
-      this.pingForActiveAccount();
+      var _this2 = this;
+
+      setTimeout(function () {
+        _this2.pingForActiveAccount();
+      }, 1);
     }
   }, {
     key: "checkIfNewAccount",
@@ -36300,34 +36547,30 @@ function (_React$Component) {
       var _checkIfNewAccount = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee() {
-        var web3, publicAddress;
+        var account;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                web3 = this.web3;
-                _context.next = 3;
-                return web3.eth.getAccounts();
+                _context.next = 2;
+                return this.web3.eth.getAccounts();
 
-              case 3:
-                publicAddress = _context.sent[0];
+              case 2:
+                account = _context.sent[0];
 
-                if (publicAddress) {
-                  _context.next = 6;
+                if (account) {
+                  _context.next = 5;
                   break;
                 }
 
                 throw noAccountError;
 
-              case 6:
-                if (publicAddress !== this.state.publicAddress) {
-                  this.setState(function (state) {
-                    state.publicAddress = publicAddress;
-                    return state;
-                  });
+              case 5:
+                if (account !== this.props.account) {
+                  this.callback(account, this.attemptSwitchAccount(account));
                 }
 
-              case 7:
+              case 6:
               case "end":
                 return _context.stop();
             }
@@ -36347,7 +36590,7 @@ function (_React$Component) {
       var _pingForActiveAccount = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee3() {
-        var _this2 = this;
+        var _this3 = this;
 
         var promise;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
@@ -36365,11 +36608,11 @@ function (_React$Component) {
                         switch (_context2.prev = _context2.next) {
                           case 0:
                             // check immediately
-                            _this2.checkIfNewAccount().catch(reject); // continue to check every 3 seconds
+                            _this3.checkIfNewAccount().catch(reject); // continue to check every 3 seconds
 
 
-                            _this2.checkAccountTimer = setInterval(function () {
-                              _this2.checkIfNewAccount().catch(reject);
+                            _this3.checkAccountTimer = setInterval(function () {
+                              _this3.checkIfNewAccount().catch(reject);
                             }, 3000);
 
                           case 2:
@@ -36386,12 +36629,9 @@ function (_React$Component) {
                 }());
                 promise.catch(function (err) {
                   if (err === noAccountError) {
-                    _this2.setState(function (state) {
-                      delete state['publicAddress'];
-                      return state;
-                    });
+                    _this3.callback(undefined, undefined);
                   } else {
-                    console.log('err', err);
+                    console.error('err', err);
                   }
                 });
 
@@ -36414,17 +36654,17 @@ function (_React$Component) {
     value: function () {
       var _signMessage = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee4(publicAddress, nonce) {
+      regeneratorRuntime.mark(function _callee4(account, nonce) {
         var ordinal, challenge, hexChallenge, signature;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                ordinal = getOrdinal(nonce);
+                ordinal = (0, _utilities.getOrdinal)(nonce);
                 challenge = "I'm signing into my everyday account for the ".concat(nonce).concat(ordinal, " time");
                 hexChallenge = this.web3.utils.utf8ToHex(challenge);
                 _context4.next = 5;
-                return this.web3.eth.personal.sign(hexChallenge, publicAddress, null);
+                return this.web3.eth.personal.sign(hexChallenge, account, null);
 
               case 5:
                 signature = _context4.sent;
@@ -36449,14 +36689,14 @@ function (_React$Component) {
     value: function () {
       var _fetchNonce = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee5(publicAddress) {
+      regeneratorRuntime.mark(function _callee5(account) {
         var response;
         return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
                 _context5.next = 2;
-                return _axios.default.get("".concat(this.url, "/address/").concat(publicAddress, "/nonce"));
+                return _axios.default.get("".concat(this.url, "/account/").concat(account, "/nonce/"));
 
               case 2:
                 response = _context5.sent;
@@ -36481,7 +36721,7 @@ function (_React$Component) {
     value: function () {
       var _authenticate = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee6(publicAddress, signature) {
+      regeneratorRuntime.mark(function _callee6(account, signature) {
         var response;
         return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
@@ -36489,13 +36729,13 @@ function (_React$Component) {
               case 0:
                 _context6.next = 2;
                 return _axios.default.post("".concat(this.url, "/authentication/"), {
-                  publicAddress: publicAddress,
+                  account: account,
                   signature: signature
                 });
 
               case 2:
                 response = _context6.sent;
-                return _context6.abrupt("return", response.data);
+                return _context6.abrupt("return", response.data.token);
 
               case 4:
               case "end":
@@ -36517,44 +36757,50 @@ function (_React$Component) {
       var _login = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee7(e) {
-        var nonce, signature, session, publicAddress;
+        var nonce, signature, session, token, account;
         return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
                 e.preventDefault();
-                publicAddress = this.state.publicAddress;
-                _context7.prev = 2;
-                _context7.next = 5;
-                return this.fetchNonce(publicAddress);
+                token = false;
+                account = this.props.account;
+                _context7.prev = 3;
+                _context7.next = 6;
+                return this.fetchNonce(account);
 
-              case 5:
+              case 6:
                 nonce = _context7.sent;
-                _context7.next = 8;
-                return this.signMessage(publicAddress, nonce);
+                _context7.next = 9;
+                return this.signMessage(account, nonce);
 
-              case 8:
+              case 9:
                 signature = _context7.sent;
-                _context7.next = 11;
-                return this.authenticate(publicAddress, signature);
+                _context7.next = 12;
+                return this.authenticate(account, signature);
 
-              case 11:
-                session = _context7.sent;
-                console.log('result', nonce, signature, session);
-                _context7.next = 18;
+              case 12:
+                token = _context7.sent;
+                _context7.next = 20;
                 break;
 
               case 15:
                 _context7.prev = 15;
-                _context7.t0 = _context7["catch"](2);
-                console.log('error login with metamask', _context7.t0);
+                _context7.t0 = _context7["catch"](3);
+                console.error('error login with metamask', _context7.t0);
+                alert('error logging in with metamask');
+                return _context7.abrupt("return");
 
-              case 18:
+              case 20:
+                this.setToken(account, token);
+                this.callback(account, token);
+
+              case 22:
               case "end":
                 return _context7.stop();
             }
           }
-        }, _callee7, this, [[2, 15]]);
+        }, _callee7, this, [[3, 15]]);
       }));
 
       function login(_x8) {
@@ -36564,27 +36810,76 @@ function (_React$Component) {
       return login;
     }()
   }, {
+    key: "logout",
+    value: function logout(e) {
+      e.preventDefault();
+      var account = this.props.account;
+
+      _jsCookie.default.remove(account);
+
+      delete _axios.default.defaults.headers.common['Authorization'];
+      this.callback(account, null);
+    }
+  }, {
+    key: "attemptSwitchAccount",
+    value: function attemptSwitchAccount(account) {
+      var oldAccount = this.props.account;
+
+      _jsCookie.default.remove(oldAccount);
+
+      delete _axios.default.defaults.headers.common['Authorization'];
+
+      var token = _jsCookie.default.get(account);
+
+      if (token) {
+        _jsCookie.default.set(account, token, {
+          secure: _settings.ENVIRONMENT === 'production'
+        });
+
+        _axios.default.defaults.headers.common['Authorization'] = token;
+      }
+
+      return token;
+    }
+  }, {
+    key: "setToken",
+    value: function setToken(account, token) {
+      var oldAccount = this.props.account;
+
+      _jsCookie.default.remove(oldAccount);
+
+      delete _axios.default.defaults.headers.common['Authorization'];
+
+      if (account && token) {
+        _jsCookie.default.set(account, token, {
+          secure: _settings.ENVIRONMENT === 'production'
+        });
+
+        _axios.default.defaults.headers.common['Authorization'] = token;
+      }
+    }
+  }, {
     key: "isLoggedIn",
     value: function isLoggedIn() {
-      return false;
+      return !!this.props.token;
     }
   }, {
     key: "hasAccount",
     value: function hasAccount() {
-      return !!this.state.publicAddress;
+      return !!this.props.account;
     }
   }, {
-    key: "getShortAddress",
-    value: function getShortAddress() {
-      var publicAddress = this.state.publicAddress;
-      var start = publicAddress.slice(0, 4);
-      var end = publicAddress.slice(-4);
+    key: "getShortAccount",
+    value: function getShortAccount() {
+      var account = this.props.account;
+      var start = account.slice(0, 4);
+      var end = account.slice(-4);
       return "".concat(start, "...").concat(end);
     }
   }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       var showMetamaskPrompt = function showMetamaskPrompt() {
         return _react.default.createElement("span", {
@@ -36595,20 +36890,27 @@ function (_React$Component) {
       var showLoggedInName = function showLoggedInName() {
         return _react.default.createElement("span", {
           className: "authInfo"
-        }, _this3.state.name);
+        }, _react.default.createElement("span", {
+          className: "loginWith"
+        }, "Logout from"), _react.default.createElement("span", {
+          className: "loginAddress"
+        }, _react.default.createElement("a", {
+          href: "#",
+          onClick: _this4.logout
+        }, _this4.getShortAccount())));
       };
 
       var showLoginWithActiveMetamaskAccount = function showLoginWithActiveMetamaskAccount() {
         return _react.default.createElement("div", {
-          className: "loginActive"
+          className: "authInfo"
         }, _react.default.createElement("span", {
           className: "loginWith"
         }, "Login with"), _react.default.createElement("span", {
           className: "loginAddress"
         }, _react.default.createElement("a", {
           href: "#",
-          onClick: _this3.login
-        }, _this3.getShortAddress())));
+          onClick: _this4.login
+        }, _this4.getShortAccount())));
       };
 
       var show;
@@ -36634,7 +36936,7 @@ function (_React$Component) {
 
 var _default = Auth;
 exports.default = _default;
-},{"axios":"../../node_modules/axios/index.js","react":"../../node_modules/react/index.js","~/components/Button":"components/Button.js","~/settings":"settings.js","babel-polyfill":"../../node_modules/babel-polyfill/lib/index.js"}],"components/Logo.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","axios":"../../node_modules/axios/index.js","js-cookie":"../../node_modules/js-cookie/src/js.cookie.js","~/settings":"settings.js","~/utilities":"utilities.js","babel-polyfill":"../../node_modules/babel-polyfill/lib/index.js"}],"components/Logo.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36672,13 +36974,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var _default = function _default(props) {
   return _react.default.createElement("header", {
     className: "header"
-  }, _react.default.createElement(_Logo.default, null), _react.default.createElement(_Auth.default, {
-    web3: props.web3
-  }));
+  }, _react.default.createElement(_Logo.default, null), _react.default.createElement(_Auth.default, props));
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Auth":"components/Auth.js","~/components/Logo":"components/Logo.js"}],"storage.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Auth":"components/Auth.js","~/components/Logo":"components/Logo.js"}],"services/remote.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36686,7 +36986,148 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+var _axios = _interopRequireDefault(require("axios"));
+
 var _settings = require("~/settings");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Remote =
+/*#__PURE__*/
+function () {
+  function Remote(account) {
+    _classCallCheck(this, Remote);
+
+    this.url = _settings.ENDPOINT;
+    this.account = account;
+    this.load = this.load.bind(this);
+    this.save = this.save.bind(this);
+  }
+
+  _createClass(Remote, [{
+    key: "save",
+    value: function () {
+      var _save = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee(account, data) {
+        var response;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return _axios.default.post("".concat(this.url, "/account/").concat(account, "/data/"), data);
+
+              case 2:
+                response = _context.sent;
+                return _context.abrupt("return", true);
+
+              case 4:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function save(_x, _x2) {
+        return _save.apply(this, arguments);
+      }
+
+      return save;
+    }()
+  }, {
+    key: "load",
+    value: function () {
+      var _load = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee2(account) {
+        var response;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return _axios.default.get("".concat(this.url, "/account/").concat(account, "/data/"));
+
+              case 2:
+                response = _context2.sent;
+                return _context2.abrupt("return", response.data);
+
+              case 4:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function load(_x3) {
+        return _load.apply(this, arguments);
+      }
+
+      return load;
+    }()
+  }, {
+    key: "clear",
+    value: function () {
+      var _clear = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3(account) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                console.error('not implemented');
+
+              case 1:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function clear(_x4) {
+        return _clear.apply(this, arguments);
+      }
+
+      return clear;
+    }()
+  }, {
+    key: "name",
+    get: function get() {
+      return 'session storage';
+    }
+  }]);
+
+  return Remote;
+}();
+
+var _default = new Remote();
+
+exports.default = _default;
+},{"axios":"../../node_modules/axios/index.js","~/settings":"settings.js"}],"services/local.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -36701,24 +37142,103 @@ function () {
     _classCallCheck(this, Storage);
 
     this.store = window.localStorage;
+    this.load = this.load.bind(this);
+    this.save = this.save.bind(this);
   }
 
   _createClass(Storage, [{
     key: "save",
-    value: function save(data) {
-      this.store.setItem(_settings.NAMESPACE, JSON.stringify(data));
-    }
+    value: function () {
+      var _save = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee(account, data) {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                this.store.setItem(account, JSON.stringify(data));
+
+              case 1:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function save(_x, _x2) {
+        return _save.apply(this, arguments);
+      }
+
+      return save;
+    }()
   }, {
     key: "load",
-    value: function load() {
-      var saved = JSON.parse(this.store.getItem(_settings.NAMESPACE));
-      if (saved === null || Object.entries(saved).length === 0) throw new Error('nothing saved');
-      return saved;
-    }
+    value: function () {
+      var _load = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee2(account) {
+        var data;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                data = JSON.parse(this.store.getItem(account));
+
+                if (!(data === null || Object.entries(data).length === 0)) {
+                  _context2.next = 3;
+                  break;
+                }
+
+                throw new Error('nothing to be found in localstorage');
+
+              case 3:
+                return _context2.abrupt("return", data);
+
+              case 4:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function load(_x3) {
+        return _load.apply(this, arguments);
+      }
+
+      return load;
+    }()
   }, {
     key: "clear",
-    value: function clear() {
-      this.store.removeItem(_settings.NAMESPACE);
+    value: function () {
+      var _clear = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3(account) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                this.store.removeItem(account);
+
+              case 1:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function clear(_x4) {
+        return _clear.apply(this, arguments);
+      }
+
+      return clear;
+    }()
+  }, {
+    key: "name",
+    get: function get() {
+      return 'local storage';
     }
   }]);
 
@@ -36728,7 +37248,7 @@ function () {
 var _default = new Storage();
 
 exports.default = _default;
-},{"~/settings":"settings.js"}],"Components/App.js":[function(require,module,exports) {
+},{}],"Components/App.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36746,13 +37266,21 @@ var _Next = _interopRequireDefault(require("~/components/Next"));
 
 var _Header = _interopRequireDefault(require("~/components/Header"));
 
-var _storage = _interopRequireDefault(require("~/storage"));
+var _remote = _interopRequireDefault(require("~/services/remote"));
+
+var _local = _interopRequireDefault(require("~/services/local"));
+
+var _messages = require("~/services/messages");
 
 var _settings = require("~/settings");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -36778,7 +37306,9 @@ function (_React$Component) {
   _createClass(App, null, [{
     key: "resetList",
     value: function resetList() {
-      return App.flatten(_settings.DEFAULTLIST);
+      var list = App.flatten(_settings.DEFAULTLIST);
+      list[0].active = true;
+      return list;
     }
   }, {
     key: "flatten",
@@ -36788,6 +37318,13 @@ function (_React$Component) {
         return i;
       });
     }
+  }, {
+    key: "hasActive",
+    value: function hasActive(list) {
+      return list && list.filter(function (i) {
+        return i.active;
+      }).length > 0;
+    }
   }]);
 
   function App(props) {
@@ -36796,103 +37333,291 @@ function (_React$Component) {
     _classCallCheck(this, App);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
-    var state;
-
-    try {
-      state = _storage.default.load();
-    } catch (err) {
-      console.log('err', err);
-      var list = App.resetList();
-      list[0].active = true;
-      state = {
-        mine: list
-      };
-    }
-
-    _this.state = state;
-    _this.doneRef = _react.default.createRef();
-    _this.web3 = props.web3; // handlers
+    _this.state = {
+      account: props.defaultAccount,
+      token: props.token,
+      data: {},
+      message: (0, _messages.randomFromList)(_messages.messages.hello)
+    };
+    _this.doneRef = _react.default.createRef(); // handlers
 
     _this.handleReset = _this.handleReset.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.handleClearDone = _this.handleClearDone.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.handleSetActive = _this.handleSetActive.bind(_assertThisInitialized(_assertThisInitialized(_this))); // callback
+    _this.handleSetActive = _this.handleSetActive.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.createSession = _this.createSession.bind(_assertThisInitialized(_assertThisInitialized(_this))); // this.hasSession = this.hasSession.bind(this)
+
+    _this.load = _this.load.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.save = _this.save.bind(_assertThisInitialized(_assertThisInitialized(_this))); // callback
 
     _this.updateList = _this.updateList.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.updateAuthentication = _this.updateAuthentication.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
 
   _createClass(App, [{
+    key: "load",
+    value: function () {
+      var _load = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee() {
+        var _this2 = this;
+
+        var data;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.prev = 0;
+                this.setState({
+                  message: 'Loading...'
+                });
+                _context.next = 4;
+                return this.store.load(this.state.account);
+
+              case 4:
+                data = _context.sent;
+                this.updateList(data.mine, true);
+                this.setState({
+                  message: "Loaded from ".concat(this.store.name, ".")
+                });
+                _context.next = 12;
+                break;
+
+              case 9:
+                _context.prev = 9;
+                _context.t0 = _context["catch"](0);
+                console.error('err loading', _context.t0);
+
+              case 12:
+                _context.prev = 12;
+                setTimeout(function () {
+                  _this2.setState({
+                    message: (0, _messages.randomFromList)(_messages.messages.working)
+                  });
+                }, 1000 * 5);
+                return _context.finish(12);
+
+              case 15:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this, [[0, 9, 12, 15]]);
+      }));
+
+      function load() {
+        return _load.apply(this, arguments);
+      }
+
+      return load;
+    }()
+  }, {
+    key: "save",
+    value: function () {
+      var _save = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee2() {
+        var _this3 = this;
+
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.prev = 0;
+                this.setState({
+                  message: 'Saving...'
+                });
+                _context2.next = 4;
+                return this.store.save(this.state.account, this.state.data);
+
+              case 4:
+                this.setState({
+                  message: "Saved to ".concat(this.store.name, ".")
+                });
+                _context2.next = 10;
+                break;
+
+              case 7:
+                _context2.prev = 7;
+                _context2.t0 = _context2["catch"](0);
+                console.error('err saving', _context2.t0);
+
+              case 10:
+                _context2.prev = 10;
+                setTimeout(function () {
+                  _this3.setState({
+                    message: (0, _messages.randomFromList)(_messages.messages.working)
+                  });
+                }, 1000 * 5);
+                return _context2.finish(10);
+
+              case 13:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[0, 7, 10, 13]]);
+      }));
+
+      function save() {
+        return _save.apply(this, arguments);
+      }
+
+      return save;
+    }()
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this4 = this;
+
+      this.store = this.state.token ? _remote.default : _local.default;
+      this.load();
+      setInterval(function () {
+        _this4.setState({
+          message: (0, _messages.randomFromList)(_messages.messages.working)
+        });
+      }, 1000 * 60 * 60);
+    }
+  }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
-      this.save();
+      this.store = this.state.token ? _remote.default : _local.default;
     }
   }, {
     key: "handleClearDone",
     value: function handleClearDone() {
-      var list = this.state.mine.slice(0).map(function (i) {
+      var list = this.state.data.mine.slice(0).map(function (i) {
         i.checked = false;
         i.active = false;
         return i;
       });
       list[0].active = true;
-      this.setState({
-        mine: list
-      });
+      this.updateList(list);
     }
   }, {
     key: "updateList",
     value: function updateList(list) {
-      this.setState({
-        mine: list
+      var _this5 = this;
+
+      var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      if (!App.hasActive(list)) {
+        list[0].active = true;
+      }
+
+      this.setState(function (state) {
+        state.data.mine = list;
+        return state;
+      }, function () {
+        if (save) _this5.save();
       });
+    }
+  }, {
+    key: "updateAuthentication",
+    value: function updateAuthentication(account) {
+      var token = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      if (token === null || token === undefined) {
+        this.setState(function (state) {
+          state.account = account;
+          delete state.token;
+          return state;
+        });
+      } else {
+        this.setState(function (state) {
+          state.account = account;
+          state.token = token;
+          return state;
+        });
+      }
+
+      this.load();
     }
   }, {
     key: "handleReset",
     value: function handleReset() {
-      this.setState({
-        mine: App.resetList()
-      });
+      this.updateList(App.resetList());
     }
   }, {
     key: "handleSetActive",
     value: function handleSetActive(id) {
-      this.setState({
-        mine: this.state.mine.slice(0).map(function (i) {
+      this.setState(function (state) {
+        state.data.mine = state.data.mine.slice(0).map(function (i) {
           i.active = i.id == id;
           return i;
-        })
+        });
+        return state;
       });
       this.doneRef.current.focus();
     }
   }, {
-    key: "save",
-    value: function save() {
-      _storage.default.save({
-        mine: this.state.mine
-      });
+    key: "hasToken",
+    value: function hasToken() {
+      function parseJwt(token) {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace('-', '+').replace('_', '/');
+        return JSON.parse(window.atob(base64));
+      }
+
+      try {
+        var parsed = parseJwt(this.state.token);
+        console.log(parsed);
+        return true;
+      } catch (err) {
+        console.log('error parsing jwt');
+        return false;
+      }
+    }
+  }, {
+    key: "createSession",
+    value: function createSession() {
+      this.updateList(App.resetList());
+    }
+  }, {
+    key: "hasSession",
+    value: function hasSession() {
+      return Array.isArray(this.state.data.mine);
     }
   }, {
     key: "render",
     value: function render() {
       var doneRef = this.doneRef;
-      return _react.default.createElement("div", {
-        className: "app"
-      }, _react.default.createElement(_Header.default, {
-        web3: this.props.web3
-      }), _react.default.createElement("div", {
+      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_Header.default, {
+        web3: this.props.web3,
+        account: this.state.account,
+        token: this.state.token,
+        callback: this.updateAuthentication
+      }), this.hasSession() ? _react.default.createElement("div", {
         className: "container"
       }, _react.default.createElement(_Next.default, {
         doneRef: doneRef,
-        list: this.state.mine,
+        list: this.state.data.mine,
         updateList: this.updateList
       }), _react.default.createElement(_Mine.default, {
-        list: this.state.mine,
+        list: this.state.data.mine,
         updateList: this.updateList,
         handleAction: this.handleSetActive,
         handleClearDone: this.handleClearDone
       }), _react.default.createElement(_Theirs.default, {
         list: _settings.TASKS
-      })));
+      })) : _react.default.createElement("div", {
+        className: "container messageScreen"
+      }, _react.default.createElement("div", {
+        className: "message"
+      }, _react.default.createElement("span", {
+        className: "messageLine"
+      }, "################################################################"), _react.default.createElement("span", null, "Session not found. Try logging in or ", _react.default.createElement("a", {
+        href: "#",
+        onClick: this.createSession
+      }, " create a new session.")), _react.default.createElement("span", {
+        className: "messageLine"
+      }, "################################################################"))), _react.default.createElement("footer", {
+        className: "footer"
+      }, _react.default.createElement("span", {
+        className: "messageLeft"
+      }, _react.default.createElement("small", null, this.state.message)), _react.default.createElement("span", {
+        className: "messageRight"
+      }, _react.default.createElement("small", null, this.hasToken() ? '' : 'Login to enable session storage.'))));
     }
   }]);
 
@@ -36901,7 +37626,7 @@ function (_React$Component) {
 
 var _default = App;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Theirs":"components/Theirs.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/components/Header":"components/Header.js","~/storage":"storage.js","~/settings":"settings.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Theirs":"components/Theirs.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/components/Header":"components/Header.js","~/services/remote":"services/remote.js","~/services/local":"services/local.js","~/services/messages":"services/messages.js","~/settings":"settings.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -95912,12 +96637,136 @@ var _web = _interopRequireDefault(require("web3"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function web3Init(window) {
-  if (typeof window.ethereum !== 'undefined' || typeof window.web3 !== 'undefined') {
-    return new _web.default(window['ethereum'] || window.web3.currentProvider);
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function getProviderType(provider) {
+  if (provider.isMetaMask) {
+    return 'metamask';
+  } else if (provider.host && provider.host.indexOf('infura') !== -1) {
+    return 'infura';
+  } else if (provider.host && provider.host.indexOf('localhost') !== -1) {
+    return 'localhost';
   }
 
-  return null;
+  return 'unknown';
+}
+
+function getNetworkType(_x) {
+  return _getNetworkType.apply(this, arguments);
+}
+
+function _getNetworkType() {
+  _getNetworkType = _asyncToGenerator(
+  /*#__PURE__*/
+  regeneratorRuntime.mark(function _callee(web3) {
+    var networkType;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.prev = 0;
+            _context.next = 3;
+            return web3.eth.net.getNetworkType();
+
+          case 3:
+            networkType = _context.sent;
+            _context.next = 10;
+            break;
+
+          case 6:
+            _context.prev = 6;
+            _context.t0 = _context["catch"](0);
+            console.log('can\'t detect web3 network type');
+            networkType = 'unknown';
+
+          case 10:
+            return _context.abrupt("return", networkType);
+
+          case 11:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee, this, [[0, 6]]);
+  }));
+  return _getNetworkType.apply(this, arguments);
+}
+
+function web3Init() {
+  return _web3Init.apply(this, arguments);
+}
+
+function _web3Init() {
+  _web3Init = _asyncToGenerator(
+  /*#__PURE__*/
+  regeneratorRuntime.mark(function _callee2() {
+    var provider, web3, enabled, defaultAccount, otherDefaultAccount, web3Version, providerType, isConnected, networkType;
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            // https://metamask.github.io/metamask-docs/Advanced_Concepts/Provider_API
+            if (typeof window.ethereum !== 'undefined' || typeof window.web3 !== 'undefined') {
+              // Web3 browser user detected. You can now use the provider.
+              provider = window['ethereum'] || window.web3.currentProvider;
+            } else {
+              provider = new _web.default.providers.HttpProvider("https://mainnet.infura.io/v3/c63d2ec360ce413ea4dc8b10e0cf1fac");
+            }
+
+            window.web3 = web3 = new _web.default(provider);
+
+            if (!window.ethereum) {
+              _context2.next = 12;
+              break;
+            }
+
+            _context2.next = 5;
+            return window.ethereum.enable();
+
+          case 5:
+            defaultAccount = _context2.sent[0];
+            _context2.next = 8;
+            return web3.eth.getAccounts();
+
+          case 8:
+            otherDefaultAccount = _context2.sent[0];
+            console.log("web3 enabled with default account: ".concat(defaultAccount));
+            console.log("web3 enabled with other default account: ".concat(otherDefaultAccount)); // use the checksum address
+
+            defaultAccount = otherDefaultAccount;
+
+          case 12:
+            web3Version = web3.version.api || web3.version;
+            console.log("web3 version: ".concat(web3Version));
+            providerType = getProviderType(provider);
+            console.log("web3 provider type: ".concat(providerType));
+            isConnected = providerType === "metamask" ? provider.isConnected() : provider.connected;
+            console.log("web3 provider connected: ".concat(isConnected));
+            _context2.next = 20;
+            return getNetworkType(web3);
+
+          case 20:
+            networkType = _context2.sent;
+            console.log("web3 connected network: ".concat(networkType));
+            return _context2.abrupt("return", {
+              web3: web3,
+              web3Version: web3Version,
+              providerType: providerType,
+              isConnected: isConnected,
+              networkType: networkType,
+              defaultAccount: defaultAccount
+            });
+
+          case 23:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2, this);
+  }));
+  return _web3Init.apply(this, arguments);
 }
 },{"web3":"../../node_modules/web3/dist/web3.umd.js"}],"../../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
@@ -95998,6 +96847,8 @@ var _react = _interopRequireDefault(require("react"));
 
 var _reactDom = require("react-dom");
 
+var _jsCookie = _interopRequireDefault(require("js-cookie"));
+
 var _App = _interopRequireDefault(require("./Components/App"));
 
 var _SwitchNetwork = _interopRequireDefault(require("./components/SwitchNetwork"));
@@ -96016,91 +96867,52 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function getNetworkType(_x) {
-  return _getNetworkType.apply(this, arguments);
-}
-
-function _getNetworkType() {
-  _getNetworkType = _asyncToGenerator(
-  /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee2(web3) {
-    var networkType;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            _context2.prev = 0;
-            _context2.next = 3;
-            return web3.eth.net.getNetworkType();
-
-          case 3:
-            networkType = _context2.sent;
-            console.log("network type: ".concat(networkType));
-            _context2.next = 11;
-            break;
-
-          case 7:
-            _context2.prev = 7;
-            _context2.t0 = _context2["catch"](0);
-            console.log('can\'t detect web3 network type');
-            networkType = 'unknown';
-
-          case 11:
-            return _context2.abrupt("return", networkType);
-
-          case 12:
-          case "end":
-            return _context2.stop();
-        }
-      }
-    }, _callee2, this, [[0, 7]]);
-  }));
-  return _getNetworkType.apply(this, arguments);
-}
-
 (function () {
   var _init = _asyncToGenerator(
   /*#__PURE__*/
   regeneratorRuntime.mark(function _callee() {
-    var networkType;
+    var _ref, providerType, networkType, defaultAccount, token;
+
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            // figure out web3. we're gonna install our own and use an infura provider
-            // if they don't have their own provider set up.
-            window.web3 = (0, _web3init.default)(window);
-            console.log('web3', window.web3.version.api || window.web3.version); // if no metamask ask to install
+            _context.next = 2;
+            return (0, _web3init.default)(window);
 
-            if (window.web3) {
-              _context.next = 4;
+          case 2:
+            _ref = _context.sent;
+            providerType = _ref.providerType;
+            networkType = _ref.networkType;
+            defaultAccount = _ref.defaultAccount;
+            token = _jsCookie.default.get(defaultAccount);
+            console.log("defaultAccount: ".concat(defaultAccount));
+            console.log("token: ".concat(token)); // if no metamask ask to install
+
+            if (!(providerType !== "metamask")) {
+              _context.next = 11;
               break;
             }
 
             return _context.abrupt("return", (0, _reactDom.render)(_react.default.createElement(_InstallMetamask.default, null), document.getElementById('root')));
 
-          case 4:
-            _context.next = 6;
-            return getNetworkType(window.web3);
-
-          case 6:
-            networkType = _context.sent;
-            console.log('networkType', networkType);
-
+          case 11:
             if (!(networkType !== 'main')) {
-              _context.next = 10;
+              _context.next = 13;
               break;
             }
 
             return _context.abrupt("return", (0, _reactDom.render)(_react.default.createElement(_SwitchNetwork.default, null), document.getElementById('root')));
 
-          case 10:
+          case 13:
             // all good, start the app
             (0, _reactDom.render)(_react.default.createElement(_App.default, {
-              web3: web3
+              web3: web3,
+              token: token,
+              defaultAccount: defaultAccount
             }), document.getElementById('root'));
 
-          case 11:
+          case 14:
           case "end":
             return _context.stop();
         }
@@ -96114,7 +96926,7 @@ function _getNetworkType() {
 
   return init;
 })()();
-},{"react":"../../node_modules/react/index.js","react-dom":"../../node_modules/react-dom/index.js","./Components/App":"Components/App.js","./components/SwitchNetwork":"components/SwitchNetwork.js","./components/InstallMetamask":"components/InstallMetamask.js","./web3init":"web3init.js","babel-polyfill":"../../node_modules/babel-polyfill/lib/index.js","./scss/index.scss":"scss/index.scss"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","react-dom":"../../node_modules/react-dom/index.js","js-cookie":"../../node_modules/js-cookie/src/js.cookie.js","./Components/App":"Components/App.js","./components/SwitchNetwork":"components/SwitchNetwork.js","./components/InstallMetamask":"components/InstallMetamask.js","./web3init":"web3init.js","babel-polyfill":"../../node_modules/babel-polyfill/lib/index.js","./scss/index.scss":"scss/index.scss"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -96141,7 +96953,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52810" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59928" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
