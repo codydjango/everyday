@@ -37299,9 +37299,7 @@ function (_React$Component) {
       if (!account) return false;
 
       try {
-        var data = Auth.parseJwt(token);
-        console.log('parsed token', data.account === account);
-        return account === data.account;
+        return account === Auth.parseJwt(token).account;
       } catch (err) {
         console.log("Auth error parsing ".concat(token), err);
         return false;
@@ -37660,6 +37658,8 @@ function (_React$Component) {
 
         _axios.default.defaults.headers.common['Authorization'] = token;
       }
+
+      console.log('token set', account, token);
     }
   }, {
     key: "isLoggedIn",
@@ -37860,54 +37860,55 @@ function (_React$Component) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.prev = 0;
+                this.store = this.state.token ? _remote.default : _local.default;
+                _context.prev = 1;
                 this.setState({
                   message: 'Loading...'
                 });
-                _context.next = 4;
+                _context.next = 5;
                 return this.store.load(this.state.account);
 
-              case 4:
+              case 5:
                 data = _context.sent;
 
                 if (data.mine && data.mine.length > 0) {
-                  _context.next = 7;
+                  _context.next = 8;
                   break;
                 }
 
                 throw new Error('lost session');
 
-              case 7:
+              case 8:
                 this.updateList(data.mine, false);
                 this.setState({
                   message: "Loaded from ".concat(this.store.name, ".")
                 });
-                _context.next = 15;
+                _context.next = 16;
                 break;
 
-              case 11:
-                _context.prev = 11;
-                _context.t0 = _context["catch"](0);
+              case 12:
+                _context.prev = 12;
+                _context.t0 = _context["catch"](1);
                 console.log('err loading', _context.t0);
                 this.setState({
                   message: "Error from ".concat(this.store.name, ".")
                 });
 
-              case 15:
-                _context.prev = 15;
+              case 16:
+                _context.prev = 16;
                 setTimeout(function () {
                   _this2.setState({
                     message: (0, _messages.randomFromList)(_messages.messages.working)
                   });
                 }, 1000 * 5);
-                return _context.finish(15);
+                return _context.finish(16);
 
-              case 18:
+              case 19:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this, [[0, 11, 15, 18]]);
+        }, _callee, this, [[1, 12, 16, 19]]);
       }));
 
       function load() {
@@ -37974,108 +37975,16 @@ function (_React$Component) {
       return save;
     }()
   }, {
-    key: "testOpen",
-    value: function () {
-      var _testOpen = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee3() {
-        var response;
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                _context3.prev = 0;
-                _context3.next = 3;
-                return _axios.default.get("".concat("http://127.0.0.1:3001/api", "/test/"), {
-                  headers: {
-                    'Content-Type': 'application/json'
-                  }
-                });
-
-              case 3:
-                response = _context3.sent;
-                _context3.next = 9;
-                break;
-
-              case 6:
-                _context3.prev = 6;
-                _context3.t0 = _context3["catch"](0);
-                console.log('err', _context3.t0);
-
-              case 9:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this, [[0, 6]]);
-      }));
-
-      function testOpen() {
-        return _testOpen.apply(this, arguments);
-      }
-
-      return testOpen;
-    }()
-  }, {
-    key: "testRestricted",
-    value: function () {
-      var _testRestricted = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee4() {
-        var response;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                _context4.prev = 0;
-                _context4.next = 3;
-                return _axios.default.get("".concat("http://127.0.0.1:3001/api", "/auth/test/"), {
-                  headers: {
-                    'Content-Type': 'application/json'
-                  }
-                });
-
-              case 3:
-                response = _context4.sent;
-                _context4.next = 9;
-                break;
-
-              case 6:
-                _context4.prev = 6;
-                _context4.t0 = _context4["catch"](0);
-                console.log('err', _context4.t0);
-
-              case 9:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this, [[0, 6]]);
-      }));
-
-      function testRestricted() {
-        return _testRestricted.apply(this, arguments);
-      }
-
-      return testRestricted;
-    }()
-  }, {
     key: "componentDidMount",
     value: function componentDidMount() {
       var _this4 = this;
 
-      this.store = this.state.token ? _remote.default : _local.default;
       this.load();
       setInterval(function () {
         _this4.setState({
           message: (0, _messages.randomFromList)(_messages.messages.working)
         });
       }, 1000 * 60 * 60);
-    }
-  }, {
-    key: "componentDidUpdate",
-    value: function componentDidUpdate() {
-      this.store = this.state.token ? _remote.default : _local.default;
     }
   }, {
     key: "handleClearDone",
@@ -97532,7 +97441,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55085" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57600" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
