@@ -14,12 +14,21 @@ class Remote {
     }
 
     async save(account, data) {
-        const response = await axios.post(`${ this.url }/account/${ account }/data/`, data)
+        const response = await axios.post(`${ this.url }/account/${ account }/data/`, data, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
         return true
     }
 
     async load(account) {
-        const response = await axios.get(`${ this.url }/account/${ account }/data/`)
+        const response = await axios.get(`${ this.url }/account/${ account }/data/`, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+
         return response.data
     }
 

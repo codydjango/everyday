@@ -6,6 +6,8 @@ import remote from '~/services/remote'
 import local from '~/services/local'
 import { messages, randomFromList } from '~/services/messages'
 import { TASKS, DEFAULTLIST } from '~/settings'
+import axios from 'axios';
+import Auth from './Auth';
 
 class App extends React.Component {
     static resetList() {
@@ -35,6 +37,8 @@ class App extends React.Component {
             message: randomFromList(messages.hello)
         }
 
+        window.ttt = this
+
         this.doneRef = React.createRef()
 
         // handlers
@@ -42,7 +46,7 @@ class App extends React.Component {
         this.handleClearDone = this.handleClearDone.bind(this)
         this.handleSetActive = this.handleSetActive.bind(this)
         this.createSession = this.createSession.bind(this)
-        // this.hasSession = this.hasSession.bind(this)
+
         this.load = this.load.bind(this)
         this.save = this.save.bind(this)
 
@@ -52,14 +56,15 @@ class App extends React.Component {
     }
 
     async load() {
-        // if (!this.hasToken()) return console.error('require token')
         try {
             this.setState({ message: 'Loading...' })
             let data = await this.store.load(this.state.account)
-            this.updateList(data.mine, true)
+            if (!(data.mine && data.mine.length > 0)) throw new Error('lost session')
+            this.updateList(data.mine, false)
             this.setState({ message: `Loaded from ${ this.store.name }.` })
         } catch (err) {
-            console.error('err loading', err)
+            console.log('err loading', err)
+            this.setState({ message: `Error from ${ this.store.name }.` })
         } finally {
             setTimeout(()=> {
                 this.setState({ message: randomFromList(messages.working) })
@@ -68,17 +73,41 @@ class App extends React.Component {
     }
 
     async save() {
-        // if (!this.hasToken()) return console.error('require token')
         try {
             this.setState({ message: 'Saving...' })
             await this.store.save(this.state.account, this.state.data)
             this.setState({ message: `Saved to ${ this.store.name }.` })
         } catch (err) {
-            console.error('err saving', err)
+            console.log('err saving', err)
+            this.setState({ message: `Error from ${ this.store.name }.` })
         } finally {
             setTimeout(()=> {
                 this.setState({ message: randomFromList(messages.working) })
             }, 1000 * 5)
+        }
+    }
+
+    async testOpen() {
+        try {
+            const response = await axios.get(`${ process.env.ENDPOINT }/test/`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+        } catch (err) {
+            console.log('err', err)
+        }
+    }
+
+    async testRestricted() {
+        try {
+            const response = await axios.get(`${ process.env.ENDPOINT }/auth/test/`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+        } catch (err) {
+            console.log('err', err)
         }
     }
 
@@ -156,20 +185,7 @@ class App extends React.Component {
     }
 
     hasToken() {
-        function parseJwt (token) {
-            const base64Url = token.split('.')[1]
-            const base64 = base64Url.replace('-', '+').replace('_', '/')
-            return JSON.parse(window.atob(base64))
-        }
-
-        try {
-            const parsed = parseJwt(this.state.token)
-            console.log(parsed)
-            return true
-        } catch (err) {
-            console.log('error parsing jwt')
-            return false
-        }
+        return Auth.verifyTokenForAccount(this.state.account, this.state.token)
     }
 
     createSession() {

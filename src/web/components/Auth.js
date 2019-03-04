@@ -9,6 +9,24 @@ import 'babel-polyfill'
 const noAccountError = new Error('no accounts')
 
 class Auth extends React.Component {
+    static parseJwt(token) {
+        const base64Url = token.split('.')[1]
+        const base64 = base64Url.replace('-', '+').replace('_', '/')
+
+        return JSON.parse(window.atob(base64))
+    }
+
+    static verifyTokenForAccount(account, token) {
+        if (!account) return false
+
+        try {
+            return (account === Auth.parseJwt(token).account)
+        } catch (err) {
+            console.log(`Auth error parsing ${ token }`, err)
+            return false
+        }
+    }
+
     constructor(props) {
         super(props)
 
@@ -29,6 +47,10 @@ class Auth extends React.Component {
         setTimeout(() => {
             this.pingForActiveAccount()
         }, 1)
+
+        if (Auth.verifyTokenForAccount(this.props.account, this.props.token)) {
+            this.setToken(this.props.account, this.props.token)
+        }
     }
 
     async checkIfNewAccount() {
@@ -69,7 +91,11 @@ class Auth extends React.Component {
     }
 
     async fetchNonce(account) {
-        const response = await axios.get(`${ this.url }/account/${ account }/nonce/`)
+        const response = await axios.get(`${ this.url }/account/${ account }/nonce/`, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
         return response.data.nonce
     }
 
