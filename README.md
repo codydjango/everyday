@@ -4,22 +4,20 @@
 
 Everyday is an ethereum-integrated habit-former. As difficult tasks become habitual, update your routine for continuous improvement.
 
-It takes 30 days to ingrain a new habit. Get started now.
+[The everyday-api](https://github.com/codydjango/everyday-api/) provides for signed message verification and persistent sessions. Try it out live on [github.io](https://codydjango.github.io/everyday/).
 
 ### How does this work?
 
-Create routine checklists, get things done, and monitor your progress. Commit to getting things done, and see how you fare against other people who choose the same tasks.
-
-If that's not enough to keep you motivated, gamble on whether you achieve your goals. Win back your ether plus your share of the ether that other people lost!
-
-To win, sign in by the target date to report your progress.
-
-#### Caveats
-
-This game functions on the basis of an "honor-code". It's entirely possible for you to not achieve your goal but claim that you have.
+Create routine checklists and monitor your progress. Commit to getting things done, and see how you fare against other people who choose the same tasks.
 
 #### Installation
 run `npm install`
+
+#### Technical
+* ParcelJS for builds
+* React
+* Web3
+* Dockerized golang microservice for web3 message-signing authentication and persistant sessions.
 
 #### Develop
 run `npm run start`
