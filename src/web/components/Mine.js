@@ -2,34 +2,94 @@ import React, { useState, useEffect } from 'react'
 import TaskList from '~/components/TaskList'
 import Link from '~/components/Link'
 
-export default props => {
-    const [{ list, edit }, setEditState] = useState({ list: props.list, edit: false })
-    const toggleEdit = () => { ;(edit) ? endEdit() : startEdit() }
-    const onUpdate = newlist => { setEditState({ list: newlist, edit }) }
-    const startEdit = () => { setEditState({ list, edit: true }) }
+class Mine extends React.Component {
+    constructor(props) {
+        super(props)
 
-    const endEdit = () => {
-        setEditState({ list, edit: false })
-        props.updateList(list)
+        this.state = { list: props.list, edit: false, dragged: null }
+        this.onUpdate = this.onUpdate.bind(this)
+        this.toggleEdit = this.toggleEdit.bind(this)
+        this.startEdit = this.startEdit.bind(this)
+        this.stopEdit = this.stopEdit.bind(this)
+
+        this.handleAction = props.handleAction
+        this.handleClearDone = props.handleClearDone
+        this.updateList = props.updateList
     }
 
-    const getEditInstruction = () => {
-        return (<ul className="instruction">
-            <li><small>drag item to reorder</small></li>
-            <li><small>click item to delete</small></li>
-            <li><small>click "done" to exit editing mode</small></li>
-        </ul>)
+    static getDerivedStateFromProps(props, state) {
+        if (state.edit) return null
+
+        if (props.list !== state.list) {
+            state.list = props.list
+            state.edit = false
+            state.dragged = null
+            return state
+        }
+
+        return null
     }
 
-    return (<div className="mine">
-        <h2>routine</h2>
-        <TaskList { ...props } editMode={ edit } onUpdate={ onUpdate } />
-        <footer>
-            <div>
-                <Link text={ (edit) ? 'done' : 'edit' } action={ toggleEdit } />
-                <Link text="reset" action={ props.handleClearDone } />
-            </div>
-            { (edit) ? getEditInstruction() : '' }
-        </footer>
-    </div>)
+    startEdit() {
+        this.setState(state => {
+            state.edit = true
+            state.dragged = null
+            return state
+        })
+    }
+
+    stopEdit() {
+        this.updateList(this.state.list)
+        this.setState(state => {
+            state.edit = false
+            state.dragged = null
+            return state
+        })
+    }
+
+    toggleEdit() {
+        if (this.state.edit) {
+            this.stopEdit()
+        } else {
+            this.startEdit()
+        }
+    }
+
+    onUpdate({ list, dragged }) {
+        this.setState(state => {
+            console.log('onUpdate', state.list, list)
+            state.list = list
+            state.dragged = dragged
+            return state
+        })
+    }
+
+    render() {
+        const getEditInstruction = () => {
+            return (<ul className="instruction">
+                <li><small>drag item to reorder</small></li>
+                <li><small>click item to delete</small></li>
+                <li><small>click "done" to exit editing mode</small></li>
+            </ul>)
+        }
+
+        return (<div className="mine">
+            <h2>routine</h2>
+            <TaskList
+                list={ this.state.list }
+                edit={ this.state.edit }
+                dragged={ this.state.dragged }
+                onUpdate={ this.onUpdate }
+                onClick={ this.handleAction } />
+            <footer>
+                <div>
+                    <Link text={ (this.state.edit) ? 'done' : 'edit' } action={ this.toggleEdit } />
+                    <Link text="reset" action={ this.handleClearDone } />
+                </div>
+                { (this.state.edit) ? getEditInstruction() : '' }
+            </footer>
+        </div>)
+    }
 }
+
+export default Mine

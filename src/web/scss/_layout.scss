@@ -23,6 +23,24 @@ $breakpoints: (
     }
 }
 
+
+#root {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+.container {
+    flex: 1;
+}
+
+.footer {
+    height: 16px;
+}
+
+
 .container {
     min-width: 300px;
     display: block;
@@ -40,7 +58,6 @@ $breakpoints: (
 
     .theirs {
         width: auto;
-        display: none;
     }
 }
 
@@ -92,7 +109,6 @@ $breakpoints: (
         }
 
         .theirs {
-            display: none;
             width: auto;
             text-align: right;
             flex: 1;

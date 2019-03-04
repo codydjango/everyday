@@ -9,14 +9,22 @@ class Remote {
         this.save = this.save.bind(this)
     }
 
+    get name() {
+        return 'session storage'
+    }
+
     async save(account, data) {
-        const response = await axios.post(`${ this.url }/account/${ account }/data/`)
-        return response.data.status
+        const response = await axios.post(`${ this.url }/account/${ account }/data/`, data)
+        return true
     }
 
     async load(account) {
         const response = await axios.get(`${ this.url }/account/${ account }/data/`)
-        return JSON.parse(response.data.state)
+        return response.data
+    }
+
+    async clear(account) {
+        console.error('not implemented')
     }
 }
 

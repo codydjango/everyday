@@ -1,5 +1,3 @@
-import { NAMESPACE } from '~/settings'
-
 class Storage {
     constructor() {
         this.store = window.localStorage
@@ -7,18 +5,22 @@ class Storage {
         this.save = this.save.bind(this)
     }
 
-    async save(data) {
-        this.store.setItem(NAMESPACE, JSON.stringify(data))
+    get name() {
+        return 'local storage'
     }
 
-    async load() {
-        const saved = JSON.parse(this.store.getItem(NAMESPACE))
-        if (saved === null || Object.entries(saved).length === 0) throw new Error('nothing saved')
-        return saved
+    async save(account, data) {
+        this.store.setItem(account, JSON.stringify(data))
     }
 
-    clear() {
-        this.store.removeItem(NAMESPACE)
+    async load(account) {
+        const data = JSON.parse(this.store.getItem(account))
+        if (data === null || Object.entries(data).length === 0) throw new Error('nothing to be found in localstorage')
+        return data
+    }
+
+    async clear(account) {
+        this.store.removeItem(account)
     }
 }
 

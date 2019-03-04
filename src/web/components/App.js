@@ -1,14 +1,17 @@
 import React from 'react'
-import Theirs from '~/components/Theirs'
 import Mine from '~/components/Mine'
 import Next from '~/components/Next'
 import Header from '~/components/Header'
 import remote from '~/services/remote'
+import local from '~/services/local'
+import { messages, randomFromList } from '~/services/messages'
 import { TASKS, DEFAULTLIST } from '~/settings'
 
 class App extends React.Component {
     static resetList() {
-        return App.flatten(DEFAULTLIST)
+        const list = App.flatten(DEFAULTLIST)
+        list[0].active = true
+        return list
     }
 
     static flatten(list) {
@@ -18,21 +21,19 @@ class App extends React.Component {
         })
     }
 
+    static hasActive(list) {
+        return (list && list.filter(i => i.active).length > 0)
+    }
+
     constructor(props) {
         super(props)
 
         this.state = {
             account: props.defaultAccount,
             token: props.token,
-            data: {
-                mine: []
-            }
+            data: {},
+            message: randomFromList(messages.hello)
         }
-
-        let list = App.resetList()
-        list[0].active = true
-
-        this.state.data.mine = list
 
         this.doneRef = React.createRef()
 
@@ -40,47 +41,60 @@ class App extends React.Component {
         this.handleReset = this.handleReset.bind(this)
         this.handleClearDone = this.handleClearDone.bind(this)
         this.handleSetActive = this.handleSetActive.bind(this)
+        this.createSession = this.createSession.bind(this)
+        // this.hasSession = this.hasSession.bind(this)
+        this.load = this.load.bind(this)
+        this.save = this.save.bind(this)
 
         // callback
         this.updateList = this.updateList.bind(this)
         this.updateAuthentication = this.updateAuthentication.bind(this)
     }
 
-    hasToken() {
-        return (this.state.account && this.state.token)
-    }
-
     async load() {
-        if (!this.hasToken()) return console.error('require token')
-
-        let data
-
+        // if (!this.hasToken()) return console.error('require token')
         try {
-            data = await remote.load(this.state.account)
-            this.setState(state => {
-                state.data = data
-                return state
-            })
+            this.setState({ message: 'Loading...' })
+            let data = await this.store.load(this.state.account)
+            this.updateList(data.mine, true)
+            this.setState({ message: `Loaded from ${ this.store.name }.` })
         } catch (err) {
             console.error('err loading', err)
+        } finally {
+            setTimeout(()=> {
+                this.setState({ message: randomFromList(messages.working) })
+            }, 1000 * 5)
         }
     }
 
     async save() {
-        if (!this.hasToken()) return console.error('require token')
+        // if (!this.hasToken()) return console.error('require token')
         try {
-            await remote.save(this.state.account, this.state.data)
+            this.setState({ message: 'Saving...' })
+            await this.store.save(this.state.account, this.state.data)
+            this.setState({ message: `Saved to ${ this.store.name }.` })
         } catch (err) {
             console.error('err saving', err)
+        } finally {
+            setTimeout(()=> {
+                this.setState({ message: randomFromList(messages.working) })
+            }, 1000 * 5)
         }
     }
 
     componentDidMount() {
+        this.store = (this.state.token) ? remote : local
         this.load()
+
+        setInterval(() => {
+            this.setState({
+                message: randomFromList(messages.working)
+            })
+        }, 1000 * 60 * 60);
     }
 
     componentDidUpdate() {
-        this.save()
+        this.store = (this.state.token) ? remote : local
     }
 
     handleClearDone() {
@@ -91,16 +105,19 @@ class App extends React.Component {
         })
         list[0].active = true
 
-        this.setState(state => {
-            state.data.mine = list
-            return state
-        })
+        this.updateList(list)
     }
 
-    updateList(list) {
+    updateList(list, save=true) {
+        if (!App.hasActive(list)) {
+            list[0].active = true
+        }
+
         this.setState(state => {
             state.data.mine = list
             return state
+        }, () => {
+            if (save) this.save()
         })
     }
 
@@ -123,10 +140,7 @@ class App extends React.Component {
     }
 
     handleReset() {
-        this.setState(state => {
-            state.data.mine = App.resetList()
-            return state
-        })
+        this.updateList(App.resetList())
     }
 
     handleSetActive(id) {
@@ -141,18 +155,43 @@ class App extends React.Component {
         this.doneRef.current.focus()
     }
 
+    hasToken() {
+        function parseJwt (token) {
+            const base64Url = token.split('.')[1]
+            const base64 = base64Url.replace('-', '+').replace('_', '/')
+            return JSON.parse(window.atob(base64))
+        }
+
+        try {
+            const parsed = parseJwt(this.state.token)
+            console.log(parsed)
+            return true
+        } catch (err) {
+            console.log('error parsing jwt')
+            return false
+        }
+    }
+
+    createSession() {
+        this.updateList(App.resetList())
+    }
+
+    hasSession() {
+        return (Array.isArray(this.state.data.mine))
+    }
+
     render() {
         const doneRef = this.doneRef
 
         return (
-            <div className="app">
+            <React.Fragment>
                 <Header web3={ this.props.web3 }
                         account={ this.state.account }
                         token={ this.state.token }
                         callback={ this.updateAuthentication } />
 
-                { (this.state.token) ? (
-                    <div className="container">
+                { (this.hasSession())
+                    ? (<div className="container">
                         <Next
                             doneRef={ doneRef }
                             list={ this.state.data.mine }
@@ -162,15 +201,23 @@ class App extends React.Component {
                             updateList={ this.updateList }
                             handleAction={ this.handleSetActive }
                             handleClearDone={ this.handleClearDone }/>
-                        <Theirs
-                            list={ TASKS } />
-                    </div>
-                ) : (
-                    <div className="container">
-                        <span>login to restore session</span>
-                    </div>
-                )}
-            </div>
+                    </div>)
+                    : (<div className="container messageScreen">
+                        <div className="message">
+                            <span className="messageLine">################################################################</span>
+                            <span>Session not found. Try logging in or <a href="#" onClick={ this.createSession }> create a new session.</a></span>
+                            <span className="messageLine">################################################################</span>
+                        </div>
+                    </div>)
+                }
+
+                <footer className="footer">
+                    <span className="messageLeft"><small>{ this.state.message }</small></span>
+                    <span className="messageRight"><small>{
+                        (this.hasToken()) ? '' : 'Login to enable session storage.'
+                    }</small></span>
+                </footer>
+            </React.Fragment>
         )
     }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Task from '~/components/Task'
 import getKey from '~/utilities/getKey'
 import throttle from '~/utilities/throttle'
@@ -19,70 +19,52 @@ function aggregates(list) {
 }
 
 export default props => {
-    const [state, setState] = useState({
-        list: aggregates(props.list),
-        dragged: undefined
-    })
-
-    const editTask = item => <Task handleAction={ () => {}} item={ item } />
-    const normalTask = item => <Task tabIndex="0" handleAction={ props.handleAction } item={ item } />
+    const normalTask = item => <Task tabIndex="0" handleAction={ props.onClick } item={ item } />
+    const editTask = item => <Task handleAction={ () => {} } item={ item } />
 
     const onDragStart = (e, i) => {
-        let dragged = state.list[i]
+        let list = props.list
+        let dragged = props.list[i]
 
         e.dataTransfer.effectAllowed = 'move'
         e.target.parentNode.classList.add('dragged')
         e.dataTransfer.setData('text/html', e.target.parentNode)
         e.dataTransfer.setDragImage(e.target.parentNode, 20, 20)
 
-        setState({
-            list: state.list,
-            dragged: dragged
-        })
+        props.onUpdate({ list, dragged })
     }
 
     const onDragEnd = (e) => {
         e.target.parentNode.classList.remove('dragged')
 
-        let newlist = aggregates(state.list)
+        let list = props.list
+        let dragged = null
 
-        setState({
-            dragged: undefined,
-            list: newlist
-        })
-
-        props.onUpdate(newlist)
+        props.onUpdate({ list, dragged })
     }
 
     const onDragOver = i => {
-        if (state.dragged === state.list[i]) return
+        if (props.dragged === props.list[i]) return
 
-        let newlist = state.list.filter(i => i.id != state.dragged.id)
-        newlist.splice(i, 0, state.dragged)
-        newlist = aggregates(newlist)
+        let dragged = props.dragged
+        let list = props.list.filter(i => i.id != props.dragged.id)
+        list.splice(i, 0, props.dragged)
 
-        setState({
-            dragged: state.dragged,
-            list: newlist
-        })
+        props.onUpdate({ list, dragged })
     }
 
     const onClick = (e, i) => {
-        let newlist = state.list.splice(0)
-        newlist.splice(i, 1)
-        newlist = aggregates(newlist)
-
-        setState({
-            dragged: state.dragged,
-            list: newlist
-        })
-
-        props.onUpdate(newlist)
+        let dragged = props.dragged
+        let list = props.list.slice(0)
+        list.splice(i, 1)
+        console.log('update the parent with the smaller list', list)
+        props.onUpdate({ list, dragged })
     }
 
-    return (props.editMode)
+    const calculatedList = aggregates(props.list)
+    return (props.edit)
         ? (<ul className={'list taskList edit'}>
-                { state.list.map((item, i) => {
+                { calculatedList.map((item, i) => {
                     return (<li
                         onDragOver={ () => { throttle(onDragOver, 100)(i) } }
                         key={ getKey(item) }>
@@ -97,9 +79,10 @@ export default props => {
                 })}
             </ul>)
         : (<ul className={'list taskList'}>
-                { state.list.map((item, i) => (<li
-                    className={ (props.editMode) ? 'drag': '' }
+                { calculatedList.map((item, i) => (<li
+                    className={ (props.edit) ? 'drag': '' }
                     key={ getKey(item) }>
                     { normalTask(item) }
                 </li>))}
-            </ul>)}
+            </ul>)
+}
