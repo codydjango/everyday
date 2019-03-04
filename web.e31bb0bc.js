@@ -36443,13 +36443,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
@@ -36463,6 +36463,27 @@ var Auth =
 /*#__PURE__*/
 function (_React$Component) {
   _inherits(Auth, _React$Component);
+
+  _createClass(Auth, null, [{
+    key: "parseJwt",
+    value: function parseJwt(token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace('-', '+').replace('_', '/');
+      return JSON.parse(window.atob(base64));
+    }
+  }, {
+    key: "verifyTokenForAccount",
+    value: function verifyTokenForAccount(account, token) {
+      if (!account) return false;
+
+      try {
+        return account === Auth.parseJwt(token).account;
+      } catch (err) {
+        console.log("Auth error parsing ".concat(token), err);
+        return false;
+      }
+    }
+  }]);
 
   function Auth(props) {
     var _this;
@@ -36490,6 +36511,10 @@ function (_React$Component) {
       setTimeout(function () {
         _this2.pingForActiveAccount();
       }, 1);
+
+      if (Auth.verifyTokenForAccount(this.props.account, this.props.token)) {
+        this.setToken(this.props.account, this.props.token);
+      }
     }
   }, {
     key: "checkIfNewAccount",
@@ -37210,7 +37235,511 @@ function () {
 var _default = new Storage();
 
 exports.default = _default;
-},{}],"Components/App.js":[function(require,module,exports) {
+},{}],"Components/Auth.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _axios = _interopRequireDefault(require("axios"));
+
+var _jsCookie = _interopRequireDefault(require("js-cookie"));
+
+var _settings = require("~/settings");
+
+var _utilities = require("~/utilities");
+
+require("babel-polyfill");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+var noAccountError = new Error('no accounts');
+
+var Auth =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(Auth, _React$Component);
+
+  _createClass(Auth, null, [{
+    key: "parseJwt",
+    value: function parseJwt(token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace('-', '+').replace('_', '/');
+      return JSON.parse(window.atob(base64));
+    }
+  }, {
+    key: "verifyTokenForAccount",
+    value: function verifyTokenForAccount(account, token) {
+      if (!account) return false;
+
+      try {
+        var data = Auth.parseJwt(token);
+        console.log('parsed token', data.account === account);
+        return account === data.account;
+      } catch (err) {
+        console.log("Auth error parsing ".concat(token), err);
+        return false;
+      }
+    }
+  }]);
+
+  function Auth(props) {
+    var _this;
+
+    _classCallCheck(this, Auth);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Auth).call(this, props));
+    _this.url = _settings.ENDPOINT;
+    _this.web3 = props.web3; // upstream callbacks
+
+    _this.callback = props.callback; // handlers
+
+    _this.login = _this.login.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.logout = _this.logout.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.attemptSwitchAccount = _this.attemptSwitchAccount.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.checkIfNewAccount = _this.checkIfNewAccount.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    return _this;
+  }
+
+  _createClass(Auth, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      setTimeout(function () {
+        _this2.pingForActiveAccount();
+      }, 1);
+
+      if (Auth.verifyTokenForAccount(this.props.account, this.props.token)) {
+        this.setToken(this.props.account, this.props.token);
+      }
+    }
+  }, {
+    key: "checkIfNewAccount",
+    value: function () {
+      var _checkIfNewAccount = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee() {
+        var account;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this.web3.eth.getAccounts();
+
+              case 2:
+                account = _context.sent[0];
+
+                if (account) {
+                  _context.next = 5;
+                  break;
+                }
+
+                throw noAccountError;
+
+              case 5:
+                if (account !== this.props.account) {
+                  this.callback(account, this.attemptSwitchAccount(account));
+                }
+
+              case 6:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function checkIfNewAccount() {
+        return _checkIfNewAccount.apply(this, arguments);
+      }
+
+      return checkIfNewAccount;
+    }()
+  }, {
+    key: "pingForActiveAccount",
+    value: function () {
+      var _pingForActiveAccount = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3() {
+        var _this3 = this;
+
+        var promise;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                promise = new Promise(
+                /*#__PURE__*/
+                function () {
+                  var _ref = _asyncToGenerator(
+                  /*#__PURE__*/
+                  regeneratorRuntime.mark(function _callee2(resolve, reject) {
+                    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                      while (1) {
+                        switch (_context2.prev = _context2.next) {
+                          case 0:
+                            // check immediately
+                            _this3.checkIfNewAccount().catch(reject); // continue to check every 3 seconds
+
+
+                            _this3.checkAccountTimer = setInterval(function () {
+                              _this3.checkIfNewAccount().catch(reject);
+                            }, 3000);
+
+                          case 2:
+                          case "end":
+                            return _context2.stop();
+                        }
+                      }
+                    }, _callee2, this);
+                  }));
+
+                  return function (_x, _x2) {
+                    return _ref.apply(this, arguments);
+                  };
+                }());
+                promise.catch(function (err) {
+                  if (err === noAccountError) {
+                    _this3.callback(undefined, undefined);
+                  } else {
+                    console.error('err', err);
+                  }
+                });
+
+              case 2:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function pingForActiveAccount() {
+        return _pingForActiveAccount.apply(this, arguments);
+      }
+
+      return pingForActiveAccount;
+    }()
+  }, {
+    key: "signMessage",
+    value: function () {
+      var _signMessage = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee4(account, nonce) {
+        var ordinal, challenge, hexChallenge, signature;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                ordinal = (0, _utilities.getOrdinal)(nonce);
+                challenge = "I'm signing into my everyday account for the ".concat(nonce).concat(ordinal, " time");
+                hexChallenge = this.web3.utils.utf8ToHex(challenge);
+                _context4.next = 5;
+                return this.web3.eth.personal.sign(hexChallenge, account, null);
+
+              case 5:
+                signature = _context4.sent;
+                return _context4.abrupt("return", signature);
+
+              case 7:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function signMessage(_x3, _x4) {
+        return _signMessage.apply(this, arguments);
+      }
+
+      return signMessage;
+    }()
+  }, {
+    key: "fetchNonce",
+    value: function () {
+      var _fetchNonce = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee5(account) {
+        var response;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.next = 2;
+                return _axios.default.get("".concat(this.url, "/account/").concat(account, "/nonce/"), {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
+
+              case 2:
+                response = _context5.sent;
+                return _context5.abrupt("return", response.data.nonce);
+
+              case 4:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function fetchNonce(_x5) {
+        return _fetchNonce.apply(this, arguments);
+      }
+
+      return fetchNonce;
+    }()
+  }, {
+    key: "authenticate",
+    value: function () {
+      var _authenticate = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee6(account, signature) {
+        var response;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return _axios.default.post("".concat(this.url, "/authentication/"), {
+                  account: account,
+                  signature: signature
+                });
+
+              case 2:
+                response = _context6.sent;
+                return _context6.abrupt("return", response.data.token);
+
+              case 4:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function authenticate(_x6, _x7) {
+        return _authenticate.apply(this, arguments);
+      }
+
+      return authenticate;
+    }()
+  }, {
+    key: "login",
+    value: function () {
+      var _login = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee7(e) {
+        var nonce, signature, session, token, account;
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                e.preventDefault();
+                token = false;
+                account = this.props.account;
+                _context7.prev = 3;
+                _context7.next = 6;
+                return this.fetchNonce(account);
+
+              case 6:
+                nonce = _context7.sent;
+                _context7.next = 9;
+                return this.signMessage(account, nonce);
+
+              case 9:
+                signature = _context7.sent;
+                _context7.next = 12;
+                return this.authenticate(account, signature);
+
+              case 12:
+                token = _context7.sent;
+                _context7.next = 20;
+                break;
+
+              case 15:
+                _context7.prev = 15;
+                _context7.t0 = _context7["catch"](3);
+                console.error('error login with metamask', _context7.t0);
+                alert('error logging in with metamask');
+                return _context7.abrupt("return");
+
+              case 20:
+                this.setToken(account, token);
+                this.callback(account, token);
+
+              case 22:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this, [[3, 15]]);
+      }));
+
+      function login(_x8) {
+        return _login.apply(this, arguments);
+      }
+
+      return login;
+    }()
+  }, {
+    key: "logout",
+    value: function logout(e) {
+      e.preventDefault();
+      var account = this.props.account;
+
+      _jsCookie.default.remove(account);
+
+      delete _axios.default.defaults.headers.common['Authorization'];
+      this.callback(account, null);
+    }
+  }, {
+    key: "attemptSwitchAccount",
+    value: function attemptSwitchAccount(account) {
+      var oldAccount = this.props.account;
+
+      _jsCookie.default.remove(oldAccount);
+
+      delete _axios.default.defaults.headers.common['Authorization'];
+
+      var token = _jsCookie.default.get(account);
+
+      if (token) {
+        _jsCookie.default.set(account, token, {
+          secure: _settings.ENVIRONMENT === 'production'
+        });
+
+        _axios.default.defaults.headers.common['Authorization'] = token;
+      }
+
+      return token;
+    }
+  }, {
+    key: "setToken",
+    value: function setToken(account, token) {
+      var oldAccount = this.props.account;
+
+      _jsCookie.default.remove(oldAccount);
+
+      delete _axios.default.defaults.headers.common['Authorization'];
+
+      if (account && token) {
+        _jsCookie.default.set(account, token, {
+          secure: _settings.ENVIRONMENT === 'production'
+        });
+
+        _axios.default.defaults.headers.common['Authorization'] = token;
+      }
+    }
+  }, {
+    key: "isLoggedIn",
+    value: function isLoggedIn() {
+      return !!this.props.token;
+    }
+  }, {
+    key: "hasAccount",
+    value: function hasAccount() {
+      return !!this.props.account;
+    }
+  }, {
+    key: "getShortAccount",
+    value: function getShortAccount() {
+      var account = this.props.account;
+      var start = account.slice(0, 4);
+      var end = account.slice(-4);
+      return "".concat(start, "...").concat(end);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this4 = this;
+
+      var showMetamaskPrompt = function showMetamaskPrompt() {
+        return _react.default.createElement("span", {
+          className: "authInfo"
+        }, "Log in to MetaMask");
+      };
+
+      var showLoggedInName = function showLoggedInName() {
+        return _react.default.createElement("span", {
+          className: "authInfo"
+        }, _react.default.createElement("span", {
+          className: "loginWith"
+        }, "Logout from"), _react.default.createElement("span", {
+          className: "loginAddress"
+        }, _react.default.createElement("a", {
+          href: "#",
+          onClick: _this4.logout
+        }, _this4.getShortAccount())));
+      };
+
+      var showLoginWithActiveMetamaskAccount = function showLoginWithActiveMetamaskAccount() {
+        return _react.default.createElement("div", {
+          className: "authInfo"
+        }, _react.default.createElement("span", {
+          className: "loginWith"
+        }, "Login with"), _react.default.createElement("span", {
+          className: "loginAddress"
+        }, _react.default.createElement("a", {
+          href: "#",
+          onClick: _this4.login
+        }, _this4.getShortAccount())));
+      };
+
+      var show;
+
+      if (this.hasAccount()) {
+        if (this.isLoggedIn()) {
+          show = showLoggedInName;
+        } else {
+          show = showLoginWithActiveMetamaskAccount;
+        }
+      } else {
+        show = showMetamaskPrompt;
+      }
+
+      return _react.default.createElement("div", {
+        className: "auth"
+      }, show());
+    }
+  }]);
+
+  return Auth;
+}(_react.default.Component);
+
+var _default = Auth;
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js","axios":"../../node_modules/axios/index.js","js-cookie":"../../node_modules/js-cookie/src/js.cookie.js","~/settings":"settings.js","~/utilities":"utilities.js","babel-polyfill":"../../node_modules/babel-polyfill/lib/index.js"}],"Components/App.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37233,6 +37762,10 @@ var _local = _interopRequireDefault(require("~/services/local"));
 var _messages = require("~/services/messages");
 
 var _settings = require("~/settings");
+
+var _axios = _interopRequireDefault(require("axios"));
+
+var _Auth = _interopRequireDefault(require("./Auth"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37299,13 +37832,13 @@ function (_React$Component) {
       data: {},
       message: (0, _messages.randomFromList)(_messages.messages.hello)
     };
+    window.ttt = _assertThisInitialized(_assertThisInitialized(_this));
     _this.doneRef = _react.default.createRef(); // handlers
 
     _this.handleReset = _this.handleReset.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.handleClearDone = _this.handleClearDone.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.handleSetActive = _this.handleSetActive.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.createSession = _this.createSession.bind(_assertThisInitialized(_assertThisInitialized(_this))); // this.hasSession = this.hasSession.bind(this)
-
+    _this.createSession = _this.createSession.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.load = _this.load.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.save = _this.save.bind(_assertThisInitialized(_assertThisInitialized(_this))); // callback
 
@@ -37336,33 +37869,45 @@ function (_React$Component) {
 
               case 4:
                 data = _context.sent;
-                this.updateList(data.mine, true);
+
+                if (data.mine && data.mine.length > 0) {
+                  _context.next = 7;
+                  break;
+                }
+
+                throw new Error('lost session');
+
+              case 7:
+                this.updateList(data.mine, false);
                 this.setState({
                   message: "Loaded from ".concat(this.store.name, ".")
                 });
-                _context.next = 12;
+                _context.next = 15;
                 break;
 
-              case 9:
-                _context.prev = 9;
+              case 11:
+                _context.prev = 11;
                 _context.t0 = _context["catch"](0);
-                console.error('err loading', _context.t0);
+                console.log('err loading', _context.t0);
+                this.setState({
+                  message: "Error from ".concat(this.store.name, ".")
+                });
 
-              case 12:
-                _context.prev = 12;
+              case 15:
+                _context.prev = 15;
                 setTimeout(function () {
                   _this2.setState({
                     message: (0, _messages.randomFromList)(_messages.messages.working)
                   });
                 }, 1000 * 5);
-                return _context.finish(12);
+                return _context.finish(15);
 
-              case 15:
+              case 18:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this, [[0, 9, 12, 15]]);
+        }, _callee, this, [[0, 11, 15, 18]]);
       }));
 
       function load() {
@@ -37394,29 +37939,32 @@ function (_React$Component) {
                 this.setState({
                   message: "Saved to ".concat(this.store.name, ".")
                 });
-                _context2.next = 10;
+                _context2.next = 11;
                 break;
 
               case 7:
                 _context2.prev = 7;
                 _context2.t0 = _context2["catch"](0);
-                console.error('err saving', _context2.t0);
+                console.log('err saving', _context2.t0);
+                this.setState({
+                  message: "Error from ".concat(this.store.name, ".")
+                });
 
-              case 10:
-                _context2.prev = 10;
+              case 11:
+                _context2.prev = 11;
                 setTimeout(function () {
                   _this3.setState({
                     message: (0, _messages.randomFromList)(_messages.messages.working)
                   });
                 }, 1000 * 5);
-                return _context2.finish(10);
+                return _context2.finish(11);
 
-              case 13:
+              case 14:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[0, 7, 10, 13]]);
+        }, _callee2, this, [[0, 7, 11, 14]]);
       }));
 
       function save() {
@@ -37424,6 +37972,92 @@ function (_React$Component) {
       }
 
       return save;
+    }()
+  }, {
+    key: "testOpen",
+    value: function () {
+      var _testOpen = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3() {
+        var response;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.prev = 0;
+                _context3.next = 3;
+                return _axios.default.get("".concat("http://127.0.0.1:3001/api", "/test/"), {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
+
+              case 3:
+                response = _context3.sent;
+                _context3.next = 9;
+                break;
+
+              case 6:
+                _context3.prev = 6;
+                _context3.t0 = _context3["catch"](0);
+                console.log('err', _context3.t0);
+
+              case 9:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this, [[0, 6]]);
+      }));
+
+      function testOpen() {
+        return _testOpen.apply(this, arguments);
+      }
+
+      return testOpen;
+    }()
+  }, {
+    key: "testRestricted",
+    value: function () {
+      var _testRestricted = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee4() {
+        var response;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.prev = 0;
+                _context4.next = 3;
+                return _axios.default.get("".concat("http://127.0.0.1:3001/api", "/auth/test/"), {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
+
+              case 3:
+                response = _context4.sent;
+                _context4.next = 9;
+                break;
+
+              case 6:
+                _context4.prev = 6;
+                _context4.t0 = _context4["catch"](0);
+                console.log('err', _context4.t0);
+
+              case 9:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this, [[0, 6]]);
+      }));
+
+      function testRestricted() {
+        return _testRestricted.apply(this, arguments);
+      }
+
+      return testRestricted;
     }()
   }, {
     key: "componentDidMount",
@@ -37513,20 +38147,7 @@ function (_React$Component) {
   }, {
     key: "hasToken",
     value: function hasToken() {
-      function parseJwt(token) {
-        var base64Url = token.split('.')[1];
-        var base64 = base64Url.replace('-', '+').replace('_', '/');
-        return JSON.parse(window.atob(base64));
-      }
-
-      try {
-        var parsed = parseJwt(this.state.token);
-        console.log(parsed);
-        return true;
-      } catch (err) {
-        console.log('error parsing jwt');
-        return false;
-      }
+      return _Auth.default.verifyTokenForAccount(this.state.account, this.state.token);
     }
   }, {
     key: "createSession",
@@ -37584,7 +38205,7 @@ function (_React$Component) {
 
 var _default = App;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/components/Header":"components/Header.js","~/services/remote":"services/remote.js","~/services/local":"services/local.js","~/services/messages":"services/messages.js","~/settings":"settings.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/components/Header":"components/Header.js","~/services/remote":"services/remote.js","~/services/local":"services/local.js","~/services/messages":"services/messages.js","~/settings":"settings.js","axios":"../../node_modules/axios/index.js","./Auth":"Components/Auth.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -96911,7 +97532,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61909" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55085" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
