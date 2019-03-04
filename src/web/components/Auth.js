@@ -161,8 +161,6 @@ class Auth extends React.Component {
             Cookies.set(account, token, { secure: (ENVIRONMENT === 'production') })
             axios.defaults.headers.common['Authorization'] = token
         }
-
-        console.log('token set', account, token)
     }
 
     isLoggedIn() {
