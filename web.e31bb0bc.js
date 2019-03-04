@@ -25702,260 +25702,7 @@ var define;
 	return init(function () {});
 }));
 
-},{}],"utilities/getKey.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var map = new WeakMap();
-var index = 0;
-
-function weakKey(obj) {
-  var key = map.get(obj);
-  if (key) return key;
-  key = 'weak-key-' + index++;
-  map.set(obj, key);
-  return key;
-}
-
-var _default = weakKey;
-exports.default = _default;
-},{}],"components/List.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _getKey = _interopRequireDefault(require("~/utilities/getKey"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var _default = function _default(props) {
-  return _react.default.createElement("ul", {
-    className: "list"
-  }, props.list.map(function (item) {
-    return _react.default.createElement("li", {
-      key: (0, _getKey.default)(item)
-    }, _react.default.createElement("div", null, _react.default.createElement("span", null, item.text)));
-  }));
-};
-
-exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/utilities/getKey":"utilities/getKey.js"}],"settings.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ENVIRONMENT = exports.ENDPOINT = exports.EARLY = exports.DEFAULTLIST = exports.TASKS = exports.TIMERINITIAL = exports.NAMESPACE = exports.DEBUG = void 0;
-var ENVIRONMENT = "development";
-exports.ENVIRONMENT = ENVIRONMENT;
-var ENDPOINT = "http://127.0.0.1:3001/api";
-exports.ENDPOINT = ENDPOINT;
-var NODE_ENV = "development";
-var DEBUG = ENVIRONMENT === 'development';
-exports.DEBUG = DEBUG;
-var NAMESPACE = 'everyday';
-exports.NAMESPACE = NAMESPACE;
-var TIMERINITIAL = 'start timer';
-exports.TIMERINITIAL = TIMERINITIAL;
-var EARLY = false;
-exports.EARLY = EARLY;
-var TASKS = [{
-  id: 1,
-  text: 'Drink water'
-}, {
-  id: 2,
-  text: 'Make bed'
-}, {
-  id: 3,
-  text: '50 crunches'
-}, {
-  id: 4,
-  text: '50 pushups'
-}, {
-  id: 5,
-  text: 'Commit a line of code'
-}, {
-  id: 6,
-  text: 'Read a chapter'
-}, {
-  id: 7,
-  text: 'Solve HackerRank challenge'
-}, {
-  id: 8,
-  text: 'Solve LeetCode challenge'
-}, {
-  id: 9,
-  text: 'Apply for employment'
-}, {
-  id: 10,
-  text: 'Code'
-}, {
-  id: 11,
-  text: 'Process email'
-}, {
-  id: 12,
-  text: 'Break for lunch'
-}, {
-  id: 13,
-  text: 'Break for snack'
-}, {
-  id: 14,
-  text: 'Do dishes'
-}, {
-  id: 15,
-  text: 'Check voicemail'
-}, {
-  id: 16,
-  text: 'Peruse social media'
-}, {
-  id: 17,
-  text: 'Post on social media'
-}, {
-  id: 17,
-  text: '50 squats'
-}];
-exports.TASKS = TASKS;
-var DEFAULTLIST = [{
-  id: 1,
-  taskId: 1,
-  checked: false
-}, {
-  id: 2,
-  taskId: 2,
-  checked: false
-}, {
-  id: 3,
-  taskId: 3,
-  checked: false
-}, {
-  id: 4,
-  taskId: 18,
-  checked: false
-}, {
-  id: 5,
-  taskId: 4,
-  checked: false
-}, {
-  id: 6,
-  taskId: 5,
-  checked: false
-}, {
-  id: 7,
-  taskId: 10,
-  checked: false,
-  duration: '1h'
-}, {
-  id: 8,
-  taskId: 1,
-  checked: false
-}, {
-  id: 9,
-  taskId: 6,
-  checked: false
-}, {
-  id: 10,
-  taskId: 7,
-  checked: false
-}, {
-  id: 11,
-  taskId: 1,
-  checked: false
-}, {
-  id: 12,
-  taskId: 10,
-  checked: false,
-  duration: '1h'
-}, {
-  id: 13,
-  taskId: 11,
-  checked: false
-}, {
-  id: 14,
-  taskId: 1,
-  checked: false
-}, {
-  id: 15,
-  taskId: 12,
-  checked: false
-}, {
-  id: 16,
-  taskId: 13,
-  checked: false
-}, {
-  id: 17,
-  taskId: 1,
-  checked: false
-}, {
-  id: 18,
-  taskId: 14,
-  checked: false
-}, {
-  id: 19,
-  taskId: 10,
-  checked: false,
-  duration: '1h'
-}, {
-  id: 20,
-  taskId: 15,
-  checked: false
-}, {
-  id: 21,
-  taskId: 1,
-  checked: false
-}, {
-  id: 22,
-  taskId: 16,
-  checked: false
-}, {
-  id: 23,
-  taskId: 10,
-  checked: false,
-  duration: '1h'
-}, {
-  id: 24,
-  taskId: 17,
-  checked: false
-}];
-exports.DEFAULTLIST = DEFAULTLIST;
-console.log("NAMESPACE ".concat(NAMESPACE));
-console.log("DEBUG ".concat(DEBUG));
-console.log("ENVIRONMENT ".concat(ENVIRONMENT));
-console.log("ENDPOINT ".concat(ENDPOINT));
-console.log("NODE_ENV: ".concat(NODE_ENV));
-},{}],"components/Theirs.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _List = _interopRequireDefault(require("~/components/List"));
-
-var _settings = require("~/settings");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var _default = function _default(props) {
-  return _react.default.createElement("div", {
-    className: "theirs"
-  }, _react.default.createElement("h2", null, "everyone else"), _react.default.createElement(_List.default, {
-    list: props.list
-  }));
-};
-
-exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/List":"components/List.js","~/settings":"settings.js"}],"components/Task.js":[function(require,module,exports) {
+},{}],"components/Task.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -26024,7 +25771,27 @@ var _default = function _default(_ref) {
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js"}],"utilities/throttle.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js"}],"utilities/getKey.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var map = new WeakMap();
+var index = 0;
+
+function weakKey(obj) {
+  var key = map.get(obj);
+  if (key) return key;
+  key = 'weak-key-' + index++;
+  map.set(obj, key);
+  return key;
+}
+
+var _default = weakKey;
+exports.default = _default;
+},{}],"utilities/throttle.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -26351,7 +26118,190 @@ function (_React$Component) {
 
 var _default = Mine;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/TaskList":"components/TaskList.js","~/components/Link":"components/Link.js"}],"components/Button.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/TaskList":"components/TaskList.js","~/components/Link":"components/Link.js"}],"settings.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ENVIRONMENT = exports.ENDPOINT = exports.EARLY = exports.DEFAULTLIST = exports.TASKS = exports.TIMERINITIAL = exports.NAMESPACE = exports.DEBUG = void 0;
+var ENVIRONMENT = "development";
+exports.ENVIRONMENT = ENVIRONMENT;
+var ENDPOINT = "http://127.0.0.1:3001/api";
+exports.ENDPOINT = ENDPOINT;
+var NODE_ENV = "development";
+var DEBUG = ENVIRONMENT === 'development';
+exports.DEBUG = DEBUG;
+var NAMESPACE = 'everyday';
+exports.NAMESPACE = NAMESPACE;
+var TIMERINITIAL = 'start timer';
+exports.TIMERINITIAL = TIMERINITIAL;
+var EARLY = false;
+exports.EARLY = EARLY;
+var TASKS = [{
+  id: 1,
+  text: 'Drink water'
+}, {
+  id: 2,
+  text: 'Make bed'
+}, {
+  id: 3,
+  text: '50 crunches'
+}, {
+  id: 4,
+  text: '50 pushups'
+}, {
+  id: 5,
+  text: 'Commit a line of code'
+}, {
+  id: 6,
+  text: 'Read a chapter'
+}, {
+  id: 7,
+  text: 'Solve HackerRank challenge'
+}, {
+  id: 8,
+  text: 'Solve LeetCode challenge'
+}, {
+  id: 9,
+  text: 'Apply for employment'
+}, {
+  id: 10,
+  text: 'Code'
+}, {
+  id: 11,
+  text: 'Process email'
+}, {
+  id: 12,
+  text: 'Break for lunch'
+}, {
+  id: 13,
+  text: 'Break for snack'
+}, {
+  id: 14,
+  text: 'Do dishes'
+}, {
+  id: 15,
+  text: 'Check voicemail'
+}, {
+  id: 16,
+  text: 'Peruse social media'
+}, {
+  id: 17,
+  text: 'Post on social media'
+}, {
+  id: 17,
+  text: '50 squats'
+}];
+exports.TASKS = TASKS;
+var DEFAULTLIST = [{
+  id: 1,
+  taskId: 1,
+  checked: false
+}, {
+  id: 2,
+  taskId: 2,
+  checked: false
+}, {
+  id: 3,
+  taskId: 3,
+  checked: false
+}, {
+  id: 4,
+  taskId: 18,
+  checked: false
+}, {
+  id: 5,
+  taskId: 4,
+  checked: false
+}, {
+  id: 6,
+  taskId: 5,
+  checked: false
+}, {
+  id: 7,
+  taskId: 10,
+  checked: false,
+  duration: '1h'
+}, {
+  id: 8,
+  taskId: 1,
+  checked: false
+}, {
+  id: 9,
+  taskId: 6,
+  checked: false
+}, {
+  id: 10,
+  taskId: 7,
+  checked: false
+}, {
+  id: 11,
+  taskId: 1,
+  checked: false
+}, {
+  id: 12,
+  taskId: 10,
+  checked: false,
+  duration: '1h'
+}, {
+  id: 13,
+  taskId: 11,
+  checked: false
+}, {
+  id: 14,
+  taskId: 1,
+  checked: false
+}, {
+  id: 15,
+  taskId: 12,
+  checked: false
+}, {
+  id: 16,
+  taskId: 13,
+  checked: false
+}, {
+  id: 17,
+  taskId: 1,
+  checked: false
+}, {
+  id: 18,
+  taskId: 14,
+  checked: false
+}, {
+  id: 19,
+  taskId: 10,
+  checked: false,
+  duration: '1h'
+}, {
+  id: 20,
+  taskId: 15,
+  checked: false
+}, {
+  id: 21,
+  taskId: 1,
+  checked: false
+}, {
+  id: 22,
+  taskId: 16,
+  checked: false
+}, {
+  id: 23,
+  taskId: 10,
+  checked: false,
+  duration: '1h'
+}, {
+  id: 24,
+  taskId: 17,
+  checked: false
+}];
+exports.DEFAULTLIST = DEFAULTLIST;
+console.log("NAMESPACE ".concat(NAMESPACE));
+console.log("DEBUG ".concat(DEBUG));
+console.log("ENVIRONMENT ".concat(ENVIRONMENT));
+console.log("ENDPOINT ".concat(ENDPOINT));
+console.log("NODE_ENV: ".concat(NODE_ENV));
+},{}],"components/Button.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36696,7 +36646,11 @@ function (_React$Component) {
             switch (_context5.prev = _context5.next) {
               case 0:
                 _context5.next = 2;
-                return _axios.default.get("".concat(this.url, "/account/").concat(account, "/nonce/"));
+                return _axios.default.get("".concat(this.url, "/account/").concat(account, "/nonce/"), {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
 
               case 2:
                 response = _context5.sent;
@@ -37026,7 +36980,11 @@ function () {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return _axios.default.post("".concat(this.url, "/account/").concat(account, "/data/"), data);
+                return _axios.default.post("".concat(this.url, "/account/").concat(account, "/data/"), data, {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
 
               case 2:
                 response = _context.sent;
@@ -37058,7 +37016,11 @@ function () {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _axios.default.get("".concat(this.url, "/account/").concat(account, "/data/"));
+                return _axios.default.get("".concat(this.url, "/account/").concat(account, "/data/"), {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
 
               case 2:
                 response = _context2.sent;
@@ -37257,8 +37219,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 var _react = _interopRequireDefault(require("react"));
-
-var _Theirs = _interopRequireDefault(require("~/components/Theirs"));
 
 var _Mine = _interopRequireDefault(require("~/components/Mine"));
 
@@ -37598,8 +37558,6 @@ function (_React$Component) {
         updateList: this.updateList,
         handleAction: this.handleSetActive,
         handleClearDone: this.handleClearDone
-      }), _react.default.createElement(_Theirs.default, {
-        list: _settings.TASKS
       })) : _react.default.createElement("div", {
         className: "container messageScreen"
       }, _react.default.createElement("div", {
@@ -37626,7 +37584,7 @@ function (_React$Component) {
 
 var _default = App;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Theirs":"components/Theirs.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/components/Header":"components/Header.js","~/services/remote":"services/remote.js","~/services/local":"services/local.js","~/services/messages":"services/messages.js","~/settings":"settings.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/components/Header":"components/Header.js","~/services/remote":"services/remote.js","~/services/local":"services/local.js","~/services/messages":"services/messages.js","~/settings":"settings.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -96953,7 +96911,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59928" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61909" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
