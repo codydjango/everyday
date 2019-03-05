@@ -26006,8 +26006,6 @@ var _react = _interopRequireWildcard(require("react"));
 
 var _Button = _interopRequireDefault(require("~/components/Button"));
 
-var _getKey = _interopRequireDefault(require("~/utilities/getKey"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
@@ -26031,13 +26029,19 @@ var _default = function _default(props) {
       error = _useState4[0],
       setError = _useState4[1];
 
-  var handleClick = function handleClick(e) {
-    e.preventDefault();
+  var _useState5 = (0, _react.useState)(false),
+      _useState6 = _slicedToArray(_useState5, 2),
+      input = _useState6[0],
+      setInput = _useState6[1];
 
+  var handleClick = function handleClick() {
     if (task && task.length > 3) {
+      setTask('');
+      input.value = '';
       props.createNew(task);
     } else {
       setError(true);
+      input.focus();
       setTimeout(function () {
         setError(false);
       }, 3000);
@@ -26063,12 +26067,19 @@ var _default = function _default(props) {
     type: "text",
     id: "takeName",
     placeholder: "task",
+    ref: function ref(input) {
+      setInput(input);
+    },
+    onKeyPress: function onKeyPress(_ref) {
+      var key = _ref.key;
+      if (key === 'Enter') handleClick();
+    },
     onChange: handleChange
   })));
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Button":"components/Button.js","~/utilities/getKey":"utilities/getKey.js"}],"components/Mine.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Button":"components/Button.js"}],"components/Mine.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -26852,7 +26863,7 @@ function (_React$Component) {
     value: function render() {
       return _react.default.createElement("div", {
         className: "next"
-      }, Next.hasTasksAndActive(this.props.list) ? _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "next up"), _react.default.createElement("p", null, _react.default.createElement("strong", null, this.activeTask.text)), this.activeTask.checked ? _react.default.createElement(_Button.default, {
+      }, Next.hasTasksAndActive(this.props.list) ? _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, this.activeTask.text), this.activeTask.checked ? _react.default.createElement(_Button.default, {
         id: "undo",
         ref: this.props.doneRef,
         action: this.handleUndo,
@@ -97553,7 +97564,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63815" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65177" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
