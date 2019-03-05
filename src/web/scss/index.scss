@@ -1,8 +1,12 @@
 @import url('https://fonts.googleapis.com/css?family=Cutive+Mono');
 @import './layout';
 
+$padding: 4px;
 $marginBottom: 14px;
 $titleMarginBottom: 10px;
+$backgroundYellow: rgb(243, 243, 0);
+$backgroundYellowBorder: #e5e700;
+$backgroundYellowBorderFocus: rgb(209, 209, 3);
 
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
@@ -12,6 +16,15 @@ $titleMarginBottom: 10px;
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
+}
+
+.selectable {
+  -webkit-touch-callout: text;
+    -webkit-user-select: text;
+     -khtml-user-select: text;
+       -moz-user-select: text;
+        -ms-user-select: text;
+            user-select: text;
 }
 
 html, body {
@@ -62,6 +75,10 @@ h2 {
     padding: 0;
     margin: 0 0 $titleMarginBottom 0;
     line-height: 1em;
+}
+
+h4 {
+    margin-bottom: 0px;
 }
 
 sup {
@@ -155,7 +172,7 @@ footer {
     &.edit {
         .task {
             label {
-                background-color: #DCDC00
+                background-color: $backgroundYellow
             }
         }
     }
@@ -164,6 +181,30 @@ footer {
         cursor: move;
         label {
             cursor: move;
+        }
+    }
+}
+
+.notes {
+    @extend .selectable;
+    position: relative;
+    > div {
+        background-color: $backgroundYellow;
+        border: 1px solid $backgroundYellowBorder;
+        margin: 0;
+        padding: $padding;
+        width: 100%;
+        box-sizing: border-box;
+        min-width: 100%;
+        min-height: 100px;
+        -webkit-transition : border 500ms ease-out;
+        -moz-transition : border 500ms ease-out;
+        -o-transition : border 500ms ease-out;
+        transition : border 500ms ease-out;
+
+        &:focus {
+            outline: none;
+            border: 1px solid $backgroundYellowBorderFocus;
         }
     }
 }
@@ -234,8 +275,8 @@ footer {
             // border: 1px;
             box-sizing: border-box;
             // border-width: 1px;
-            background-color: #e5e700;
-            border: 1px solid #DCDC00;
+            background-color: $backgroundYellow;
+            border: 1px solid $backgroundYellowBorder;
             width: 100%;
             -webkit-transition : border 500ms ease-out;
             -moz-transition : border 500ms ease-out;

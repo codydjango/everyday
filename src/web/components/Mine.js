@@ -71,18 +71,15 @@ class Mine extends React.Component {
     }
 
     pressHelp() {
-        console.log('presshelp')
         this.setState({ help: true })
     }
 
-    depressHelp(e) {
-        console.log('depresshelp')
+    depressHelp() {
         this.setState({ help: false})
     }
 
-    leaveHelp(e) {
+    leaveHelp() {
         if (this.state.help) {
-            console.log('leaving help')
             this.setState({ help: false})
         }
     }
@@ -127,12 +124,31 @@ class Mine extends React.Component {
             <footer>
                 <div>
                     <Link text={ (this.state.edit) ? 'done' : 'edit' }
-                        onClick={ this.toggleEdit } />
+                        onClick={ (e) => {
+                            e.preventDefault()
+                            this.toggleEdit()
+                        } } />
                     <Link text={ (this.state.help) ? 'ahh!' : 'help' }
-                        onMouseLeave={ this.leaveHelp }
-                        onMouseUp={ this.depressHelp }
-                        onMouseDown={ this.pressHelp } />
-                    <Link text="reset" onClick={ this.handleClearDone } />
+                        onMouseLeave={ e => {
+                            e.preventDefault()
+                            this.leaveHelp()
+                        } }
+                        onMouseUp={ e => {
+                            e.preventDefault()
+                            this.depressHelp()
+                        } }
+                        onMouseDown={ e => {
+                            e.preventDefault()
+                            this.pressHelp()
+                        } }
+                        onClick={ e => {
+                            e.preventDefault()
+                        } } />
+                    <Link text="reset"
+                        onClick={ e => {
+                            e.preventDefault()
+                            this.handleClearDone()
+                        } } />
                 </div>
                 { (this.state.edit) ? getEditInstruction() : '' }
                 { (this.state.help) ? getHelpInstruction() : '' }

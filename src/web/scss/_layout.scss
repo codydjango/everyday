@@ -59,6 +59,11 @@ $divisionPadding: 16px;
         padding-bottom: $divisionPadding;
         margin-bottom: $divisionPadding;
         border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
+
+        .notes {
+            display: none;
+            padding-top: $marginBottom;
+        }
     }
 
     .mine {
@@ -114,6 +119,11 @@ $divisionPadding: 16px;
             border: 0;
             padding-top: 0px;
             padding-bottom: 0px;
+            flex: 1;
+
+            .notes {
+                display: block;
+            }
         }
 
         .mine {

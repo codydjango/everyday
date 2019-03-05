@@ -187,12 +187,12 @@ class App extends React.Component {
                         <Next
                             doneRef={ doneRef }
                             list={ this.state.data.mine }
-                            updateList={ this.updateList }/>
+                            updateList={ this.updateList } />
                         <Mine
                             list={ this.state.data.mine }
                             updateList={ this.updateList }
                             handleAction={ this.handleSetActive }
-                            handleClearDone={ this.handleClearDone }/>
+                            handleClearDone={ this.handleClearDone } />
                     </div>)
                     : (<div className="container messageScreen">
                         <div className="message">

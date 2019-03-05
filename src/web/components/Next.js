@@ -5,6 +5,7 @@ import Button from '~/components/Button'
 import Totals from '~/components/Totals'
 import Timer from '~/utilities/Timer'
 import audios from '~/utilities/audios'
+import Notes from '~/components/Notes'
 
 class Next extends React.Component {
     static nothingActive(list) {
@@ -137,6 +138,8 @@ class Next extends React.Component {
                     <p><small>Go drink more water.</small></p>
                 </React.Fragment>
             ) }
+
+            <Notes />
         </div>)
     }
 }
