@@ -6,6 +6,9 @@ $breakpoints: (
 );
 
 $padding: 4px;
+$titleMarginBottom: 10px;
+$marginBottom: 14px;
+$divisionPadding: 16px;
 
 @mixin respond-above($breakpoint) {
     // If the breakpoint exists in the map.
@@ -51,6 +54,11 @@ $padding: 4px;
     .next {
         width: auto;
         display: block;
+        border-top: 1px dotted rgba(0, 0, 0, 0.2);
+        padding-top: $divisionPadding;
+        padding-bottom: $divisionPadding;
+        margin-bottom: $divisionPadding;
+        border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
     }
 
     .mine {
@@ -103,6 +111,9 @@ $padding: 4px;
         .next {
             width: auto;
             order: 1;
+            border: 0;
+            padding-top: 0px;
+            padding-bottom: 0px;
         }
 
         .mine {

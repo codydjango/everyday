@@ -2,6 +2,7 @@
 @import './layout';
 
 $marginBottom: 14px;
+$titleMarginBottom: 10px;
 
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
@@ -59,7 +60,7 @@ h1 {
 h2 {
     font-style: italic;
     padding: 0;
-    margin: 0 0 1em 0;
+    margin: 0 0 $titleMarginBottom 0;
     line-height: 1em;
 }
 
@@ -77,6 +78,11 @@ sub {
 
 a {
     color: black;
+}
+
+p {
+    margin-top: 0px;
+    padding-top: 0px;
 }
 
 header {

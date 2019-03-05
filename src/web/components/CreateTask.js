@@ -1,18 +1,19 @@
 import React, { useState } from 'react'
 import Button from '~/components/Button'
-import getKey from '~/utilities/getKey'
 
 export default props => {
     const [task, setTask] = useState(0)
     const [error, setError] = useState(false)
+    const [input, setInput] = useState(false)
 
-    const handleClick = (e) => {
-        e.preventDefault()
-
+    const handleClick = () => {
         if (task && task.length > 3 ) {
+            setTask('')
+            input.value = ''
             props.createNew(task)
         } else {
             setError(true)
+            input.focus()
             setTimeout(() => {
                 setError(false)
             }, 3000)
@@ -35,7 +36,13 @@ export default props => {
 
         <div className={ `field ${ (error) ? "error" : "" }` }>
             <label htmlFor="taskName">task</label>
-            <input type="text" id="takeName" placeholder="task" onChange={ handleChange } />
+            <input
+                type="text"
+                id="takeName"
+                placeholder="task"
+                ref={(input) => { setInput(input) }}
+                onKeyPress={ ({ key }) => { if (key === 'Enter') handleClick() }}
+                onChange={ handleChange } />
         </div>
     </div>)
 }
