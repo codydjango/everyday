@@ -1,4 +1,4 @@
-const map = new WeakMap();
+const map = new WeakMap()
 let index = 0;
 
 function weakKey(obj) {

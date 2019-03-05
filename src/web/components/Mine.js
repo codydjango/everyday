@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import TaskList from '~/components/TaskList'
 import Link from '~/components/Link'
+import CreateTask from '~/components/CreateTask'
 
 class Mine extends React.Component {
     constructor(props) {
@@ -11,6 +12,7 @@ class Mine extends React.Component {
         this.toggleEdit = this.toggleEdit.bind(this)
         this.startEdit = this.startEdit.bind(this)
         this.stopEdit = this.stopEdit.bind(this)
+        this.createNew = this.createNew.bind(this)
 
         this.handleAction = props.handleAction
         this.handleClearDone = props.handleClearDone
@@ -28,6 +30,11 @@ class Mine extends React.Component {
         }
 
         return null
+    }
+
+    createNew(task) {
+        console.log('new', task)
+        alert('create new')
     }
 
     startEdit() {
@@ -57,7 +64,6 @@ class Mine extends React.Component {
 
     onUpdate({ list, dragged }) {
         this.setState(state => {
-            console.log('onUpdate', state.list, list)
             state.list = list
             state.dragged = dragged
             return state
@@ -81,6 +87,7 @@ class Mine extends React.Component {
                 dragged={ this.state.dragged }
                 onUpdate={ this.onUpdate }
                 onClick={ this.handleAction } />
+            <CreateTask createNew={ this.createNew } />
             <footer>
                 <div>
                     <Link text={ (this.state.edit) ? 'done' : 'edit' } action={ this.toggleEdit } />

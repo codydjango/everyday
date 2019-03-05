@@ -122,8 +122,8 @@ class Next extends React.Component {
                 </React.Fragment>
             ) : (
                 <React.Fragment>
-                    <h2>you are so good. your brain is so strong.</h2>
-                    <p><small>Go drink some water.</small></p>
+                    <h2>Your brain is so strong.</h2>
+                    <p><small>Go drink more water.</small></p>
                 </React.Fragment>
             ) }
         </div>)

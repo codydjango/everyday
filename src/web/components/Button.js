@@ -2,7 +2,7 @@ import React from 'react'
 
 export default React.forwardRef(( props, ref) => {
     return (<button
+        className={ `button ${ (props.className) ? props.className : '' }` }
         ref={ ref }
-        id={ props.id }
         onClick={ props.action }>{ props.text }</button>)
 })
