@@ -26189,24 +26189,21 @@ function (_React$Component) {
   }, {
     key: "pressHelp",
     value: function pressHelp() {
-      console.log('presshelp');
       this.setState({
         help: true
       });
     }
   }, {
     key: "depressHelp",
-    value: function depressHelp(e) {
-      console.log('depresshelp');
+    value: function depressHelp() {
       this.setState({
         help: false
       });
     }
   }, {
     key: "leaveHelp",
-    value: function leaveHelp(e) {
+    value: function leaveHelp() {
       if (this.state.help) {
-        console.log('leaving help');
         this.setState({
           help: false
         });
@@ -26226,6 +26223,8 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
+      var _this2 = this;
+
       var getEditInstruction = function getEditInstruction() {
         return _react.default.createElement("ul", {
           className: "instruction"
@@ -26250,15 +26249,38 @@ function (_React$Component) {
         createNew: this.createNew
       }), _react.default.createElement("footer", null, _react.default.createElement("div", null, _react.default.createElement(_Link.default, {
         text: this.state.edit ? 'done' : 'edit',
-        onClick: this.toggleEdit
+        onClick: function onClick(e) {
+          e.preventDefault();
+
+          _this2.toggleEdit();
+        }
       }), _react.default.createElement(_Link.default, {
         text: this.state.help ? 'ahh!' : 'help',
-        onMouseLeave: this.leaveHelp,
-        onMouseUp: this.depressHelp,
-        onMouseDown: this.pressHelp
+        onMouseLeave: function onMouseLeave(e) {
+          e.preventDefault();
+
+          _this2.leaveHelp();
+        },
+        onMouseUp: function onMouseUp(e) {
+          e.preventDefault();
+
+          _this2.depressHelp();
+        },
+        onMouseDown: function onMouseDown(e) {
+          e.preventDefault();
+
+          _this2.pressHelp();
+        },
+        onClick: function onClick(e) {
+          e.preventDefault();
+        }
       }), _react.default.createElement(_Link.default, {
         text: "reset",
-        onClick: this.handleClearDone
+        onClick: function onClick(e) {
+          e.preventDefault();
+
+          _this2.handleClearDone();
+        }
       })), this.state.edit ? getEditInstruction() : '', this.state.help ? getHelpInstruction() : ''));
     }
   }], [{
@@ -26675,7 +26697,41 @@ function () {
 var _default = new Audios();
 
 exports.default = _default;
-},{}],"components/Next.js":[function(require,module,exports) {
+},{}],"components/Notes.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+var _default = function _default(props) {
+  var _useState = (0, _react.useState)(false),
+      _useState2 = _slicedToArray(_useState, 2),
+      error = _useState2[0],
+      setError = _useState2[1];
+
+  return _react.default.createElement("div", {
+    className: "notes field ".concat(error ? "error" : "")
+  }, _react.default.createElement("h4", null, "Scratchpad (not saved)"), _react.default.createElement("div", {
+    contentEditable: true
+  }));
+};
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js"}],"components/Next.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -26694,6 +26750,8 @@ var _Totals = _interopRequireDefault(require("~/components/Totals"));
 var _Timer = _interopRequireDefault(require("~/utilities/Timer"));
 
 var _audios = _interopRequireDefault(require("~/utilities/audios"));
+
+var _Notes = _interopRequireDefault(require("~/components/Notes"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -26879,7 +26937,7 @@ function (_React$Component) {
       }), _react.default.createElement(_Button.default, {
         action: this.handleToggleTimer,
         text: this.state.time
-      })) : _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "Your brain is so strong."), _react.default.createElement("p", null, _react.default.createElement("small", null, "Go drink more water."))));
+      })) : _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "Your brain is so strong."), _react.default.createElement("p", null, _react.default.createElement("small", null, "Go drink more water."))), _react.default.createElement(_Notes.default, null));
     }
   }, {
     key: "activeTask",
@@ -26893,7 +26951,7 @@ function (_React$Component) {
 
 var _default = Next;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/settings":"settings.js","~/components/Button":"components/Button.js","~/components/Totals":"components/Totals.js","~/utilities/Timer":"utilities/Timer.js","~/utilities/audios":"utilities/audios.js"}],"../../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/settings":"settings.js","~/components/Button":"components/Button.js","~/components/Totals":"components/Totals.js","~/utilities/Timer":"utilities/Timer.js","~/utilities/audios":"utilities/audios.js","~/components/Notes":"components/Notes.js"}],"../../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -97564,7 +97622,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65177" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49886" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
