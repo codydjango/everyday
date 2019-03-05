@@ -5,20 +5,23 @@ import Header from '~/components/Header'
 import remote from '~/services/remote'
 import local from '~/services/local'
 import { messages, randomFromList } from '~/services/messages'
-import { TASKS, DEFAULTLIST } from '~/settings'
-import axios from 'axios';
+import { DEFAULTLIST } from '~/settings'
 import Auth from './Auth';
+import { CODYLIST } from '../settings';
 
 class App extends React.Component {
-    static resetList() {
-        const list = App.flatten(DEFAULTLIST)
+    static resetList(defaultList='default') {
+        const listType = (defaultList === 'cody') ? CODYLIST : DEFAULTLIST
+        const list = App.flatten(listType)
+
         list[0].active = true
         return list
     }
 
     static flatten(list) {
-        return list.map(i => {
-            i.task = TASKS[i.taskId - 1]
+        return list.map((i, ii) => {
+            i.id = ii
+            i.checked = false
             return i
         })
     }
@@ -141,8 +144,8 @@ class App extends React.Component {
         this.load()
     }
 
-    handleReset() {
-        this.updateList(App.resetList())
+    handleReset(listType='default') {
+        this.updateList(App.resetList(listType))
     }
 
     handleSetActive(id) {

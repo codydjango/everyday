@@ -8,11 +8,11 @@ function aggregates(list) {
 
     return list.slice(0).map(i => {
         delete i.multiple
-        if (Number.isInteger(counts[i.taskId])) {
-            counts[i.taskId] += 1
-            i.multiple = counts[i.taskId]
+        if (Number.isInteger(counts[i.text])) {
+            counts[i.text] += 1
+            i.multiple = counts[i.text]
         } else {
-            counts[i.taskId] = 1
+            counts[i.text] = 1
         }
         return i
     })

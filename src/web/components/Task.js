@@ -17,8 +17,9 @@ export default ({ handleAction, item, ...props }) => (
                 <label
                     htmlFor={ `taskId_${ item.id }`}
                     onClick={ (e) => { e.preventDefault() } }>
-                    <span className={ (item.active) ? 'taskText active' : 'taskText' } style={{ marginRight: '2px' }}>{ item.task.text }</span>
-                    { (item.duration) ? (<sub className="duration">{ item.duration }</sub>) : '' }
+                    <span className={ (item.active) ? 'taskText active' : 'taskText' } style={{ marginRight: '2px' }}>{ item.text }</span>
+                    { (item.duration) ? (<sub className="duration" title="minute duration">{ item.duration }</sub>) : '' }
+                    { (item.limit) ? (<sub className="limit" title="minute limit">{ item.limit }</sub>) : '' }
                     { (item.multiple) ? (<sup className="multiple">x{ item.multiple }</sup>) : '' }
                 </label>
             </span>

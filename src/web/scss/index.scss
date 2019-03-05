@@ -70,7 +70,7 @@ sup {
 sub {
     position: relative;
     vertical-align: top;
-    top: 2px;
+    top: 4px;
 }
 
 a {
@@ -162,6 +162,11 @@ footer {
 .duration {
     margin-right: 2px;
     color: green;
+}
+
+.limit {
+    margin-right: 2px;
+    color:purple;
 }
 
 .multiple {
