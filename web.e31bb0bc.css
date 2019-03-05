@@ -69,8 +69,10 @@
     order: 1;
   }
   .container .mine {
-    width: 300px;
+    width: 200px;
     order: 0;
+    padding: 0;
+    margin-right: 4px;
   }
   .container .theirs {
     width: auto;
@@ -148,7 +150,7 @@ sup {
 sub {
   position: relative;
   vertical-align: top;
-  top: 2px;
+  top: 4px;
 }
 
 a {
@@ -196,8 +198,9 @@ footer .messageRight {
 
 .list, .taskList {
   list-style: none;
-  padding: 0 0 1em 0;
+  padding: 0;
   margin: 0;
+  margin-bottom: 14px;
 }
 
 .instruction {
@@ -227,6 +230,11 @@ footer .messageRight {
   color: green;
 }
 
+.limit {
+  margin-right: 2px;
+  color: purple;
+}
+
 .multiple {
   color: red;
   padding: 0em;
@@ -252,4 +260,37 @@ footer .messageRight {
 }
 .ascii-box .taskText.active {
   font-weight: 600;
+}
+
+.createTask {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.createTask .field {
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1;
+  padding: 0px;
+  margin: 0px;
+}
+.createTask .field label {
+  display: none;
+}
+.createTask .field input {
+  box-sizing: border-box;
+  background-color: #e5e700;
+  border: 1px solid #DCDC00;
+  width: 100%;
+  -webkit-transition: border 500ms ease-out;
+  -moz-transition: border 500ms ease-out;
+  -o-transition: border 500ms ease-out;
+  transition: border 500ms ease-out;
+}
+.createTask .field.error input {
+  border-color: #ff0202;
+}
+.createTask .submitTask {
+  margin: 0 2px 0 0;
 }

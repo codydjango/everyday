@@ -1,0 +1,296 @@
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css?family=Cutive+Mono");
+#root {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.container {
+  flex: 1;
+}
+
+.footer {
+  height: 16px;
+}
+
+.container {
+  min-width: 300px;
+  display: block;
+  position: relative;
+}
+.container .next {
+  width: auto;
+  display: block;
+}
+.container .mine {
+  width: auto;
+  display: block;
+}
+.container .theirs {
+  width: auto;
+}
+
+.header {
+  min-width: 300px;
+  display: block;
+  position: relative;
+}
+.header .logo {
+  display: block;
+}
+.header .logo h1 {
+  display: block;
+}
+
+.header {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+}
+.header .logo {
+  flex: 0;
+}
+.header .auth {
+  text-align: right;
+  flex: 1;
+}
+
+@media screen and (min-width: 576px) {
+  .container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+  }
+  .container .next {
+    width: auto;
+    order: 1;
+  }
+  .container .mine {
+    width: 200px;
+    order: 0;
+    padding: 0;
+    margin-right: 4px;
+  }
+  .container .theirs {
+    width: auto;
+    text-align: right;
+    flex: 1;
+    order: 2;
+  }
+}
+.noselect, body {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+     supported by Chrome and Opera */
+}
+
+html, body {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: "Cutive Mono", sans-serif;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 400;
+  font-size: 14px;
+  background-color: yellow;
+}
+
+h1 {
+  font-style: italic;
+  padding: 0;
+  margin: 0 0 0 0;
+  line-height: 1em;
+  font-size: 32px;
+}
+
+.auth .authInfo .loginWith {
+  font-size: 12px;
+  line-height: 12px;
+  height: 12px;
+  display: block;
+}
+.auth .authInfo .loginAddress {
+  font-size: 18px;
+  line-height: 20px;
+  font-weight: 700;
+  height: 20px;
+  display: block;
+}
+
+h2 {
+  font-style: italic;
+  padding: 0;
+  margin: 0 0 1em 0;
+  line-height: 1em;
+}
+
+sup {
+  position: relative;
+  vertical-align: top;
+  top: -2px;
+}
+
+sub {
+  position: relative;
+  vertical-align: top;
+  top: 4px;
+}
+
+a {
+  color: black;
+}
+
+header {
+  margin-bottom: 20px;
+}
+
+footer {
+  position: relative;
+}
+footer .messageLeft {
+  position: absolute;
+  font-style: italic;
+  text-align: left;
+  width: 100%;
+  font-weight: 700;
+}
+footer .messageRight {
+  position: absolute;
+  font-style: italic;
+  text-align: right;
+  width: 100%;
+}
+
+.messageScreen {
+  display: flex;
+  height: 98%;
+  align-items: center;
+  justify-content: center;
+}
+.messageScreen .message {
+  text-align: center;
+}
+.messageScreen .message .messageLine {
+  display: block;
+}
+
+.link {
+  display: inline-block;
+  padding: 2px;
+}
+
+.list, .taskList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 14px;
+}
+
+.instruction {
+  padding: 0px;
+  margin: 15px 0 0 3px;
+  list-style-position: inside;
+}
+.instruction li {
+  font-style: italic;
+}
+
+.taskList .task {
+  display: block;
+}
+.taskList.edit .task label {
+  background-color: #DCDC00;
+}
+.taskList .drag {
+  cursor: move;
+}
+.taskList .drag label {
+  cursor: move;
+}
+
+.duration {
+  margin-right: 2px;
+  color: green;
+}
+
+.limit {
+  margin-right: 2px;
+  color: purple;
+}
+
+.multiple {
+  color: red;
+  padding: 0em;
+  margin-left: 2px;
+}
+
+.ascii-box input[type=checkbox] {
+  display: none;
+}
+.ascii-box .visible:before {
+  content: "☐";
+}
+.ascii-box input[type=checkbox]:checked + .visible:before {
+  content: "☑";
+}
+.ascii-box .visible {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+}
+.ascii-box .taskText {
+  font-weight: normal;
+}
+.ascii-box .taskText.active {
+  font-weight: 600;
+}
+
+.createTask {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.createTask .field {
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1;
+  padding: 0px;
+  margin: 0px;
+}
+.createTask .field label {
+  display: none;
+}
+.createTask .field input {
+  box-sizing: border-box;
+  background-color: #e5e700;
+  border: 1px solid #DCDC00;
+  width: 100%;
+  -webkit-transition: border 500ms ease-out;
+  -moz-transition: border 500ms ease-out;
+  -o-transition: border 500ms ease-out;
+  transition: border 500ms ease-out;
+}
+.createTask .field.error input {
+  border-color: #ff0202;
+}
+.createTask .submitTask {
+  margin: 0 2px 0 0;
+}
