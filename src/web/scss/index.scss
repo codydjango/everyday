@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css?family=Cutive+Mono');
 @import './layout';
 
+$marginBottom: 14px;
+
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -70,7 +72,7 @@ sup {
 sub {
     position: relative;
     vertical-align: top;
-    top: 2px;
+    top: 4px;
 }
 
 a {
@@ -122,8 +124,9 @@ footer {
 
 .list {
     list-style: none;
-    padding: 0 0 1em 0;
+    padding: 0;
     margin: 0;
+    margin-bottom: $marginBottom;
 }
 
 .instruction {
@@ -164,6 +167,11 @@ footer {
     color: green;
 }
 
+.limit {
+    margin-right: 2px;
+    color:purple;
+}
+
 .multiple {
     color: red;
     padding: 0em;
@@ -197,7 +205,52 @@ footer {
     }
 }
 
+.createTask {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+    margin-bottom: $marginBottom;
 
+    .field {
+        width: 100%;
+        box-sizing: border-box;
+        flex: 1;
+        padding: 0px;
+        margin: 0px;
 
+        label {
+            display: none;
+        }
+
+        input {
+            // padding: 0px;
+            // margin: 0px;
+            // border: 1px;
+            box-sizing: border-box;
+            // border-width: 1px;
+            background-color: #e5e700;
+            border: 1px solid #DCDC00;
+            width: 100%;
+            -webkit-transition : border 500ms ease-out;
+            -moz-transition : border 500ms ease-out;
+            -o-transition : border 500ms ease-out;
+            transition : border 500ms ease-out;
+        }
+
+        &.error {
+            input {
+                border-color: #ff0202;
+            }
+        }
+    }
+
+    .submitTask {
+        // flex: 0;
+        margin: 0 2px 0 0;
+        // margin: 0;
+        // border-width: 0px;
+        // box-sizing: border-box;
+    }
+}
 
 

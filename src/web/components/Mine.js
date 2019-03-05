@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import TaskList from '~/components/TaskList'
 import Link from '~/components/Link'
+import CreateTask from '~/components/CreateTask'
 
 class Mine extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { list: props.list, edit: false, dragged: null }
+        this.state = { list: props.list, edit: false, dragged: null, help: false }
         this.onUpdate = this.onUpdate.bind(this)
         this.toggleEdit = this.toggleEdit.bind(this)
         this.startEdit = this.startEdit.bind(this)
         this.stopEdit = this.stopEdit.bind(this)
-
+        this.createNew = this.createNew.bind(this)
+        this.pressHelp = this.pressHelp.bind(this)
+        this.depressHelp = this.depressHelp.bind(this)
+        this.leaveHelp = this.leaveHelp.bind(this)
         this.handleAction = props.handleAction
         this.handleClearDone = props.handleClearDone
         this.updateList = props.updateList
@@ -28,6 +32,17 @@ class Mine extends React.Component {
         }
 
         return null
+    }
+
+    createNew(task) {
+        let list = this.state.list.slice(0)
+
+        list.push({
+            text: task,
+            checked: false
+        })
+
+        this.updateList(list)
     }
 
     startEdit() {
@@ -55,9 +70,25 @@ class Mine extends React.Component {
         }
     }
 
+    pressHelp() {
+        console.log('presshelp')
+        this.setState({ help: true })
+    }
+
+    depressHelp(e) {
+        console.log('depresshelp')
+        this.setState({ help: false})
+    }
+
+    leaveHelp(e) {
+        if (this.state.help) {
+            console.log('leaving help')
+            this.setState({ help: false})
+        }
+    }
+
     onUpdate({ list, dragged }) {
         this.setState(state => {
-            console.log('onUpdate', state.list, list)
             state.list = list
             state.dragged = dragged
             return state
@@ -73,6 +104,17 @@ class Mine extends React.Component {
             </ul>)
         }
 
+        const getHelpInstruction = () => {
+            return (<ul className="instruction">
+                <li><small>green subscript indicates <strong>minimum time</strong> for task</small></li>
+                <li><small>purple subscript indicates <strong>maximum time</strong> for task</small></li>
+                <li><small>red superscript indicates multiple of task</small></li>
+                <li><small>click "order" to order your list</small></li>
+                <li><small>click "add" to add a new item to your list</small></li>
+                <li><small>click "reset" to reset your list</small></li>
+            </ul>)
+        }
+
         return (<div className="mine">
             <h2>routine</h2>
             <TaskList
@@ -81,12 +123,19 @@ class Mine extends React.Component {
                 dragged={ this.state.dragged }
                 onUpdate={ this.onUpdate }
                 onClick={ this.handleAction } />
+            <CreateTask createNew={ this.createNew } />
             <footer>
                 <div>
-                    <Link text={ (this.state.edit) ? 'done' : 'edit' } action={ this.toggleEdit } />
-                    <Link text="reset" action={ this.handleClearDone } />
+                    <Link text={ (this.state.edit) ? 'done' : 'edit' }
+                        onClick={ this.toggleEdit } />
+                    <Link text={ (this.state.help) ? 'ahh!' : 'help' }
+                        onMouseLeave={ this.leaveHelp }
+                        onMouseUp={ this.depressHelp }
+                        onMouseDown={ this.pressHelp } />
+                    <Link text="reset" onClick={ this.handleClearDone } />
                 </div>
                 { (this.state.edit) ? getEditInstruction() : '' }
+                { (this.state.help) ? getHelpInstruction() : '' }
             </footer>
         </div>)
     }
