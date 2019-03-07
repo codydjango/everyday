@@ -1,6 +1,6 @@
 import React from 'react'
 
 export default ({ children }) => (
-    <header className="header">
+    <footer className="footer">
         { children }
-    </header>)
+    </footer>)

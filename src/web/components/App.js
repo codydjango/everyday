@@ -2,13 +2,17 @@ import React from 'react'
 import Mine from '~/components/Mine'
 import Next from '~/components/Next'
 import Header from '~/components/Header'
+import Footer from '~/components/Footer'
+import Auth from '~/components/Auth'
+import Logo from '~/components/Logo'
+import Message from '~/components/Message'
+
 import remote from '~/services/remote'
 import local from '~/services/local'
 import { messages, randomFromList } from '~/services/messages'
-import { DEFAULTLIST } from '~/settings'
-import Auth from './Auth'
-import { CODYLIST } from '../settings'
+import { DEFAULTLIST, CODYLIST } from '~/settings'
 import uniqueId from '~/utilities/uniqueId'
+import { promised } from 'q';
 
 class App extends React.Component {
     static resetList(defaultList='default') {
@@ -63,7 +67,7 @@ class App extends React.Component {
     }
 
     async load() {
-        this.store = (this.state.token) ? remote : local
+        this.store = (this.hasToken()) ? remote : local
 
         try {
             this.setState({ message: 'Loading...' })
@@ -85,13 +89,16 @@ class App extends React.Component {
     }
 
     async save() {
+        const storeType = (this.hasToken()) ? remote.name : local.name
+
         try {
             this.setState({ message: 'Saving...' })
-            await this.store.save(this.state.account, this.state.data)
-            this.setState({ message: `Saved to ${ this.store.name }.` })
+            if (storeType === remote.name) await remote.save(this.state.account, this.state.data)
+            await local.save(this.state.account, this.state.data)
+            this.setState({ message: `Saved to ${ storeType }.` })
         } catch (err) {
             console.log('err saving', err)
-            this.setState({ message: `Error from ${ this.store.name }.` })
+            this.setState({ message: `Error from ${ storeType }.` })
         } finally {
             setTimeout(()=> {
                 this.setState({ message: randomFromList(messages.working) })
@@ -173,20 +180,22 @@ class App extends React.Component {
         })
     }
 
-    updateAuthentication(account, token=null) {
-        if ((token === null) || (token === undefined)) {
+    async updateAuthentication(account, token=null) {
+        await new Promise((resolve, reject) => {
             this.setState(state => {
-                state.account = account
-                delete state.token
+                if ((token === null) || (token === undefined)) {
+                    state.account = account
+                    delete state.token
+                } else {
+                    state.account = account
+                    state.token = token
+                }
+
                 return state
+            }, () => {
+                resolve(true)
             })
-        } else {
-            this.setState(state => {
-                state.account = account
-                state.token = token
-                return state
-            })
-        }
+        })
 
         this.load()
     }
@@ -224,10 +233,14 @@ class App extends React.Component {
 
         return (
             <React.Fragment>
-                <Header web3={ this.props.web3 }
+                <Header >
+                    <Logo />
+                    <Auth
+                        web3={ this.props.web3 }
                         account={ this.state.account }
                         token={ this.state.token }
                         callback={ this.updateAuthentication } />
+                </Header>
 
                 { (this.hasSession())
                     ? (<div className="container">
@@ -243,21 +256,20 @@ class App extends React.Component {
                             handleAction={ this.handleSetActive }
                             handleClearDone={ this.handleClearDone } />
                     </div>)
-                    : (<div className="container messageScreen">
-                        <div className="message">
-                            <span className="messageLine">################################################################</span>
-                            <span>Session not found. Try logging in or <a href="#" onClick={ this.createSession }> create a new session.</a></span>
-                            <span className="messageLine">################################################################</span>
-                        </div>
-                    </div>)
+                    : (<Message>
+                        <span>Session not found. Try logging in or <a href="#" onClick={ this.createSession }> create a new session.</a></span>
+                    </Message>)
                 }
 
-                <footer className="footer">
+                <Footer>
                     <span className="messageLeft"><small>{ this.state.message }</small></span>
-                    <span className="messageRight"><small>{
-                        (this.hasToken()) ? '' : 'Login to enable session storage.'
-                    }</small></span>
-                </footer>
+                    <span className="messageRight">
+                        <small>
+                            <span>{ (this.hasToken()) ? '' : 'Login to enable session storage.'}</span>
+                            <a download="export.json" href={ `data:application/octet-stream,${encodeURIComponent(JSON.stringify(this.state.data, null, 2))}`}>export</a>
+                        </small>
+                    </span>
+                </Footer>
             </React.Fragment>
         )
     }
