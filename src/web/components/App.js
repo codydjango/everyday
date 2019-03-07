@@ -6,6 +6,7 @@ import Footer from '~/components/Footer'
 import Auth from '~/components/Auth'
 import Logo from '~/components/Logo'
 import Message from '~/components/Message'
+import Import from '~/components/Import'
 
 import remote from '~/services/remote'
 import local from '~/services/local'
@@ -58,6 +59,7 @@ class App extends React.Component {
         this.createSession = this.createSession.bind(this)
 
         this.load = this.load.bind(this)
+        this.import = this.import.bind(this)
         this.save = this.save.bind(this)
 
         // callback
@@ -86,6 +88,13 @@ class App extends React.Component {
                 this.setState({ message: randomFromList(messages.working) })
             }, 1000 * 5)
         }
+    }
+
+    async import(data, source) {
+        if (data.mine) this.updateList(data.mine, false)
+        if (data.notes) this.updateNotes(data.notes, false)
+
+        this.setState({ message: `Loaded from ${ source }.` })
     }
 
     async save() {
@@ -262,11 +271,12 @@ class App extends React.Component {
                 }
 
                 <Footer>
-                    <span className="messageLeft"><small>{ this.state.message }</small></span>
+                    <span className="messageLeft"><small className="readout">{ this.state.message }</small></span>
                     <span className="messageRight">
                         <small>
-                            <span>{ (this.hasToken()) ? '' : 'Login to enable session storage.'}</span>
-                            <a download="export.json" href={ `data:application/octet-stream,${encodeURIComponent(JSON.stringify(this.state.data, null, 2))}`}>export</a>
+                            <span className="readout">{ (this.hasToken()) ? '' : 'Login to enable session storage.'}</span>
+                            <Import onImport={ this.import }/>
+                            <a className="link" download="export.json" href={ `data:application/octet-stream,${encodeURIComponent(JSON.stringify(this.state.data, null, 2))}`}>export</a>
                         </small>
                     </span>
                 </Footer>
