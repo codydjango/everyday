@@ -36,7 +36,9 @@ class App extends React.Component {
         this.state = {
             account: props.defaultAccount,
             token: props.token,
-            data: {},
+            data: {
+                notes: '<p>default paragraph notes</p>'
+            },
             message: randomFromList(messages.hello)
         }
 
@@ -55,6 +57,7 @@ class App extends React.Component {
 
         // callback
         this.updateList = this.updateList.bind(this)
+        this.updateNotes = this.updateNotes.bind(this)
         this.updateAuthentication = this.updateAuthentication.bind(this)
     }
 
@@ -65,7 +68,10 @@ class App extends React.Component {
             this.setState({ message: 'Loading...' })
             let data = await this.store.load(this.state.account)
             if (!(data.mine && data.mine.length > 0)) throw new Error('lost session')
-            this.updateList(data.mine, false)
+
+            if (data.mine) this.updateList(data.mine, false)
+            if (data.notes) this.updateNotes(data.notes, false)
+
             this.setState({ message: `Loaded from ${ this.store.name }.` })
         } catch (err) {
             console.log('err loading', err)
@@ -114,15 +120,46 @@ class App extends React.Component {
     }
 
     updateList(list, save=true) {
-        if (!App.hasActive(list)) {
-            list[0].active = true
-        }
+        return new Promise((resolve, reject) => {
+            if (!App.hasActive(list)) {
+                list[0].active = true
+            }
 
-        this.setState(state => {
-            state.data.mine = list
-            return state
-        }, () => {
-            if (save) this.save()
+            this.setState(state => {
+                state.data.mine = list
+                return state
+            }, async () => {
+                if (save) {
+                    try {
+                        await this.save()
+                        resolve(true)
+                    } catch (err) {
+                        reject(err)
+                    }
+                } else {
+                    resolve(true)
+                }
+            })
+        })
+    }
+
+    updateNotes(notes, save=true) {
+        return new Promise((resolve, reject) => {
+            this.setState(state => {
+                state.data.notes = notes
+                return state
+            }, async () => {
+                if (save) {
+                    try {
+                        await this.save()
+                        resolve(true)
+                    } catch (err) {
+                        reject(err)
+                    }
+                } else {
+                    resolve(true)
+                }
+            })
         })
     }
 
@@ -187,7 +224,9 @@ class App extends React.Component {
                         <Next
                             doneRef={ doneRef }
                             list={ this.state.data.mine }
-                            updateList={ this.updateList } />
+                            notes={ this.state.data.notes }
+                            updateList={ this.updateList }
+                            updateNotes={ this.updateNotes } />
                         <Mine
                             list={ this.state.data.mine }
                             updateList={ this.updateList }

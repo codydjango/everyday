@@ -22,7 +22,7 @@ class Auth extends React.Component {
         try {
             return (account === Auth.parseJwt(token).account)
         } catch (err) {
-            console.log(`Auth error parsing ${ token }`, err)
+            // console.log(`Auth error parsing ${ token }`, err)
             return false
         }
     }

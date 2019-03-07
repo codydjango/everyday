@@ -60,9 +60,12 @@ $divisionPadding: 16px;
         margin-bottom: $divisionPadding;
         border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
 
+        .today {
+            height: auto;
+        }
+
         .notes {
             display: none;
-            padding-top: $marginBottom;
         }
     }
 
@@ -120,9 +123,20 @@ $divisionPadding: 16px;
             padding-top: 0px;
             padding-bottom: 0px;
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
 
             .notes {
+                position: relative;
                 display: block;
+                height: 100%;
+                padding-top: $marginBottom;
+                flex: 1;
+
+                .notesInput {
+                    height: 100%;
+                }
             }
         }
 

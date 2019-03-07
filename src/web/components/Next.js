@@ -59,6 +59,7 @@ class Next extends React.Component {
         this.handleDone = this.handleDone.bind(this)
         this.handleUndo = this.handleUndo.bind(this)
         this.handleNotNow = this.handleNotNow.bind(this)
+        this.handleNotesUpdate = this.handleNotesUpdate.bind(this)
         this.handleToggleTimer = this.handleToggleTimer.bind(this)
     }
 
@@ -110,6 +111,10 @@ class Next extends React.Component {
         ;(this.timer.active) ? this.timer.stop() : this.timer.start(timerType, limit)
     }
 
+    handleNotesUpdate(text) {
+        return this.props.updateNotes(text)
+    }
+
     getTotals() {
         let list = this.props.list
         return {
@@ -120,26 +125,29 @@ class Next extends React.Component {
 
     render() {
         return (<div className="next">
-            { (Next.hasTasksAndActive(this.props.list)) ? (
-                <React.Fragment>
-                    <h2>{ this.activeTask.text }</h2>
-                    {/* <p><strong>{ this.activeTask.text }</strong></p> */}
-                    { (this.activeTask.checked)
-                        ? (<Button id="undo" ref={ this.props.doneRef } action={ this.handleUndo } text="undo" />)
-                        : (<Button id="done" ref={ this.props.doneRef } action={ this.handleDone } text="done" />)}
+            <div className="today">
+                { (Next.hasTasksAndActive(this.props.list)) ? (
+                    <React.Fragment>
+                        <h2>{ this.activeTask.text }</h2>
+                        { (this.activeTask.checked)
+                            ? (<Button id="undo" ref={ this.props.doneRef } action={ this.handleUndo } text="undo" />)
+                            : (<Button id="done" ref={ this.props.doneRef } action={ this.handleDone } text="done" />)}
 
-                    <Button action={ this.handleNotNow } text="not now" />
-                    <Button action={ this.handleToggleTimer } text={ this.state.time } />
-                    {/* <Totals totals={ this.getTotals() } /> */}
-                </React.Fragment>
-            ) : (
-                <React.Fragment>
-                    <h2>Your brain is so strong.</h2>
-                    <p><small>Go drink more water.</small></p>
-                </React.Fragment>
-            ) }
+                        <Button action={ this.handleNotNow } text="not now" />
+                        <Button action={ this.handleToggleTimer } text={ this.state.time } />
+                        {/* <Totals totals={ this.getTotals() } /> */}
+                    </React.Fragment>
+                ) : (
+                    <React.Fragment>
+                        <h2>Your brain is so strong.</h2>
+                        <p><small>Go drink more water.</small></p>
+                    </React.Fragment>
+                ) }
+            </div>
 
-            <Notes />
+            <Notes
+                notes={ this.props.notes }
+                onUpdate={ this.handleNotesUpdate } />
         </div>)
     }
 }
