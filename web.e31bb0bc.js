@@ -25781,7 +25781,7 @@ exports.default = _default;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.default = weakKey;
 var map = new WeakMap();
 var index = 0;
 
@@ -25792,9 +25792,6 @@ function weakKey(obj) {
   map.set(obj, key);
   return key;
 }
-
-var _default = weakKey;
-exports.default = _default;
 },{}],"utilities/throttle.js":[function(require,module,exports) {
 "use strict";
 
@@ -26080,7 +26077,236 @@ var _default = function _default(props) {
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Button":"components/Button.js"}],"components/Mine.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Button":"components/Button.js"}],"../../node_modules/uuid/lib/rng-browser.js":[function(require,module,exports) {
+// Unique ID creation requires a high quality random # generator.  In the
+// browser this is a little complicated due to unknown quality of Math.random()
+// and inconsistent support for the `crypto` API.  We do the best we can via
+// feature-detection
+
+// getRandomValues needs to be invoked in a context where "this" is a Crypto
+// implementation. Also, find the complete implementation of crypto on IE11.
+var getRandomValues = (typeof(crypto) != 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto)) ||
+                      (typeof(msCrypto) != 'undefined' && typeof window.msCrypto.getRandomValues == 'function' && msCrypto.getRandomValues.bind(msCrypto));
+
+if (getRandomValues) {
+  // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
+  var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
+
+  module.exports = function whatwgRNG() {
+    getRandomValues(rnds8);
+    return rnds8;
+  };
+} else {
+  // Math.random()-based (RNG)
+  //
+  // If all else fails, use Math.random().  It's fast, but is of unspecified
+  // quality.
+  var rnds = new Array(16);
+
+  module.exports = function mathRNG() {
+    for (var i = 0, r; i < 16; i++) {
+      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+      rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+    }
+
+    return rnds;
+  };
+}
+
+},{}],"../../node_modules/uuid/lib/bytesToUuid.js":[function(require,module,exports) {
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+var byteToHex = [];
+for (var i = 0; i < 256; ++i) {
+  byteToHex[i] = (i + 0x100).toString(16).substr(1);
+}
+
+function bytesToUuid(buf, offset) {
+  var i = offset || 0;
+  var bth = byteToHex;
+  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+  return ([bth[buf[i++]], bth[buf[i++]], 
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]]]).join('');
+}
+
+module.exports = bytesToUuid;
+
+},{}],"../../node_modules/uuid/v1.js":[function(require,module,exports) {
+var rng = require('./lib/rng');
+var bytesToUuid = require('./lib/bytesToUuid');
+
+// **`v1()` - Generate time-based UUID**
+//
+// Inspired by https://github.com/LiosK/UUID.js
+// and http://docs.python.org/library/uuid.html
+
+var _nodeId;
+var _clockseq;
+
+// Previous uuid creation time
+var _lastMSecs = 0;
+var _lastNSecs = 0;
+
+// See https://github.com/broofa/node-uuid for API details
+function v1(options, buf, offset) {
+  var i = buf && offset || 0;
+  var b = buf || [];
+
+  options = options || {};
+  var node = options.node || _nodeId;
+  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+  // node and clockseq need to be initialized to random values if they're not
+  // specified.  We do this lazily to minimize issues related to insufficient
+  // system entropy.  See #189
+  if (node == null || clockseq == null) {
+    var seedBytes = rng();
+    if (node == null) {
+      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+      node = _nodeId = [
+        seedBytes[0] | 0x01,
+        seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]
+      ];
+    }
+    if (clockseq == null) {
+      // Per 4.2.2, randomize (14 bit) clockseq
+      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
+    }
+  }
+
+  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
+
+  // Per 4.2.1.2, use count of uuid's generated during the current clock
+  // cycle to simulate higher resolution clock
+  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
+
+  // Time since last uuid creation (in msecs)
+  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+  // Per 4.2.1.2, Bump clockseq on clock regression
+  if (dt < 0 && options.clockseq === undefined) {
+    clockseq = clockseq + 1 & 0x3fff;
+  }
+
+  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+  // time interval
+  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+    nsecs = 0;
+  }
+
+  // Per 4.2.1.2 Throw error if too many uuids are requested
+  if (nsecs >= 10000) {
+    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+  }
+
+  _lastMSecs = msecs;
+  _lastNSecs = nsecs;
+  _clockseq = clockseq;
+
+  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+  msecs += 12219292800000;
+
+  // `time_low`
+  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+  b[i++] = tl >>> 24 & 0xff;
+  b[i++] = tl >>> 16 & 0xff;
+  b[i++] = tl >>> 8 & 0xff;
+  b[i++] = tl & 0xff;
+
+  // `time_mid`
+  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+  b[i++] = tmh >>> 8 & 0xff;
+  b[i++] = tmh & 0xff;
+
+  // `time_high_and_version`
+  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+  b[i++] = tmh >>> 16 & 0xff;
+
+  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+  b[i++] = clockseq >>> 8 | 0x80;
+
+  // `clock_seq_low`
+  b[i++] = clockseq & 0xff;
+
+  // `node`
+  for (var n = 0; n < 6; ++n) {
+    b[i + n] = node[n];
+  }
+
+  return buf ? buf : bytesToUuid(b);
+}
+
+module.exports = v1;
+
+},{"./lib/rng":"../../node_modules/uuid/lib/rng-browser.js","./lib/bytesToUuid":"../../node_modules/uuid/lib/bytesToUuid.js"}],"../../node_modules/uuid/v4.js":[function(require,module,exports) {
+var rng = require('./lib/rng');
+var bytesToUuid = require('./lib/bytesToUuid');
+
+function v4(options, buf, offset) {
+  var i = buf && offset || 0;
+
+  if (typeof(options) == 'string') {
+    buf = options === 'binary' ? new Array(16) : null;
+    options = null;
+  }
+  options = options || {};
+
+  var rnds = options.random || (options.rng || rng)();
+
+  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+  // Copy bytes to buffer, if provided
+  if (buf) {
+    for (var ii = 0; ii < 16; ++ii) {
+      buf[i + ii] = rnds[ii];
+    }
+  }
+
+  return buf || bytesToUuid(rnds);
+}
+
+module.exports = v4;
+
+},{"./lib/rng":"../../node_modules/uuid/lib/rng-browser.js","./lib/bytesToUuid":"../../node_modules/uuid/lib/bytesToUuid.js"}],"../../node_modules/uuid/index.js":[function(require,module,exports) {
+var v1 = require('./v1');
+var v4 = require('./v4');
+
+var uuid = v4;
+uuid.v1 = v1;
+uuid.v4 = v4;
+
+module.exports = uuid;
+
+},{"./v1":"../../node_modules/uuid/v1.js","./v4":"../../node_modules/uuid/v4.js"}],"utilities/uniqueId.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = uniqueId;
+
+var _uuid = _interopRequireDefault(require("uuid"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function uniqueId() {
+  return _uuid.default.v4();
+}
+},{"uuid":"../../node_modules/uuid/index.js"}],"components/Mine.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -26095,6 +26321,8 @@ var _TaskList = _interopRequireDefault(require("~/components/TaskList"));
 var _Link = _interopRequireDefault(require("~/components/Link"));
 
 var _CreateTask = _interopRequireDefault(require("~/components/CreateTask"));
+
+var _uniqueId = _interopRequireDefault(require("~/utilities/uniqueId"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -26155,7 +26383,8 @@ function (_React$Component) {
       var list = this.state.list.slice(0);
       list.push({
         text: task,
-        checked: false
+        checked: false,
+        id: (0, _uniqueId.default)()
       });
       this.updateList(list);
     }
@@ -26305,7 +26534,7 @@ function (_React$Component) {
 
 var _default = Mine;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/TaskList":"components/TaskList.js","~/components/Link":"components/Link.js","~/components/CreateTask":"components/CreateTask.js"}],"settings.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/TaskList":"components/TaskList.js","~/components/Link":"components/Link.js","~/components/CreateTask":"components/CreateTask.js","~/utilities/uniqueId":"utilities/uniqueId.js"}],"settings.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27883,34 +28112,13 @@ return purify;
 })));
 
 
-},{}],"utilities.js":[function(require,module,exports) {
+},{}],"utilities/debounce.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getOrdinal = getOrdinal;
-exports.debounce = debounce;
-
-function getOrdinal(nonce) {
-  var i = parseInt(nonce);
-  var j = i % 10;
-  var k = i % 100;
-
-  if (j == 1 && k != 11) {
-    return "st";
-  }
-
-  if (j == 2 && k != 12) {
-    return "nd";
-  }
-
-  if (j == 3 && k != 13) {
-    return "rd";
-  }
-
-  return "th";
-}
+exports.default = debounce;
 
 function debounce(func, wait, immediate) {
   var timeout;
@@ -27941,7 +28149,7 @@ var _react = _interopRequireWildcard(require("react"));
 
 var _dompurify = _interopRequireDefault(require("dompurify"));
 
-var _utilities = require("~/utilities");
+var _debounce = _interopRequireDefault(require("~/utilities/debounce"));
 
 var _Button = _interopRequireDefault(require("~/components/Button"));
 
@@ -27973,7 +28181,7 @@ var _default = function _default(props) {
       setDirty = _useState4[1];
 
   var notes = props.notes;
-  var debouncedOnUpdate = (0, _utilities.debounce)(function (html) {
+  var debouncedOnUpdate = (0, _debounce.default)(function (html) {
     notes = html;
     setDirty(true);
   }, 100);
@@ -28033,7 +28241,7 @@ var _default = function _default(props) {
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","dompurify":"../../node_modules/dompurify/dist/purify.js","~/utilities":"utilities.js","~/components/Button":"components/Button.js"}],"components/Next.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","dompurify":"../../node_modules/dompurify/dist/purify.js","~/utilities/debounce":"utilities/debounce.js","~/components/Button":"components/Button.js"}],"components/Next.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28264,7 +28472,47 @@ function (_React$Component) {
 
 var _default = Next;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/settings":"settings.js","~/components/Button":"components/Button.js","~/components/Totals":"components/Totals.js","~/utilities/Timer":"utilities/Timer.js","~/utilities/audios":"utilities/audios.js","~/components/Notes":"components/Notes.js"}],"../../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/settings":"settings.js","~/components/Button":"components/Button.js","~/components/Totals":"components/Totals.js","~/utilities/Timer":"utilities/Timer.js","~/utilities/audios":"utilities/audios.js","~/components/Notes":"components/Notes.js"}],"components/Header.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = function _default(_ref) {
+  var children = _ref.children;
+  return _react.default.createElement("header", {
+    className: "header"
+  }, children);
+};
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js"}],"components/Footer.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = function _default(_ref) {
+  var children = _ref.children;
+  return _react.default.createElement("footer", {
+    className: "footer"
+  }, children);
+};
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js"}],"../../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -29910,7 +30158,34 @@ module.exports.default = axios;
 
 },{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/bind":"../../node_modules/axios/lib/helpers/bind.js","./core/Axios":"../../node_modules/axios/lib/core/Axios.js","./defaults":"../../node_modules/axios/lib/defaults.js","./cancel/Cancel":"../../node_modules/axios/lib/cancel/Cancel.js","./cancel/CancelToken":"../../node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"../../node_modules/axios/lib/cancel/isCancel.js","./helpers/spread":"../../node_modules/axios/lib/helpers/spread.js"}],"../../node_modules/axios/index.js":[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":"../../node_modules/axios/lib/axios.js"}],"../../node_modules/core-js/modules/_global.js":[function(require,module,exports) {
+},{"./lib/axios":"../../node_modules/axios/lib/axios.js"}],"utilities/getOrdinal.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = getOrdinal;
+
+function getOrdinal(nonce) {
+  var i = parseInt(nonce);
+  var j = i % 10;
+  var k = i % 100;
+
+  if (j == 1 && k != 11) {
+    return "st";
+  }
+
+  if (j == 2 && k != 12) {
+    return "nd";
+  }
+
+  if (j == 3 && k != 13) {
+    return "rd";
+  }
+
+  return "th";
+}
+},{}],"../../node_modules/core-js/modules/_global.js":[function(require,module,exports) {
 
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
@@ -37894,7 +38169,7 @@ var _jsCookie = _interopRequireDefault(require("js-cookie"));
 
 var _settings = require("~/settings");
 
-var _utilities = require("~/utilities");
+var _getOrdinal = _interopRequireDefault(require("~/utilities/getOrdinal"));
 
 require("babel-polyfill");
 
@@ -38100,7 +38375,7 @@ function (_React$Component) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                ordinal = (0, _utilities.getOrdinal)(nonce);
+                ordinal = (0, _getOrdinal.default)(nonce);
                 challenge = "I'm signing into my everyday account for the ".concat(nonce).concat(ordinal, " time");
                 hexChallenge = this.web3.utils.utf8ToHex(challenge);
                 _context4.next = 5;
@@ -38380,7 +38655,7 @@ function (_React$Component) {
 
 var _default = Auth;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","axios":"../../node_modules/axios/index.js","js-cookie":"../../node_modules/js-cookie/src/js.cookie.js","~/settings":"settings.js","~/utilities":"utilities.js","babel-polyfill":"../../node_modules/babel-polyfill/lib/index.js"}],"components/Logo.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","axios":"../../node_modules/axios/index.js","js-cookie":"../../node_modules/js-cookie/src/js.cookie.js","~/settings":"settings.js","~/utilities/getOrdinal":"utilities/getOrdinal.js","babel-polyfill":"../../node_modules/babel-polyfill/lib/index.js"}],"components/Logo.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38399,7 +38674,7 @@ var _default = function _default() {
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js"}],"components/Header.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js"}],"components/Message.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38409,20 +38684,23 @@ exports.default = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
-var _Auth = _interopRequireDefault(require("~/components/Auth"));
-
-var _Logo = _interopRequireDefault(require("~/components/Logo"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _default = function _default(props) {
-  return _react.default.createElement("header", {
-    className: "header"
-  }, _react.default.createElement(_Logo.default, null), _react.default.createElement(_Auth.default, props));
+var _default = function _default(_ref) {
+  var children = _ref.children;
+  return _react.default.createElement("div", {
+    className: "container messageScreen"
+  }, _react.default.createElement("div", {
+    className: "message"
+  }, _react.default.createElement("span", {
+    className: "messageLine"
+  }, "################################################################"), children, _react.default.createElement("span", {
+    className: "messageLine"
+  }, "################################################################")));
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Auth":"components/Auth.js","~/components/Logo":"components/Logo.js"}],"services/remote.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js"}],"services/remote.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38700,509 +38978,2207 @@ function () {
 var _default = new Storage();
 
 exports.default = _default;
-},{}],"Components/Auth.js":[function(require,module,exports) {
-"use strict";
+},{}],"../../node_modules/q/q.js":[function(require,module,exports) {
+var define;
+var global = arguments[3];
+var process = require("process");
+// vim:ts=4:sts=4:sw=4:
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
+/*!
+ *
+ * Copyright 2009-2017 Kris Kowal under the terms of the MIT
+ * license found at https://github.com/kriskowal/q/blob/v1/LICENSE
+ *
+ * With parts by Tyler Close
+ * Copyright 2007-2009 Tyler Close under the terms of the MIT X license found
+ * at http://www.opensource.org/licenses/mit-license.html
+ * Forked at ref_send.js version: 2009-05-11
+ *
+ * With parts by Mark Miller
+ * Copyright (C) 2011 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+(function (definition) {
+  "use strict"; // This file will function properly as a <script> tag, or a module
+  // using CommonJS and NodeJS or RequireJS module formats.  In
+  // Common/Node/RequireJS, the module exports the Q API and when
+  // executed as a simple <script>, it creates a Q global instead.
+  // Montage Require
 
-var _react = _interopRequireDefault(require("react"));
+  if (typeof bootstrap === "function") {
+    bootstrap("promise", definition); // CommonJS
+  } else if (typeof exports === "object" && typeof module === "object") {
+    module.exports = definition(); // RequireJS
+  } else if (typeof define === "function" && define.amd) {
+    define(definition); // SES (Secure EcmaScript)
+  } else if (typeof ses !== "undefined") {
+    if (!ses.ok()) {
+      return;
+    } else {
+      ses.makeQ = definition;
+    } // <script>
 
-var _axios = _interopRequireDefault(require("axios"));
+  } else if (typeof window !== "undefined" || typeof self !== "undefined") {
+    // Prefer window over self for add-on scripts. Use self for
+    // non-windowed contexts.
+    var global = typeof window !== "undefined" ? window : self; // Get the `window` object, save the previous Q global
+    // and initialize Q as a global.
 
-var _jsCookie = _interopRequireDefault(require("js-cookie"));
+    var previousQ = global.Q;
+    global.Q = definition(); // Add a noConflict function so Q can be removed from the
+    // global namespace.
 
-var _settings = require("~/settings");
+    global.Q.noConflict = function () {
+      global.Q = previousQ;
+      return this;
+    };
+  } else {
+    throw new Error("This environment was not anticipated by Q. Please file a bug.");
+  }
+})(function () {
+  "use strict";
 
-var _utilities = require("~/utilities");
+  var hasStacks = false;
 
-require("babel-polyfill");
+  try {
+    throw new Error();
+  } catch (e) {
+    hasStacks = !!e.stack;
+  } // All code after this point will be filtered from stack traces reported
+  // by Q.
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+  var qStartingLine = captureLine();
+  var qFileName; // shims
+  // used for fallback in "allResolved"
 
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+  var noop = function () {}; // Use the fastest possible means to execute a task in a future turn
+  // of the event loop.
 
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+  var nextTick = function () {
+    // linked list of tasks (single, with head node)
+    var head = {
+      task: void 0,
+      next: null
+    };
+    var tail = head;
+    var flushing = false;
+    var requestTick = void 0;
+    var isNodeJS = false; // queue for late tasks, used by unhandled rejection tracking
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+    var laterQueue = [];
 
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+    function flush() {
+      /* jshint loopfunc: true */
+      var task, domain;
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+      while (head.next) {
+        head = head.next;
+        task = head.task;
+        head.task = void 0;
+        domain = head.domain;
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+        if (domain) {
+          head.domain = void 0;
+          domain.enter();
+        }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+        runSingle(task, domain);
+      }
 
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+      while (laterQueue.length) {
+        task = laterQueue.pop();
+        runSingle(task);
+      }
 
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+      flushing = false;
+    } // runs a single function in the async queue
 
-var noAccountError = new Error('no accounts');
 
-var Auth =
-/*#__PURE__*/
-function (_React$Component) {
-  _inherits(Auth, _React$Component);
-
-  _createClass(Auth, null, [{
-    key: "parseJwt",
-    value: function parseJwt(token) {
-      var base64Url = token.split('.')[1];
-      var base64 = base64Url.replace('-', '+').replace('_', '/');
-      return JSON.parse(window.atob(base64));
-    }
-  }, {
-    key: "verifyTokenForAccount",
-    value: function verifyTokenForAccount(account, token) {
-      if (!account) return false;
-
+    function runSingle(task, domain) {
       try {
-        return account === Auth.parseJwt(token).account;
-      } catch (err) {
-        // console.log(`Auth error parsing ${ token }`, err)
-        return false;
+        task();
+      } catch (e) {
+        if (isNodeJS) {
+          // In node, uncaught exceptions are considered fatal errors.
+          // Re-throw them synchronously to interrupt flushing!
+          // Ensure continuation if the uncaught exception is suppressed
+          // listening "uncaughtException" events (as domains does).
+          // Continue in next event to avoid tick recursion.
+          if (domain) {
+            domain.exit();
+          }
+
+          setTimeout(flush, 0);
+
+          if (domain) {
+            domain.enter();
+          }
+
+          throw e;
+        } else {
+          // In browsers, uncaught exceptions are not fatal.
+          // Re-throw them asynchronously to avoid slow-downs.
+          setTimeout(function () {
+            throw e;
+          }, 0);
+        }
+      }
+
+      if (domain) {
+        domain.exit();
       }
     }
-  }]);
 
-  function Auth(props) {
-    var _this;
+    nextTick = function (task) {
+      tail = tail.next = {
+        task: task,
+        domain: isNodeJS && process.domain,
+        next: null
+      };
 
-    _classCallCheck(this, Auth);
+      if (!flushing) {
+        flushing = true;
+        requestTick();
+      }
+    };
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Auth).call(this, props));
-    _this.url = _settings.ENDPOINT;
-    _this.web3 = props.web3; // upstream callbacks
+    if (typeof process === "object" && process.toString() === "[object process]" && process.nextTick) {
+      // Ensure Q is in a real Node environment, with a `process.nextTick`.
+      // To see through fake Node environments:
+      // * Mocha test runner - exposes a `process` global without a `nextTick`
+      // * Browserify - exposes a `process.nexTick` function that uses
+      //   `setTimeout`. In this case `setImmediate` is preferred because
+      //    it is faster. Browserify's `process.toString()` yields
+      //   "[object Object]", while in a real Node environment
+      //   `process.toString()` yields "[object process]".
+      isNodeJS = true;
 
-    _this.callback = props.callback; // handlers
+      requestTick = function () {
+        process.nextTick(flush);
+      };
+    } else if (typeof setImmediate === "function") {
+      // In IE10, Node.js 0.9+, or https://github.com/NobleJS/setImmediate
+      if (typeof window !== "undefined") {
+        requestTick = setImmediate.bind(window, flush);
+      } else {
+        requestTick = function () {
+          setImmediate(flush);
+        };
+      }
+    } else if (typeof MessageChannel !== "undefined") {
+      // modern browsers
+      // http://www.nonblocking.io/2011/06/windownexttick.html
+      var channel = new MessageChannel(); // At least Safari Version 6.0.5 (8536.30.1) intermittently cannot create
+      // working message ports the first time a page loads.
 
-    _this.login = _this.login.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.logout = _this.logout.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.attemptSwitchAccount = _this.attemptSwitchAccount.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.checkIfNewAccount = _this.checkIfNewAccount.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    return _this;
+      channel.port1.onmessage = function () {
+        requestTick = requestPortTick;
+        channel.port1.onmessage = flush;
+        flush();
+      };
+
+      var requestPortTick = function () {
+        // Opera requires us to provide a message payload, regardless of
+        // whether we use it.
+        channel.port2.postMessage(0);
+      };
+
+      requestTick = function () {
+        setTimeout(flush, 0);
+        requestPortTick();
+      };
+    } else {
+      // old browsers
+      requestTick = function () {
+        setTimeout(flush, 0);
+      };
+    } // runs a task after all other tasks have been run
+    // this is useful for unhandled rejection tracking that needs to happen
+    // after all `then`d tasks have been run.
+
+
+    nextTick.runAfter = function (task) {
+      laterQueue.push(task);
+
+      if (!flushing) {
+        flushing = true;
+        requestTick();
+      }
+    };
+
+    return nextTick;
+  }(); // Attempt to make generics safe in the face of downstream
+  // modifications.
+  // There is no situation where this is necessary.
+  // If you need a security guarantee, these primordials need to be
+  // deeply frozen anyway, and if you don’t need a security guarantee,
+  // this is just plain paranoid.
+  // However, this **might** have the nice side-effect of reducing the size of
+  // the minified code by reducing x.call() to merely x()
+  // See Mark Miller’s explanation of what this does.
+  // http://wiki.ecmascript.org/doku.php?id=conventions:safe_meta_programming
+
+
+  var call = Function.call;
+
+  function uncurryThis(f) {
+    return function () {
+      return call.apply(f, arguments);
+    };
+  } // This is equivalent, but slower:
+  // uncurryThis = Function_bind.bind(Function_bind.call);
+  // http://jsperf.com/uncurrythis
+
+
+  var array_slice = uncurryThis(Array.prototype.slice);
+  var array_reduce = uncurryThis(Array.prototype.reduce || function (callback, basis) {
+    var index = 0,
+        length = this.length; // concerning the initial value, if one is not provided
+
+    if (arguments.length === 1) {
+      // seek to the first value in the array, accounting
+      // for the possibility that is is a sparse array
+      do {
+        if (index in this) {
+          basis = this[index++];
+          break;
+        }
+
+        if (++index >= length) {
+          throw new TypeError();
+        }
+      } while (1);
+    } // reduce
+
+
+    for (; index < length; index++) {
+      // account for the possibility that the array is sparse
+      if (index in this) {
+        basis = callback(basis, this[index], index);
+      }
+    }
+
+    return basis;
+  });
+  var array_indexOf = uncurryThis(Array.prototype.indexOf || function (value) {
+    // not a very good shim, but good enough for our one use of it
+    for (var i = 0; i < this.length; i++) {
+      if (this[i] === value) {
+        return i;
+      }
+    }
+
+    return -1;
+  });
+  var array_map = uncurryThis(Array.prototype.map || function (callback, thisp) {
+    var self = this;
+    var collect = [];
+    array_reduce(self, function (undefined, value, index) {
+      collect.push(callback.call(thisp, value, index, self));
+    }, void 0);
+    return collect;
+  });
+
+  var object_create = Object.create || function (prototype) {
+    function Type() {}
+
+    Type.prototype = prototype;
+    return new Type();
+  };
+
+  var object_defineProperty = Object.defineProperty || function (obj, prop, descriptor) {
+    obj[prop] = descriptor.value;
+    return obj;
+  };
+
+  var object_hasOwnProperty = uncurryThis(Object.prototype.hasOwnProperty);
+
+  var object_keys = Object.keys || function (object) {
+    var keys = [];
+
+    for (var key in object) {
+      if (object_hasOwnProperty(object, key)) {
+        keys.push(key);
+      }
+    }
+
+    return keys;
+  };
+
+  var object_toString = uncurryThis(Object.prototype.toString);
+
+  function isObject(value) {
+    return value === Object(value);
+  } // generator related shims
+  // FIXME: Remove this function once ES6 generators are in SpiderMonkey.
+
+
+  function isStopIteration(exception) {
+    return object_toString(exception) === "[object StopIteration]" || exception instanceof QReturnValue;
+  } // FIXME: Remove this helper and Q.return once ES6 generators are in
+  // SpiderMonkey.
+
+
+  var QReturnValue;
+
+  if (typeof ReturnValue !== "undefined") {
+    QReturnValue = ReturnValue;
+  } else {
+    QReturnValue = function (value) {
+      this.value = value;
+    };
+  } // long stack traces
+
+
+  var STACK_JUMP_SEPARATOR = "From previous event:";
+
+  function makeStackTraceLong(error, promise) {
+    // If possible, transform the error stack trace by removing Node and Q
+    // cruft, then concatenating with the stack trace of `promise`. See #57.
+    if (hasStacks && promise.stack && typeof error === "object" && error !== null && error.stack) {
+      var stacks = [];
+
+      for (var p = promise; !!p; p = p.source) {
+        if (p.stack && (!error.__minimumStackCounter__ || error.__minimumStackCounter__ > p.stackCounter)) {
+          object_defineProperty(error, "__minimumStackCounter__", {
+            value: p.stackCounter,
+            configurable: true
+          });
+          stacks.unshift(p.stack);
+        }
+      }
+
+      stacks.unshift(error.stack);
+      var concatedStacks = stacks.join("\n" + STACK_JUMP_SEPARATOR + "\n");
+      var stack = filterStackString(concatedStacks);
+      object_defineProperty(error, "stack", {
+        value: stack,
+        configurable: true
+      });
+    }
   }
 
-  _createClass(Auth, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      var _this2 = this;
+  function filterStackString(stackString) {
+    var lines = stackString.split("\n");
+    var desiredLines = [];
 
-      setTimeout(function () {
-        _this2.pingForActiveAccount();
-      }, 1);
+    for (var i = 0; i < lines.length; ++i) {
+      var line = lines[i];
 
-      if (Auth.verifyTokenForAccount(this.props.account, this.props.token)) {
-        this.setToken(this.props.account, this.props.token);
+      if (!isInternalFrame(line) && !isNodeFrame(line) && line) {
+        desiredLines.push(line);
       }
     }
-  }, {
-    key: "checkIfNewAccount",
-    value: function () {
-      var _checkIfNewAccount = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee() {
-        var account;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return this.web3.eth.getAccounts();
 
-              case 2:
-                account = _context.sent[0];
+    return desiredLines.join("\n");
+  }
 
-                if (account) {
-                  _context.next = 5;
-                  break;
-                }
+  function isNodeFrame(stackLine) {
+    return stackLine.indexOf("(module.js:") !== -1 || stackLine.indexOf("(node.js:") !== -1;
+  }
 
-                throw noAccountError;
+  function getFileNameAndLineNumber(stackLine) {
+    // Named functions: "at functionName (filename:lineNumber:columnNumber)"
+    // In IE10 function name can have spaces ("Anonymous function") O_o
+    var attempt1 = /at .+ \((.+):(\d+):(?:\d+)\)$/.exec(stackLine);
 
-              case 5:
-                if (account !== this.props.account) {
-                  this.callback(account, this.attemptSwitchAccount(account));
-                }
-
-              case 6:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function checkIfNewAccount() {
-        return _checkIfNewAccount.apply(this, arguments);
-      }
-
-      return checkIfNewAccount;
-    }()
-  }, {
-    key: "pingForActiveAccount",
-    value: function () {
-      var _pingForActiveAccount = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee3() {
-        var _this3 = this;
-
-        var promise;
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                promise = new Promise(
-                /*#__PURE__*/
-                function () {
-                  var _ref = _asyncToGenerator(
-                  /*#__PURE__*/
-                  regeneratorRuntime.mark(function _callee2(resolve, reject) {
-                    return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                      while (1) {
-                        switch (_context2.prev = _context2.next) {
-                          case 0:
-                            // check immediately
-                            _this3.checkIfNewAccount().catch(reject); // continue to check every 3 seconds
+    if (attempt1) {
+      return [attempt1[1], Number(attempt1[2])];
+    } // Anonymous functions: "at filename:lineNumber:columnNumber"
 
 
-                            _this3.checkAccountTimer = setInterval(function () {
-                              _this3.checkIfNewAccount().catch(reject);
-                            }, 3000);
+    var attempt2 = /at ([^ ]+):(\d+):(?:\d+)$/.exec(stackLine);
 
-                          case 2:
-                          case "end":
-                            return _context2.stop();
-                        }
-                      }
-                    }, _callee2, this);
-                  }));
+    if (attempt2) {
+      return [attempt2[1], Number(attempt2[2])];
+    } // Firefox style: "function@filename:lineNumber or @filename:lineNumber"
 
-                  return function (_x, _x2) {
-                    return _ref.apply(this, arguments);
-                  };
-                }());
-                promise.catch(function (err) {
-                  if (err === noAccountError) {
-                    _this3.callback(undefined, undefined);
-                  } else {
-                    console.error('err', err);
-                  }
-                });
 
-              case 2:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
+    var attempt3 = /.*@(.+):(\d+)$/.exec(stackLine);
 
-      function pingForActiveAccount() {
-        return _pingForActiveAccount.apply(this, arguments);
-      }
-
-      return pingForActiveAccount;
-    }()
-  }, {
-    key: "signMessage",
-    value: function () {
-      var _signMessage = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee4(account, nonce) {
-        var ordinal, challenge, hexChallenge, signature;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                ordinal = (0, _utilities.getOrdinal)(nonce);
-                challenge = "I'm signing into my everyday account for the ".concat(nonce).concat(ordinal, " time");
-                hexChallenge = this.web3.utils.utf8ToHex(challenge);
-                _context4.next = 5;
-                return this.web3.eth.personal.sign(hexChallenge, account, null);
-
-              case 5:
-                signature = _context4.sent;
-                return _context4.abrupt("return", signature);
-
-              case 7:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this);
-      }));
-
-      function signMessage(_x3, _x4) {
-        return _signMessage.apply(this, arguments);
-      }
-
-      return signMessage;
-    }()
-  }, {
-    key: "fetchNonce",
-    value: function () {
-      var _fetchNonce = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee5(account) {
-        var response;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                _context5.next = 2;
-                return _axios.default.get("".concat(this.url, "/account/").concat(account, "/nonce/"), {
-                  headers: {
-                    'Content-Type': 'application/json'
-                  }
-                });
-
-              case 2:
-                response = _context5.sent;
-                return _context5.abrupt("return", response.data.nonce);
-
-              case 4:
-              case "end":
-                return _context5.stop();
-            }
-          }
-        }, _callee5, this);
-      }));
-
-      function fetchNonce(_x5) {
-        return _fetchNonce.apply(this, arguments);
-      }
-
-      return fetchNonce;
-    }()
-  }, {
-    key: "authenticate",
-    value: function () {
-      var _authenticate = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee6(account, signature) {
-        var response;
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                _context6.next = 2;
-                return _axios.default.post("".concat(this.url, "/authentication/"), {
-                  account: account,
-                  signature: signature
-                });
-
-              case 2:
-                response = _context6.sent;
-                return _context6.abrupt("return", response.data.token);
-
-              case 4:
-              case "end":
-                return _context6.stop();
-            }
-          }
-        }, _callee6, this);
-      }));
-
-      function authenticate(_x6, _x7) {
-        return _authenticate.apply(this, arguments);
-      }
-
-      return authenticate;
-    }()
-  }, {
-    key: "login",
-    value: function () {
-      var _login = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee7(e) {
-        var nonce, signature, session, token, account;
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                e.preventDefault();
-                token = false;
-                account = this.props.account;
-                _context7.prev = 3;
-                _context7.next = 6;
-                return this.fetchNonce(account);
-
-              case 6:
-                nonce = _context7.sent;
-                _context7.next = 9;
-                return this.signMessage(account, nonce);
-
-              case 9:
-                signature = _context7.sent;
-                _context7.next = 12;
-                return this.authenticate(account, signature);
-
-              case 12:
-                token = _context7.sent;
-                _context7.next = 20;
-                break;
-
-              case 15:
-                _context7.prev = 15;
-                _context7.t0 = _context7["catch"](3);
-                console.error('error login with metamask', _context7.t0);
-                alert('error logging in with metamask');
-                return _context7.abrupt("return");
-
-              case 20:
-                this.setToken(account, token);
-                this.callback(account, token);
-
-              case 22:
-              case "end":
-                return _context7.stop();
-            }
-          }
-        }, _callee7, this, [[3, 15]]);
-      }));
-
-      function login(_x8) {
-        return _login.apply(this, arguments);
-      }
-
-      return login;
-    }()
-  }, {
-    key: "logout",
-    value: function logout(e) {
-      e.preventDefault();
-      var account = this.props.account;
-
-      _jsCookie.default.remove(account);
-
-      delete _axios.default.defaults.headers.common['Authorization'];
-      this.callback(account, null);
+    if (attempt3) {
+      return [attempt3[1], Number(attempt3[2])];
     }
-  }, {
-    key: "attemptSwitchAccount",
-    value: function attemptSwitchAccount(account) {
-      var oldAccount = this.props.account;
+  }
 
-      _jsCookie.default.remove(oldAccount);
+  function isInternalFrame(stackLine) {
+    var fileNameAndLineNumber = getFileNameAndLineNumber(stackLine);
 
-      delete _axios.default.defaults.headers.common['Authorization'];
+    if (!fileNameAndLineNumber) {
+      return false;
+    }
 
-      var token = _jsCookie.default.get(account);
+    var fileName = fileNameAndLineNumber[0];
+    var lineNumber = fileNameAndLineNumber[1];
+    return fileName === qFileName && lineNumber >= qStartingLine && lineNumber <= qEndingLine;
+  } // discover own file name and line number range for filtering stack
+  // traces
 
-      if (token) {
-        _jsCookie.default.set(account, token, {
-          secure: _settings.ENVIRONMENT === 'production'
-        });
 
-        _axios.default.defaults.headers.common['Authorization'] = token;
+  function captureLine() {
+    if (!hasStacks) {
+      return;
+    }
+
+    try {
+      throw new Error();
+    } catch (e) {
+      var lines = e.stack.split("\n");
+      var firstLine = lines[0].indexOf("@") > 0 ? lines[1] : lines[2];
+      var fileNameAndLineNumber = getFileNameAndLineNumber(firstLine);
+
+      if (!fileNameAndLineNumber) {
+        return;
       }
 
-      return token;
+      qFileName = fileNameAndLineNumber[0];
+      return fileNameAndLineNumber[1];
     }
-  }, {
-    key: "setToken",
-    value: function setToken(account, token) {
-      var oldAccount = this.props.account;
+  }
 
-      _jsCookie.default.remove(oldAccount);
-
-      delete _axios.default.defaults.headers.common['Authorization'];
-
-      if (account && token) {
-        _jsCookie.default.set(account, token, {
-          secure: _settings.ENVIRONMENT === 'production'
-        });
-
-        _axios.default.defaults.headers.common['Authorization'] = token;
+  function deprecate(callback, name, alternative) {
+    return function () {
+      if (typeof console !== "undefined" && typeof console.warn === "function") {
+        console.warn(name + " is deprecated, use " + alternative + " instead.", new Error("").stack);
       }
+
+      return callback.apply(callback, arguments);
+    };
+  } // end of shims
+  // beginning of real work
+
+  /**
+   * Constructs a promise for an immediate reference, passes promises through, or
+   * coerces promises from different systems.
+   * @param value immediate reference or promise
+   */
+
+
+  function Q(value) {
+    // If the object is already a Promise, return it directly.  This enables
+    // the resolve function to both be used to created references from objects,
+    // but to tolerably coerce non-promises to promises.
+    if (value instanceof Promise) {
+      return value;
+    } // assimilate thenables
+
+
+    if (isPromiseAlike(value)) {
+      return coerce(value);
+    } else {
+      return fulfill(value);
     }
-  }, {
-    key: "isLoggedIn",
-    value: function isLoggedIn() {
-      return !!this.props.token;
-    }
-  }, {
-    key: "hasAccount",
-    value: function hasAccount() {
-      return !!this.props.account;
-    }
-  }, {
-    key: "getShortAccount",
-    value: function getShortAccount() {
-      var account = this.props.account;
-      var start = account.slice(0, 4);
-      var end = account.slice(-4);
-      return "".concat(start, "...").concat(end);
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var _this4 = this;
+  }
 
-      var showMetamaskPrompt = function showMetamaskPrompt() {
-        return _react.default.createElement("span", {
-          className: "authInfo"
-        }, "Log in to MetaMask");
-      };
+  Q.resolve = Q;
+  /**
+   * Performs a task in a future turn of the event loop.
+   * @param {Function} task
+   */
 
-      var showLoggedInName = function showLoggedInName() {
-        return _react.default.createElement("span", {
-          className: "authInfo"
-        }, _react.default.createElement("span", {
-          className: "loginWith"
-        }, "Logout from"), _react.default.createElement("span", {
-          className: "loginAddress"
-        }, _react.default.createElement("a", {
-          href: "#",
-          onClick: _this4.logout
-        }, _this4.getShortAccount())));
-      };
+  Q.nextTick = nextTick;
+  /**
+   * Controls whether or not long stack traces will be on
+   */
 
-      var showLoginWithActiveMetamaskAccount = function showLoginWithActiveMetamaskAccount() {
-        return _react.default.createElement("div", {
-          className: "authInfo"
-        }, _react.default.createElement("span", {
-          className: "loginWith"
-        }, "Login with"), _react.default.createElement("span", {
-          className: "loginAddress"
-        }, _react.default.createElement("a", {
-          href: "#",
-          onClick: _this4.login
-        }, _this4.getShortAccount())));
-      };
+  Q.longStackSupport = false;
+  /**
+   * The counter is used to determine the stopping point for building
+   * long stack traces. In makeStackTraceLong we walk backwards through
+   * the linked list of promises, only stacks which were created before
+   * the rejection are concatenated.
+   */
 
-      var show;
+  var longStackCounter = 1; // enable long stacks if Q_DEBUG is set
 
-      if (this.hasAccount()) {
-        if (this.isLoggedIn()) {
-          show = showLoggedInName;
-        } else {
-          show = showLoginWithActiveMetamaskAccount;
+  if (typeof process === "object" && process && process.env && undefined) {
+    Q.longStackSupport = true;
+  }
+  /**
+   * Constructs a {promise, resolve, reject} object.
+   *
+   * `resolve` is a callback to invoke with a more resolved value for the
+   * promise. To fulfill the promise, invoke `resolve` with any value that is
+   * not a thenable. To reject the promise, invoke `resolve` with a rejected
+   * thenable, or invoke `reject` with the reason directly. To resolve the
+   * promise to another thenable, thus putting it in the same state, invoke
+   * `resolve` with that other thenable.
+   */
+
+
+  Q.defer = defer;
+
+  function defer() {
+    // if "messages" is an "Array", that indicates that the promise has not yet
+    // been resolved.  If it is "undefined", it has been resolved.  Each
+    // element of the messages array is itself an array of complete arguments to
+    // forward to the resolved promise.  We coerce the resolution value to a
+    // promise using the `resolve` function because it handles both fully
+    // non-thenable values and other thenables gracefully.
+    var messages = [],
+        progressListeners = [],
+        resolvedPromise;
+    var deferred = object_create(defer.prototype);
+    var promise = object_create(Promise.prototype);
+
+    promise.promiseDispatch = function (resolve, op, operands) {
+      var args = array_slice(arguments);
+
+      if (messages) {
+        messages.push(args);
+
+        if (op === "when" && operands[1]) {
+          // progress operand
+          progressListeners.push(operands[1]);
         }
       } else {
-        show = showMetamaskPrompt;
+        Q.nextTick(function () {
+          resolvedPromise.promiseDispatch.apply(resolvedPromise, args);
+        });
+      }
+    }; // XXX deprecated
+
+
+    promise.valueOf = function () {
+      if (messages) {
+        return promise;
       }
 
-      return _react.default.createElement("div", {
-        className: "auth"
-      }, show());
+      var nearerValue = nearer(resolvedPromise);
+
+      if (isPromise(nearerValue)) {
+        resolvedPromise = nearerValue; // shorten chain
+      }
+
+      return nearerValue;
+    };
+
+    promise.inspect = function () {
+      if (!resolvedPromise) {
+        return {
+          state: "pending"
+        };
+      }
+
+      return resolvedPromise.inspect();
+    };
+
+    if (Q.longStackSupport && hasStacks) {
+      try {
+        throw new Error();
+      } catch (e) {
+        // NOTE: don't try to use `Error.captureStackTrace` or transfer the
+        // accessor around; that causes memory leaks as per GH-111. Just
+        // reify the stack trace as a string ASAP.
+        //
+        // At the same time, cut off the first line; it's always just
+        // "[object Promise]\n", as per the `toString`.
+        promise.stack = e.stack.substring(e.stack.indexOf("\n") + 1);
+        promise.stackCounter = longStackCounter++;
+      }
+    } // NOTE: we do the checks for `resolvedPromise` in each method, instead of
+    // consolidating them into `become`, since otherwise we'd create new
+    // promises with the lines `become(whatever(value))`. See e.g. GH-252.
+
+
+    function become(newPromise) {
+      resolvedPromise = newPromise;
+
+      if (Q.longStackSupport && hasStacks) {
+        // Only hold a reference to the new promise if long stacks
+        // are enabled to reduce memory usage
+        promise.source = newPromise;
+      }
+
+      array_reduce(messages, function (undefined, message) {
+        Q.nextTick(function () {
+          newPromise.promiseDispatch.apply(newPromise, message);
+        });
+      }, void 0);
+      messages = void 0;
+      progressListeners = void 0;
     }
-  }]);
 
-  return Auth;
-}(_react.default.Component);
+    deferred.promise = promise;
 
-var _default = Auth;
-exports.default = _default;
-},{"react":"../../node_modules/react/index.js","axios":"../../node_modules/axios/index.js","js-cookie":"../../node_modules/js-cookie/src/js.cookie.js","~/settings":"settings.js","~/utilities":"utilities.js","babel-polyfill":"../../node_modules/babel-polyfill/lib/index.js"}],"Components/App.js":[function(require,module,exports) {
+    deferred.resolve = function (value) {
+      if (resolvedPromise) {
+        return;
+      }
+
+      become(Q(value));
+    };
+
+    deferred.fulfill = function (value) {
+      if (resolvedPromise) {
+        return;
+      }
+
+      become(fulfill(value));
+    };
+
+    deferred.reject = function (reason) {
+      if (resolvedPromise) {
+        return;
+      }
+
+      become(reject(reason));
+    };
+
+    deferred.notify = function (progress) {
+      if (resolvedPromise) {
+        return;
+      }
+
+      array_reduce(progressListeners, function (undefined, progressListener) {
+        Q.nextTick(function () {
+          progressListener(progress);
+        });
+      }, void 0);
+    };
+
+    return deferred;
+  }
+  /**
+   * Creates a Node-style callback that will resolve or reject the deferred
+   * promise.
+   * @returns a nodeback
+   */
+
+
+  defer.prototype.makeNodeResolver = function () {
+    var self = this;
+    return function (error, value) {
+      if (error) {
+        self.reject(error);
+      } else if (arguments.length > 2) {
+        self.resolve(array_slice(arguments, 1));
+      } else {
+        self.resolve(value);
+      }
+    };
+  };
+  /**
+   * @param resolver {Function} a function that returns nothing and accepts
+   * the resolve, reject, and notify functions for a deferred.
+   * @returns a promise that may be resolved with the given resolve and reject
+   * functions, or rejected by a thrown exception in resolver
+   */
+
+
+  Q.Promise = promise; // ES6
+
+  Q.promise = promise;
+
+  function promise(resolver) {
+    if (typeof resolver !== "function") {
+      throw new TypeError("resolver must be a function.");
+    }
+
+    var deferred = defer();
+
+    try {
+      resolver(deferred.resolve, deferred.reject, deferred.notify);
+    } catch (reason) {
+      deferred.reject(reason);
+    }
+
+    return deferred.promise;
+  }
+
+  promise.race = race; // ES6
+
+  promise.all = all; // ES6
+
+  promise.reject = reject; // ES6
+
+  promise.resolve = Q; // ES6
+  // XXX experimental.  This method is a way to denote that a local value is
+  // serializable and should be immediately dispatched to a remote upon request,
+  // instead of passing a reference.
+
+  Q.passByCopy = function (object) {
+    //freeze(object);
+    //passByCopies.set(object, true);
+    return object;
+  };
+
+  Promise.prototype.passByCopy = function () {
+    //freeze(object);
+    //passByCopies.set(object, true);
+    return this;
+  };
+  /**
+   * If two promises eventually fulfill to the same value, promises that value,
+   * but otherwise rejects.
+   * @param x {Any*}
+   * @param y {Any*}
+   * @returns {Any*} a promise for x and y if they are the same, but a rejection
+   * otherwise.
+   *
+   */
+
+
+  Q.join = function (x, y) {
+    return Q(x).join(y);
+  };
+
+  Promise.prototype.join = function (that) {
+    return Q([this, that]).spread(function (x, y) {
+      if (x === y) {
+        // TODO: "===" should be Object.is or equiv
+        return x;
+      } else {
+        throw new Error("Q can't join: not the same: " + x + " " + y);
+      }
+    });
+  };
+  /**
+   * Returns a promise for the first of an array of promises to become settled.
+   * @param answers {Array[Any*]} promises to race
+   * @returns {Any*} the first promise to be settled
+   */
+
+
+  Q.race = race;
+
+  function race(answerPs) {
+    return promise(function (resolve, reject) {
+      // Switch to this once we can assume at least ES5
+      // answerPs.forEach(function (answerP) {
+      //     Q(answerP).then(resolve, reject);
+      // });
+      // Use this in the meantime
+      for (var i = 0, len = answerPs.length; i < len; i++) {
+        Q(answerPs[i]).then(resolve, reject);
+      }
+    });
+  }
+
+  Promise.prototype.race = function () {
+    return this.then(Q.race);
+  };
+  /**
+   * Constructs a Promise with a promise descriptor object and optional fallback
+   * function.  The descriptor contains methods like when(rejected), get(name),
+   * set(name, value), post(name, args), and delete(name), which all
+   * return either a value, a promise for a value, or a rejection.  The fallback
+   * accepts the operation name, a resolver, and any further arguments that would
+   * have been forwarded to the appropriate method above had a method been
+   * provided with the proper name.  The API makes no guarantees about the nature
+   * of the returned object, apart from that it is usable whereever promises are
+   * bought and sold.
+   */
+
+
+  Q.makePromise = Promise;
+
+  function Promise(descriptor, fallback, inspect) {
+    if (fallback === void 0) {
+      fallback = function (op) {
+        return reject(new Error("Promise does not support operation: " + op));
+      };
+    }
+
+    if (inspect === void 0) {
+      inspect = function () {
+        return {
+          state: "unknown"
+        };
+      };
+    }
+
+    var promise = object_create(Promise.prototype);
+
+    promise.promiseDispatch = function (resolve, op, args) {
+      var result;
+
+      try {
+        if (descriptor[op]) {
+          result = descriptor[op].apply(promise, args);
+        } else {
+          result = fallback.call(promise, op, args);
+        }
+      } catch (exception) {
+        result = reject(exception);
+      }
+
+      if (resolve) {
+        resolve(result);
+      }
+    };
+
+    promise.inspect = inspect; // XXX deprecated `valueOf` and `exception` support
+
+    if (inspect) {
+      var inspected = inspect();
+
+      if (inspected.state === "rejected") {
+        promise.exception = inspected.reason;
+      }
+
+      promise.valueOf = function () {
+        var inspected = inspect();
+
+        if (inspected.state === "pending" || inspected.state === "rejected") {
+          return promise;
+        }
+
+        return inspected.value;
+      };
+    }
+
+    return promise;
+  }
+
+  Promise.prototype.toString = function () {
+    return "[object Promise]";
+  };
+
+  Promise.prototype.then = function (fulfilled, rejected, progressed) {
+    var self = this;
+    var deferred = defer();
+    var done = false; // ensure the untrusted promise makes at most a
+    // single call to one of the callbacks
+
+    function _fulfilled(value) {
+      try {
+        return typeof fulfilled === "function" ? fulfilled(value) : value;
+      } catch (exception) {
+        return reject(exception);
+      }
+    }
+
+    function _rejected(exception) {
+      if (typeof rejected === "function") {
+        makeStackTraceLong(exception, self);
+
+        try {
+          return rejected(exception);
+        } catch (newException) {
+          return reject(newException);
+        }
+      }
+
+      return reject(exception);
+    }
+
+    function _progressed(value) {
+      return typeof progressed === "function" ? progressed(value) : value;
+    }
+
+    Q.nextTick(function () {
+      self.promiseDispatch(function (value) {
+        if (done) {
+          return;
+        }
+
+        done = true;
+        deferred.resolve(_fulfilled(value));
+      }, "when", [function (exception) {
+        if (done) {
+          return;
+        }
+
+        done = true;
+        deferred.resolve(_rejected(exception));
+      }]);
+    }); // Progress propagator need to be attached in the current tick.
+
+    self.promiseDispatch(void 0, "when", [void 0, function (value) {
+      var newValue;
+      var threw = false;
+
+      try {
+        newValue = _progressed(value);
+      } catch (e) {
+        threw = true;
+
+        if (Q.onerror) {
+          Q.onerror(e);
+        } else {
+          throw e;
+        }
+      }
+
+      if (!threw) {
+        deferred.notify(newValue);
+      }
+    }]);
+    return deferred.promise;
+  };
+
+  Q.tap = function (promise, callback) {
+    return Q(promise).tap(callback);
+  };
+  /**
+   * Works almost like "finally", but not called for rejections.
+   * Original resolution value is passed through callback unaffected.
+   * Callback may return a promise that will be awaited for.
+   * @param {Function} callback
+   * @returns {Q.Promise}
+   * @example
+   * doSomething()
+   *   .then(...)
+   *   .tap(console.log)
+   *   .then(...);
+   */
+
+
+  Promise.prototype.tap = function (callback) {
+    callback = Q(callback);
+    return this.then(function (value) {
+      return callback.fcall(value).thenResolve(value);
+    });
+  };
+  /**
+   * Registers an observer on a promise.
+   *
+   * Guarantees:
+   *
+   * 1. that fulfilled and rejected will be called only once.
+   * 2. that either the fulfilled callback or the rejected callback will be
+   *    called, but not both.
+   * 3. that fulfilled and rejected will not be called in this turn.
+   *
+   * @param value      promise or immediate reference to observe
+   * @param fulfilled  function to be called with the fulfilled value
+   * @param rejected   function to be called with the rejection exception
+   * @param progressed function to be called on any progress notifications
+   * @return promise for the return value from the invoked callback
+   */
+
+
+  Q.when = when;
+
+  function when(value, fulfilled, rejected, progressed) {
+    return Q(value).then(fulfilled, rejected, progressed);
+  }
+
+  Promise.prototype.thenResolve = function (value) {
+    return this.then(function () {
+      return value;
+    });
+  };
+
+  Q.thenResolve = function (promise, value) {
+    return Q(promise).thenResolve(value);
+  };
+
+  Promise.prototype.thenReject = function (reason) {
+    return this.then(function () {
+      throw reason;
+    });
+  };
+
+  Q.thenReject = function (promise, reason) {
+    return Q(promise).thenReject(reason);
+  };
+  /**
+   * If an object is not a promise, it is as "near" as possible.
+   * If a promise is rejected, it is as "near" as possible too.
+   * If it’s a fulfilled promise, the fulfillment value is nearer.
+   * If it’s a deferred promise and the deferred has been resolved, the
+   * resolution is "nearer".
+   * @param object
+   * @returns most resolved (nearest) form of the object
+   */
+  // XXX should we re-do this?
+
+
+  Q.nearer = nearer;
+
+  function nearer(value) {
+    if (isPromise(value)) {
+      var inspected = value.inspect();
+
+      if (inspected.state === "fulfilled") {
+        return inspected.value;
+      }
+    }
+
+    return value;
+  }
+  /**
+   * @returns whether the given object is a promise.
+   * Otherwise it is a fulfilled value.
+   */
+
+
+  Q.isPromise = isPromise;
+
+  function isPromise(object) {
+    return object instanceof Promise;
+  }
+
+  Q.isPromiseAlike = isPromiseAlike;
+
+  function isPromiseAlike(object) {
+    return isObject(object) && typeof object.then === "function";
+  }
+  /**
+   * @returns whether the given object is a pending promise, meaning not
+   * fulfilled or rejected.
+   */
+
+
+  Q.isPending = isPending;
+
+  function isPending(object) {
+    return isPromise(object) && object.inspect().state === "pending";
+  }
+
+  Promise.prototype.isPending = function () {
+    return this.inspect().state === "pending";
+  };
+  /**
+   * @returns whether the given object is a value or fulfilled
+   * promise.
+   */
+
+
+  Q.isFulfilled = isFulfilled;
+
+  function isFulfilled(object) {
+    return !isPromise(object) || object.inspect().state === "fulfilled";
+  }
+
+  Promise.prototype.isFulfilled = function () {
+    return this.inspect().state === "fulfilled";
+  };
+  /**
+   * @returns whether the given object is a rejected promise.
+   */
+
+
+  Q.isRejected = isRejected;
+
+  function isRejected(object) {
+    return isPromise(object) && object.inspect().state === "rejected";
+  }
+
+  Promise.prototype.isRejected = function () {
+    return this.inspect().state === "rejected";
+  }; //// BEGIN UNHANDLED REJECTION TRACKING
+  // This promise library consumes exceptions thrown in handlers so they can be
+  // handled by a subsequent promise.  The exceptions get added to this array when
+  // they are created, and removed when they are handled.  Note that in ES6 or
+  // shimmed environments, this would naturally be a `Set`.
+
+
+  var unhandledReasons = [];
+  var unhandledRejections = [];
+  var reportedUnhandledRejections = [];
+  var trackUnhandledRejections = true;
+
+  function resetUnhandledRejections() {
+    unhandledReasons.length = 0;
+    unhandledRejections.length = 0;
+
+    if (!trackUnhandledRejections) {
+      trackUnhandledRejections = true;
+    }
+  }
+
+  function trackRejection(promise, reason) {
+    if (!trackUnhandledRejections) {
+      return;
+    }
+
+    if (typeof process === "object" && typeof process.emit === "function") {
+      Q.nextTick.runAfter(function () {
+        if (array_indexOf(unhandledRejections, promise) !== -1) {
+          process.emit("unhandledRejection", reason, promise);
+          reportedUnhandledRejections.push(promise);
+        }
+      });
+    }
+
+    unhandledRejections.push(promise);
+
+    if (reason && typeof reason.stack !== "undefined") {
+      unhandledReasons.push(reason.stack);
+    } else {
+      unhandledReasons.push("(no stack) " + reason);
+    }
+  }
+
+  function untrackRejection(promise) {
+    if (!trackUnhandledRejections) {
+      return;
+    }
+
+    var at = array_indexOf(unhandledRejections, promise);
+
+    if (at !== -1) {
+      if (typeof process === "object" && typeof process.emit === "function") {
+        Q.nextTick.runAfter(function () {
+          var atReport = array_indexOf(reportedUnhandledRejections, promise);
+
+          if (atReport !== -1) {
+            process.emit("rejectionHandled", unhandledReasons[at], promise);
+            reportedUnhandledRejections.splice(atReport, 1);
+          }
+        });
+      }
+
+      unhandledRejections.splice(at, 1);
+      unhandledReasons.splice(at, 1);
+    }
+  }
+
+  Q.resetUnhandledRejections = resetUnhandledRejections;
+
+  Q.getUnhandledReasons = function () {
+    // Make a copy so that consumers can't interfere with our internal state.
+    return unhandledReasons.slice();
+  };
+
+  Q.stopUnhandledRejectionTracking = function () {
+    resetUnhandledRejections();
+    trackUnhandledRejections = false;
+  };
+
+  resetUnhandledRejections(); //// END UNHANDLED REJECTION TRACKING
+
+  /**
+   * Constructs a rejected promise.
+   * @param reason value describing the failure
+   */
+
+  Q.reject = reject;
+
+  function reject(reason) {
+    var rejection = Promise({
+      "when": function (rejected) {
+        // note that the error has been handled
+        if (rejected) {
+          untrackRejection(this);
+        }
+
+        return rejected ? rejected(reason) : this;
+      }
+    }, function fallback() {
+      return this;
+    }, function inspect() {
+      return {
+        state: "rejected",
+        reason: reason
+      };
+    }); // Note that the reason has not been handled.
+
+    trackRejection(rejection, reason);
+    return rejection;
+  }
+  /**
+   * Constructs a fulfilled promise for an immediate reference.
+   * @param value immediate reference
+   */
+
+
+  Q.fulfill = fulfill;
+
+  function fulfill(value) {
+    return Promise({
+      "when": function () {
+        return value;
+      },
+      "get": function (name) {
+        return value[name];
+      },
+      "set": function (name, rhs) {
+        value[name] = rhs;
+      },
+      "delete": function (name) {
+        delete value[name];
+      },
+      "post": function (name, args) {
+        // Mark Miller proposes that post with no name should apply a
+        // promised function.
+        if (name === null || name === void 0) {
+          return value.apply(void 0, args);
+        } else {
+          return value[name].apply(value, args);
+        }
+      },
+      "apply": function (thisp, args) {
+        return value.apply(thisp, args);
+      },
+      "keys": function () {
+        return object_keys(value);
+      }
+    }, void 0, function inspect() {
+      return {
+        state: "fulfilled",
+        value: value
+      };
+    });
+  }
+  /**
+   * Converts thenables to Q promises.
+   * @param promise thenable promise
+   * @returns a Q promise
+   */
+
+
+  function coerce(promise) {
+    var deferred = defer();
+    Q.nextTick(function () {
+      try {
+        promise.then(deferred.resolve, deferred.reject, deferred.notify);
+      } catch (exception) {
+        deferred.reject(exception);
+      }
+    });
+    return deferred.promise;
+  }
+  /**
+   * Annotates an object such that it will never be
+   * transferred away from this process over any promise
+   * communication channel.
+   * @param object
+   * @returns promise a wrapping of that object that
+   * additionally responds to the "isDef" message
+   * without a rejection.
+   */
+
+
+  Q.master = master;
+
+  function master(object) {
+    return Promise({
+      "isDef": function () {}
+    }, function fallback(op, args) {
+      return dispatch(object, op, args);
+    }, function () {
+      return Q(object).inspect();
+    });
+  }
+  /**
+   * Spreads the values of a promised array of arguments into the
+   * fulfillment callback.
+   * @param fulfilled callback that receives variadic arguments from the
+   * promised array
+   * @param rejected callback that receives the exception if the promise
+   * is rejected.
+   * @returns a promise for the return value or thrown exception of
+   * either callback.
+   */
+
+
+  Q.spread = spread;
+
+  function spread(value, fulfilled, rejected) {
+    return Q(value).spread(fulfilled, rejected);
+  }
+
+  Promise.prototype.spread = function (fulfilled, rejected) {
+    return this.all().then(function (array) {
+      return fulfilled.apply(void 0, array);
+    }, rejected);
+  };
+  /**
+   * The async function is a decorator for generator functions, turning
+   * them into asynchronous generators.  Although generators are only part
+   * of the newest ECMAScript 6 drafts, this code does not cause syntax
+   * errors in older engines.  This code should continue to work and will
+   * in fact improve over time as the language improves.
+   *
+   * ES6 generators are currently part of V8 version 3.19 with the
+   * --harmony-generators runtime flag enabled.  SpiderMonkey has had them
+   * for longer, but under an older Python-inspired form.  This function
+   * works on both kinds of generators.
+   *
+   * Decorates a generator function such that:
+   *  - it may yield promises
+   *  - execution will continue when that promise is fulfilled
+   *  - the value of the yield expression will be the fulfilled value
+   *  - it returns a promise for the return value (when the generator
+   *    stops iterating)
+   *  - the decorated function returns a promise for the return value
+   *    of the generator or the first rejected promise among those
+   *    yielded.
+   *  - if an error is thrown in the generator, it propagates through
+   *    every following yield until it is caught, or until it escapes
+   *    the generator function altogether, and is translated into a
+   *    rejection for the promise returned by the decorated generator.
+   */
+
+
+  Q.async = async;
+
+  function async(makeGenerator) {
+    return function () {
+      // when verb is "send", arg is a value
+      // when verb is "throw", arg is an exception
+      function continuer(verb, arg) {
+        var result; // Until V8 3.19 / Chromium 29 is released, SpiderMonkey is the only
+        // engine that has a deployed base of browsers that support generators.
+        // However, SM's generators use the Python-inspired semantics of
+        // outdated ES6 drafts.  We would like to support ES6, but we'd also
+        // like to make it possible to use generators in deployed browsers, so
+        // we also support Python-style generators.  At some point we can remove
+        // this block.
+
+        if (typeof StopIteration === "undefined") {
+          // ES6 Generators
+          try {
+            result = generator[verb](arg);
+          } catch (exception) {
+            return reject(exception);
+          }
+
+          if (result.done) {
+            return Q(result.value);
+          } else {
+            return when(result.value, callback, errback);
+          }
+        } else {
+          // SpiderMonkey Generators
+          // FIXME: Remove this case when SM does ES6 generators.
+          try {
+            result = generator[verb](arg);
+          } catch (exception) {
+            if (isStopIteration(exception)) {
+              return Q(exception.value);
+            } else {
+              return reject(exception);
+            }
+          }
+
+          return when(result, callback, errback);
+        }
+      }
+
+      var generator = makeGenerator.apply(this, arguments);
+      var callback = continuer.bind(continuer, "next");
+      var errback = continuer.bind(continuer, "throw");
+      return callback();
+    };
+  }
+  /**
+   * The spawn function is a small wrapper around async that immediately
+   * calls the generator and also ends the promise chain, so that any
+   * unhandled errors are thrown instead of forwarded to the error
+   * handler. This is useful because it's extremely common to run
+   * generators at the top-level to work with libraries.
+   */
+
+
+  Q.spawn = spawn;
+
+  function spawn(makeGenerator) {
+    Q.done(Q.async(makeGenerator)());
+  } // FIXME: Remove this interface once ES6 generators are in SpiderMonkey.
+
+  /**
+   * Throws a ReturnValue exception to stop an asynchronous generator.
+   *
+   * This interface is a stop-gap measure to support generator return
+   * values in older Firefox/SpiderMonkey.  In browsers that support ES6
+   * generators like Chromium 29, just use "return" in your generator
+   * functions.
+   *
+   * @param value the return value for the surrounding generator
+   * @throws ReturnValue exception with the value.
+   * @example
+   * // ES6 style
+   * Q.async(function* () {
+   *      var foo = yield getFooPromise();
+   *      var bar = yield getBarPromise();
+   *      return foo + bar;
+   * })
+   * // Older SpiderMonkey style
+   * Q.async(function () {
+   *      var foo = yield getFooPromise();
+   *      var bar = yield getBarPromise();
+   *      Q.return(foo + bar);
+   * })
+   */
+
+
+  Q["return"] = _return;
+
+  function _return(value) {
+    throw new QReturnValue(value);
+  }
+  /**
+   * The promised function decorator ensures that any promise arguments
+   * are settled and passed as values (`this` is also settled and passed
+   * as a value).  It will also ensure that the result of a function is
+   * always a promise.
+   *
+   * @example
+   * var add = Q.promised(function (a, b) {
+   *     return a + b;
+   * });
+   * add(Q(a), Q(B));
+   *
+   * @param {function} callback The function to decorate
+   * @returns {function} a function that has been decorated.
+   */
+
+
+  Q.promised = promised;
+
+  function promised(callback) {
+    return function () {
+      return spread([this, all(arguments)], function (self, args) {
+        return callback.apply(self, args);
+      });
+    };
+  }
+  /**
+   * sends a message to a value in a future turn
+   * @param object* the recipient
+   * @param op the name of the message operation, e.g., "when",
+   * @param args further arguments to be forwarded to the operation
+   * @returns result {Promise} a promise for the result of the operation
+   */
+
+
+  Q.dispatch = dispatch;
+
+  function dispatch(object, op, args) {
+    return Q(object).dispatch(op, args);
+  }
+
+  Promise.prototype.dispatch = function (op, args) {
+    var self = this;
+    var deferred = defer();
+    Q.nextTick(function () {
+      self.promiseDispatch(deferred.resolve, op, args);
+    });
+    return deferred.promise;
+  };
+  /**
+   * Gets the value of a property in a future turn.
+   * @param object    promise or immediate reference for target object
+   * @param name      name of property to get
+   * @return promise for the property value
+   */
+
+
+  Q.get = function (object, key) {
+    return Q(object).dispatch("get", [key]);
+  };
+
+  Promise.prototype.get = function (key) {
+    return this.dispatch("get", [key]);
+  };
+  /**
+   * Sets the value of a property in a future turn.
+   * @param object    promise or immediate reference for object object
+   * @param name      name of property to set
+   * @param value     new value of property
+   * @return promise for the return value
+   */
+
+
+  Q.set = function (object, key, value) {
+    return Q(object).dispatch("set", [key, value]);
+  };
+
+  Promise.prototype.set = function (key, value) {
+    return this.dispatch("set", [key, value]);
+  };
+  /**
+   * Deletes a property in a future turn.
+   * @param object    promise or immediate reference for target object
+   * @param name      name of property to delete
+   * @return promise for the return value
+   */
+
+
+  Q.del = // XXX legacy
+  Q["delete"] = function (object, key) {
+    return Q(object).dispatch("delete", [key]);
+  };
+
+  Promise.prototype.del = // XXX legacy
+  Promise.prototype["delete"] = function (key) {
+    return this.dispatch("delete", [key]);
+  };
+  /**
+   * Invokes a method in a future turn.
+   * @param object    promise or immediate reference for target object
+   * @param name      name of method to invoke
+   * @param value     a value to post, typically an array of
+   *                  invocation arguments for promises that
+   *                  are ultimately backed with `resolve` values,
+   *                  as opposed to those backed with URLs
+   *                  wherein the posted value can be any
+   *                  JSON serializable object.
+   * @return promise for the return value
+   */
+  // bound locally because it is used by other methods
+
+
+  Q.mapply = // XXX As proposed by "Redsandro"
+  Q.post = function (object, name, args) {
+    return Q(object).dispatch("post", [name, args]);
+  };
+
+  Promise.prototype.mapply = // XXX As proposed by "Redsandro"
+  Promise.prototype.post = function (name, args) {
+    return this.dispatch("post", [name, args]);
+  };
+  /**
+   * Invokes a method in a future turn.
+   * @param object    promise or immediate reference for target object
+   * @param name      name of method to invoke
+   * @param ...args   array of invocation arguments
+   * @return promise for the return value
+   */
+
+
+  Q.send = // XXX Mark Miller's proposed parlance
+  Q.mcall = // XXX As proposed by "Redsandro"
+  Q.invoke = function (object, name
+  /*...args*/
+  ) {
+    return Q(object).dispatch("post", [name, array_slice(arguments, 2)]);
+  };
+
+  Promise.prototype.send = // XXX Mark Miller's proposed parlance
+  Promise.prototype.mcall = // XXX As proposed by "Redsandro"
+  Promise.prototype.invoke = function (name
+  /*...args*/
+  ) {
+    return this.dispatch("post", [name, array_slice(arguments, 1)]);
+  };
+  /**
+   * Applies the promised function in a future turn.
+   * @param object    promise or immediate reference for target function
+   * @param args      array of application arguments
+   */
+
+
+  Q.fapply = function (object, args) {
+    return Q(object).dispatch("apply", [void 0, args]);
+  };
+
+  Promise.prototype.fapply = function (args) {
+    return this.dispatch("apply", [void 0, args]);
+  };
+  /**
+   * Calls the promised function in a future turn.
+   * @param object    promise or immediate reference for target function
+   * @param ...args   array of application arguments
+   */
+
+
+  Q["try"] = Q.fcall = function (object
+  /* ...args*/
+  ) {
+    return Q(object).dispatch("apply", [void 0, array_slice(arguments, 1)]);
+  };
+
+  Promise.prototype.fcall = function ()
+  /*...args*/
+  {
+    return this.dispatch("apply", [void 0, array_slice(arguments)]);
+  };
+  /**
+   * Binds the promised function, transforming return values into a fulfilled
+   * promise and thrown errors into a rejected one.
+   * @param object    promise or immediate reference for target function
+   * @param ...args   array of application arguments
+   */
+
+
+  Q.fbind = function (object
+  /*...args*/
+  ) {
+    var promise = Q(object);
+    var args = array_slice(arguments, 1);
+    return function fbound() {
+      return promise.dispatch("apply", [this, args.concat(array_slice(arguments))]);
+    };
+  };
+
+  Promise.prototype.fbind = function ()
+  /*...args*/
+  {
+    var promise = this;
+    var args = array_slice(arguments);
+    return function fbound() {
+      return promise.dispatch("apply", [this, args.concat(array_slice(arguments))]);
+    };
+  };
+  /**
+   * Requests the names of the owned properties of a promised
+   * object in a future turn.
+   * @param object    promise or immediate reference for target object
+   * @return promise for the keys of the eventually settled object
+   */
+
+
+  Q.keys = function (object) {
+    return Q(object).dispatch("keys", []);
+  };
+
+  Promise.prototype.keys = function () {
+    return this.dispatch("keys", []);
+  };
+  /**
+   * Turns an array of promises into a promise for an array.  If any of
+   * the promises gets rejected, the whole array is rejected immediately.
+   * @param {Array*} an array (or promise for an array) of values (or
+   * promises for values)
+   * @returns a promise for an array of the corresponding values
+   */
+  // By Mark Miller
+  // http://wiki.ecmascript.org/doku.php?id=strawman:concurrency&rev=1308776521#allfulfilled
+
+
+  Q.all = all;
+
+  function all(promises) {
+    return when(promises, function (promises) {
+      var pendingCount = 0;
+      var deferred = defer();
+      array_reduce(promises, function (undefined, promise, index) {
+        var snapshot;
+
+        if (isPromise(promise) && (snapshot = promise.inspect()).state === "fulfilled") {
+          promises[index] = snapshot.value;
+        } else {
+          ++pendingCount;
+          when(promise, function (value) {
+            promises[index] = value;
+
+            if (--pendingCount === 0) {
+              deferred.resolve(promises);
+            }
+          }, deferred.reject, function (progress) {
+            deferred.notify({
+              index: index,
+              value: progress
+            });
+          });
+        }
+      }, void 0);
+
+      if (pendingCount === 0) {
+        deferred.resolve(promises);
+      }
+
+      return deferred.promise;
+    });
+  }
+
+  Promise.prototype.all = function () {
+    return all(this);
+  };
+  /**
+   * Returns the first resolved promise of an array. Prior rejected promises are
+   * ignored.  Rejects only if all promises are rejected.
+   * @param {Array*} an array containing values or promises for values
+   * @returns a promise fulfilled with the value of the first resolved promise,
+   * or a rejected promise if all promises are rejected.
+   */
+
+
+  Q.any = any;
+
+  function any(promises) {
+    if (promises.length === 0) {
+      return Q.resolve();
+    }
+
+    var deferred = Q.defer();
+    var pendingCount = 0;
+    array_reduce(promises, function (prev, current, index) {
+      var promise = promises[index];
+      pendingCount++;
+      when(promise, onFulfilled, onRejected, onProgress);
+
+      function onFulfilled(result) {
+        deferred.resolve(result);
+      }
+
+      function onRejected(err) {
+        pendingCount--;
+
+        if (pendingCount === 0) {
+          var rejection = err || new Error("" + err);
+          rejection.message = "Q can't get fulfillment value from any promise, all " + "promises were rejected. Last error message: " + rejection.message;
+          deferred.reject(rejection);
+        }
+      }
+
+      function onProgress(progress) {
+        deferred.notify({
+          index: index,
+          value: progress
+        });
+      }
+    }, undefined);
+    return deferred.promise;
+  }
+
+  Promise.prototype.any = function () {
+    return any(this);
+  };
+  /**
+   * Waits for all promises to be settled, either fulfilled or
+   * rejected.  This is distinct from `all` since that would stop
+   * waiting at the first rejection.  The promise returned by
+   * `allResolved` will never be rejected.
+   * @param promises a promise for an array (or an array) of promises
+   * (or values)
+   * @return a promise for an array of promises
+   */
+
+
+  Q.allResolved = deprecate(allResolved, "allResolved", "allSettled");
+
+  function allResolved(promises) {
+    return when(promises, function (promises) {
+      promises = array_map(promises, Q);
+      return when(all(array_map(promises, function (promise) {
+        return when(promise, noop, noop);
+      })), function () {
+        return promises;
+      });
+    });
+  }
+
+  Promise.prototype.allResolved = function () {
+    return allResolved(this);
+  };
+  /**
+   * @see Promise#allSettled
+   */
+
+
+  Q.allSettled = allSettled;
+
+  function allSettled(promises) {
+    return Q(promises).allSettled();
+  }
+  /**
+   * Turns an array of promises into a promise for an array of their states (as
+   * returned by `inspect`) when they have all settled.
+   * @param {Array[Any*]} values an array (or promise for an array) of values (or
+   * promises for values)
+   * @returns {Array[State]} an array of states for the respective values.
+   */
+
+
+  Promise.prototype.allSettled = function () {
+    return this.then(function (promises) {
+      return all(array_map(promises, function (promise) {
+        promise = Q(promise);
+
+        function regardless() {
+          return promise.inspect();
+        }
+
+        return promise.then(regardless, regardless);
+      }));
+    });
+  };
+  /**
+   * Captures the failure of a promise, giving an oportunity to recover
+   * with a callback.  If the given promise is fulfilled, the returned
+   * promise is fulfilled.
+   * @param {Any*} promise for something
+   * @param {Function} callback to fulfill the returned promise if the
+   * given promise is rejected
+   * @returns a promise for the return value of the callback
+   */
+
+
+  Q.fail = // XXX legacy
+  Q["catch"] = function (object, rejected) {
+    return Q(object).then(void 0, rejected);
+  };
+
+  Promise.prototype.fail = // XXX legacy
+  Promise.prototype["catch"] = function (rejected) {
+    return this.then(void 0, rejected);
+  };
+  /**
+   * Attaches a listener that can respond to progress notifications from a
+   * promise's originating deferred. This listener receives the exact arguments
+   * passed to ``deferred.notify``.
+   * @param {Any*} promise for something
+   * @param {Function} callback to receive any progress notifications
+   * @returns the given promise, unchanged
+   */
+
+
+  Q.progress = progress;
+
+  function progress(object, progressed) {
+    return Q(object).then(void 0, void 0, progressed);
+  }
+
+  Promise.prototype.progress = function (progressed) {
+    return this.then(void 0, void 0, progressed);
+  };
+  /**
+   * Provides an opportunity to observe the settling of a promise,
+   * regardless of whether the promise is fulfilled or rejected.  Forwards
+   * the resolution to the returned promise when the callback is done.
+   * The callback can return a promise to defer completion.
+   * @param {Any*} promise
+   * @param {Function} callback to observe the resolution of the given
+   * promise, takes no arguments.
+   * @returns a promise for the resolution of the given promise when
+   * ``fin`` is done.
+   */
+
+
+  Q.fin = // XXX legacy
+  Q["finally"] = function (object, callback) {
+    return Q(object)["finally"](callback);
+  };
+
+  Promise.prototype.fin = // XXX legacy
+  Promise.prototype["finally"] = function (callback) {
+    if (!callback || typeof callback.apply !== "function") {
+      throw new Error("Q can't apply finally callback");
+    }
+
+    callback = Q(callback);
+    return this.then(function (value) {
+      return callback.fcall().then(function () {
+        return value;
+      });
+    }, function (reason) {
+      // TODO attempt to recycle the rejection with "this".
+      return callback.fcall().then(function () {
+        throw reason;
+      });
+    });
+  };
+  /**
+   * Terminates a chain of promises, forcing rejections to be
+   * thrown as exceptions.
+   * @param {Any*} promise at the end of a chain of promises
+   * @returns nothing
+   */
+
+
+  Q.done = function (object, fulfilled, rejected, progress) {
+    return Q(object).done(fulfilled, rejected, progress);
+  };
+
+  Promise.prototype.done = function (fulfilled, rejected, progress) {
+    var onUnhandledError = function (error) {
+      // forward to a future turn so that ``when``
+      // does not catch it and turn it into a rejection.
+      Q.nextTick(function () {
+        makeStackTraceLong(error, promise);
+
+        if (Q.onerror) {
+          Q.onerror(error);
+        } else {
+          throw error;
+        }
+      });
+    }; // Avoid unnecessary `nextTick`ing via an unnecessary `when`.
+
+
+    var promise = fulfilled || rejected || progress ? this.then(fulfilled, rejected, progress) : this;
+
+    if (typeof process === "object" && process && process.domain) {
+      onUnhandledError = process.domain.bind(onUnhandledError);
+    }
+
+    promise.then(void 0, onUnhandledError);
+  };
+  /**
+   * Causes a promise to be rejected if it does not get fulfilled before
+   * some milliseconds time out.
+   * @param {Any*} promise
+   * @param {Number} milliseconds timeout
+   * @param {Any*} custom error message or Error object (optional)
+   * @returns a promise for the resolution of the given promise if it is
+   * fulfilled before the timeout, otherwise rejected.
+   */
+
+
+  Q.timeout = function (object, ms, error) {
+    return Q(object).timeout(ms, error);
+  };
+
+  Promise.prototype.timeout = function (ms, error) {
+    var deferred = defer();
+    var timeoutId = setTimeout(function () {
+      if (!error || "string" === typeof error) {
+        error = new Error(error || "Timed out after " + ms + " ms");
+        error.code = "ETIMEDOUT";
+      }
+
+      deferred.reject(error);
+    }, ms);
+    this.then(function (value) {
+      clearTimeout(timeoutId);
+      deferred.resolve(value);
+    }, function (exception) {
+      clearTimeout(timeoutId);
+      deferred.reject(exception);
+    }, deferred.notify);
+    return deferred.promise;
+  };
+  /**
+   * Returns a promise for the given value (or promised value), some
+   * milliseconds after it resolved. Passes rejections immediately.
+   * @param {Any*} promise
+   * @param {Number} milliseconds
+   * @returns a promise for the resolution of the given promise after milliseconds
+   * time has elapsed since the resolution of the given promise.
+   * If the given promise rejects, that is passed immediately.
+   */
+
+
+  Q.delay = function (object, timeout) {
+    if (timeout === void 0) {
+      timeout = object;
+      object = void 0;
+    }
+
+    return Q(object).delay(timeout);
+  };
+
+  Promise.prototype.delay = function (timeout) {
+    return this.then(function (value) {
+      var deferred = defer();
+      setTimeout(function () {
+        deferred.resolve(value);
+      }, timeout);
+      return deferred.promise;
+    });
+  };
+  /**
+   * Passes a continuation to a Node function, which is called with the given
+   * arguments provided as an array, and returns a promise.
+   *
+   *      Q.nfapply(FS.readFile, [__filename])
+   *      .then(function (content) {
+   *      })
+   *
+   */
+
+
+  Q.nfapply = function (callback, args) {
+    return Q(callback).nfapply(args);
+  };
+
+  Promise.prototype.nfapply = function (args) {
+    var deferred = defer();
+    var nodeArgs = array_slice(args);
+    nodeArgs.push(deferred.makeNodeResolver());
+    this.fapply(nodeArgs).fail(deferred.reject);
+    return deferred.promise;
+  };
+  /**
+   * Passes a continuation to a Node function, which is called with the given
+   * arguments provided individually, and returns a promise.
+   * @example
+   * Q.nfcall(FS.readFile, __filename)
+   * .then(function (content) {
+   * })
+   *
+   */
+
+
+  Q.nfcall = function (callback
+  /*...args*/
+  ) {
+    var args = array_slice(arguments, 1);
+    return Q(callback).nfapply(args);
+  };
+
+  Promise.prototype.nfcall = function ()
+  /*...args*/
+  {
+    var nodeArgs = array_slice(arguments);
+    var deferred = defer();
+    nodeArgs.push(deferred.makeNodeResolver());
+    this.fapply(nodeArgs).fail(deferred.reject);
+    return deferred.promise;
+  };
+  /**
+   * Wraps a NodeJS continuation passing function and returns an equivalent
+   * version that returns a promise.
+   * @example
+   * Q.nfbind(FS.readFile, __filename)("utf-8")
+   * .then(console.log)
+   * .done()
+   */
+
+
+  Q.nfbind = Q.denodeify = function (callback
+  /*...args*/
+  ) {
+    if (callback === undefined) {
+      throw new Error("Q can't wrap an undefined function");
+    }
+
+    var baseArgs = array_slice(arguments, 1);
+    return function () {
+      var nodeArgs = baseArgs.concat(array_slice(arguments));
+      var deferred = defer();
+      nodeArgs.push(deferred.makeNodeResolver());
+      Q(callback).fapply(nodeArgs).fail(deferred.reject);
+      return deferred.promise;
+    };
+  };
+
+  Promise.prototype.nfbind = Promise.prototype.denodeify = function ()
+  /*...args*/
+  {
+    var args = array_slice(arguments);
+    args.unshift(this);
+    return Q.denodeify.apply(void 0, args);
+  };
+
+  Q.nbind = function (callback, thisp
+  /*...args*/
+  ) {
+    var baseArgs = array_slice(arguments, 2);
+    return function () {
+      var nodeArgs = baseArgs.concat(array_slice(arguments));
+      var deferred = defer();
+      nodeArgs.push(deferred.makeNodeResolver());
+
+      function bound() {
+        return callback.apply(thisp, arguments);
+      }
+
+      Q(bound).fapply(nodeArgs).fail(deferred.reject);
+      return deferred.promise;
+    };
+  };
+
+  Promise.prototype.nbind = function ()
+  /*thisp, ...args*/
+  {
+    var args = array_slice(arguments, 0);
+    args.unshift(this);
+    return Q.nbind.apply(void 0, args);
+  };
+  /**
+   * Calls a method of a Node-style object that accepts a Node-style
+   * callback with a given array of arguments, plus a provided callback.
+   * @param object an object that has the named method
+   * @param {String} name name of the method of object
+   * @param {Array} args arguments to pass to the method; the callback
+   * will be provided by Q and appended to these arguments.
+   * @returns a promise for the value or error
+   */
+
+
+  Q.nmapply = // XXX As proposed by "Redsandro"
+  Q.npost = function (object, name, args) {
+    return Q(object).npost(name, args);
+  };
+
+  Promise.prototype.nmapply = // XXX As proposed by "Redsandro"
+  Promise.prototype.npost = function (name, args) {
+    var nodeArgs = array_slice(args || []);
+    var deferred = defer();
+    nodeArgs.push(deferred.makeNodeResolver());
+    this.dispatch("post", [name, nodeArgs]).fail(deferred.reject);
+    return deferred.promise;
+  };
+  /**
+   * Calls a method of a Node-style object that accepts a Node-style
+   * callback, forwarding the given variadic arguments, plus a provided
+   * callback argument.
+   * @param object an object that has the named method
+   * @param {String} name name of the method of object
+   * @param ...args arguments to pass to the method; the callback will
+   * be provided by Q and appended to these arguments.
+   * @returns a promise for the value or error
+   */
+
+
+  Q.nsend = // XXX Based on Mark Miller's proposed "send"
+  Q.nmcall = // XXX Based on "Redsandro's" proposal
+  Q.ninvoke = function (object, name
+  /*...args*/
+  ) {
+    var nodeArgs = array_slice(arguments, 2);
+    var deferred = defer();
+    nodeArgs.push(deferred.makeNodeResolver());
+    Q(object).dispatch("post", [name, nodeArgs]).fail(deferred.reject);
+    return deferred.promise;
+  };
+
+  Promise.prototype.nsend = // XXX Based on Mark Miller's proposed "send"
+  Promise.prototype.nmcall = // XXX Based on "Redsandro's" proposal
+  Promise.prototype.ninvoke = function (name
+  /*...args*/
+  ) {
+    var nodeArgs = array_slice(arguments, 1);
+    var deferred = defer();
+    nodeArgs.push(deferred.makeNodeResolver());
+    this.dispatch("post", [name, nodeArgs]).fail(deferred.reject);
+    return deferred.promise;
+  };
+  /**
+   * If a function would like to support both Node continuation-passing-style and
+   * promise-returning-style, it can end its internal promise chain with
+   * `nodeify(nodeback)`, forwarding the optional nodeback argument.  If the user
+   * elects to use a nodeback, the result will be sent there.  If they do not
+   * pass a nodeback, they will receive the result promise.
+   * @param object a result (or a promise for a result)
+   * @param {Function} nodeback a Node.js-style callback
+   * @returns either the promise or nothing
+   */
+
+
+  Q.nodeify = nodeify;
+
+  function nodeify(object, nodeback) {
+    return Q(object).nodeify(nodeback);
+  }
+
+  Promise.prototype.nodeify = function (nodeback) {
+    if (nodeback) {
+      this.then(function (value) {
+        Q.nextTick(function () {
+          nodeback(null, value);
+        });
+      }, function (error) {
+        Q.nextTick(function () {
+          nodeback(error);
+        });
+      });
+    } else {
+      return this;
+    }
+  };
+
+  Q.noConflict = function () {
+    throw new Error("Q.noConflict only works when Q is used as a global");
+  }; // All code before this point will be filtered from stack traces.
+
+
+  var qEndingLine = captureLine();
+  return Q;
+});
+},{"process":"../../node_modules/process/browser.js"}],"Components/App.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39218,6 +41194,14 @@ var _Next = _interopRequireDefault(require("~/components/Next"));
 
 var _Header = _interopRequireDefault(require("~/components/Header"));
 
+var _Footer = _interopRequireDefault(require("~/components/Footer"));
+
+var _Auth = _interopRequireDefault(require("~/components/Auth"));
+
+var _Logo = _interopRequireDefault(require("~/components/Logo"));
+
+var _Message = _interopRequireDefault(require("~/components/Message"));
+
 var _remote = _interopRequireDefault(require("~/services/remote"));
 
 var _local = _interopRequireDefault(require("~/services/local"));
@@ -39226,9 +41210,9 @@ var _messages = require("~/services/messages");
 
 var _settings = require("~/settings");
 
-var _Auth = _interopRequireDefault(require("./Auth"));
+var _uniqueId = _interopRequireDefault(require("~/utilities/uniqueId"));
 
-var _settings2 = require("../settings");
+var _q = require("q");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -39263,7 +41247,7 @@ function (_React$Component) {
     key: "resetList",
     value: function resetList() {
       var defaultList = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'default';
-      var listType = defaultList === 'cody' ? _settings2.CODYLIST : _settings.DEFAULTLIST;
+      var listType = defaultList === 'cody' ? _settings.CODYLIST : _settings.DEFAULTLIST;
       var list = App.flatten(listType);
       list[0].active = true;
       return list;
@@ -39329,7 +41313,7 @@ function (_React$Component) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                this.store = this.state.token ? _remote.default : _local.default;
+                this.store = this.hasToken() ? _remote.default : _local.default;
                 _context.prev = 1;
                 this.setState({
                   message: 'Loading...'
@@ -39395,47 +41379,59 @@ function (_React$Component) {
       regeneratorRuntime.mark(function _callee2() {
         var _this3 = this;
 
+        var storeType;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _context2.prev = 0;
+                storeType = this.hasToken() ? _remote.default.name : _local.default.name;
+                _context2.prev = 1;
                 this.setState({
                   message: 'Saving...'
                 });
-                _context2.next = 4;
-                return this.store.save(this.state.account, this.state.data);
 
-              case 4:
+                if (!(storeType === _remote.default.name)) {
+                  _context2.next = 6;
+                  break;
+                }
+
+                _context2.next = 6;
+                return _remote.default.save(this.state.account, this.state.data);
+
+              case 6:
+                _context2.next = 8;
+                return _local.default.save(this.state.account, this.state.data);
+
+              case 8:
                 this.setState({
-                  message: "Saved to ".concat(this.store.name, ".")
+                  message: "Saved to ".concat(storeType, ".")
                 });
-                _context2.next = 11;
+                _context2.next = 15;
                 break;
-
-              case 7:
-                _context2.prev = 7;
-                _context2.t0 = _context2["catch"](0);
-                console.log('err saving', _context2.t0);
-                this.setState({
-                  message: "Error from ".concat(this.store.name, ".")
-                });
 
               case 11:
                 _context2.prev = 11;
+                _context2.t0 = _context2["catch"](1);
+                console.log('err saving', _context2.t0);
+                this.setState({
+                  message: "Error from ".concat(storeType, ".")
+                });
+
+              case 15:
+                _context2.prev = 15;
                 setTimeout(function () {
                   _this3.setState({
                     message: (0, _messages.randomFromList)(_messages.messages.working)
                   });
                 }, 1000 * 5);
-                return _context2.finish(11);
+                return _context2.finish(15);
 
-              case 14:
+              case 18:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[0, 7, 11, 14]]);
+        }, _callee2, this, [[1, 11, 15, 18]]);
       }));
 
       function save() {
@@ -39476,7 +41472,16 @@ function (_React$Component) {
       return new Promise(function (resolve, reject) {
         if (!App.hasActive(list)) {
           list[0].active = true;
-        }
+        } // give a default uniqueId if one is not already set.
+
+
+        list.map(function (li) {
+          if (!li.id) {
+            li.id = (0, _uniqueId.default)();
+          }
+
+          return li;
+        });
 
         _this5.setState(function (state) {
           state.data.mine = list;
@@ -39581,25 +41586,53 @@ function (_React$Component) {
     }
   }, {
     key: "updateAuthentication",
-    value: function updateAuthentication(account) {
-      var token = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    value: function () {
+      var _updateAuthentication = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee5(account) {
+        var _this7 = this;
 
-      if (token === null || token === undefined) {
-        this.setState(function (state) {
-          state.account = account;
-          delete state.token;
-          return state;
-        });
-      } else {
-        this.setState(function (state) {
-          state.account = account;
-          state.token = token;
-          return state;
-        });
+        var token,
+            _args5 = arguments;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                token = _args5.length > 1 && _args5[1] !== undefined ? _args5[1] : null;
+                _context5.next = 3;
+                return new Promise(function (resolve, reject) {
+                  _this7.setState(function (state) {
+                    if (token === null || token === undefined) {
+                      state.account = account;
+                      delete state.token;
+                    } else {
+                      state.account = account;
+                      state.token = token;
+                    }
+
+                    return state;
+                  }, function () {
+                    resolve(true);
+                  });
+                });
+
+              case 3:
+                this.load();
+
+              case 4:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function updateAuthentication(_x) {
+        return _updateAuthentication.apply(this, arguments);
       }
 
-      this.load();
-    }
+      return updateAuthentication;
+    }()
   }, {
     key: "handleReset",
     value: function handleReset() {
@@ -39637,12 +41670,12 @@ function (_React$Component) {
     key: "render",
     value: function render() {
       var doneRef = this.doneRef;
-      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_Header.default, {
+      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_Header.default, null, _react.default.createElement(_Logo.default, null), _react.default.createElement(_Auth.default, {
         web3: this.props.web3,
         account: this.state.account,
         token: this.state.token,
         callback: this.updateAuthentication
-      }), this.hasSession() ? _react.default.createElement("div", {
+      })), this.hasSession() ? _react.default.createElement("div", {
         className: "container"
       }, _react.default.createElement(_Next.default, {
         doneRef: doneRef,
@@ -39655,24 +41688,17 @@ function (_React$Component) {
         updateList: this.updateList,
         handleAction: this.handleSetActive,
         handleClearDone: this.handleClearDone
-      })) : _react.default.createElement("div", {
-        className: "container messageScreen"
-      }, _react.default.createElement("div", {
-        className: "message"
-      }, _react.default.createElement("span", {
-        className: "messageLine"
-      }, "################################################################"), _react.default.createElement("span", null, "Session not found. Try logging in or ", _react.default.createElement("a", {
+      })) : _react.default.createElement(_Message.default, null, _react.default.createElement("span", null, "Session not found. Try logging in or ", _react.default.createElement("a", {
         href: "#",
         onClick: this.createSession
-      }, " create a new session.")), _react.default.createElement("span", {
-        className: "messageLine"
-      }, "################################################################"))), _react.default.createElement("footer", {
-        className: "footer"
-      }, _react.default.createElement("span", {
+      }, " create a new session."))), _react.default.createElement(_Footer.default, null, _react.default.createElement("span", {
         className: "messageLeft"
       }, _react.default.createElement("small", null, this.state.message)), _react.default.createElement("span", {
         className: "messageRight"
-      }, _react.default.createElement("small", null, this.hasToken() ? '' : 'Login to enable session storage.'))));
+      }, _react.default.createElement("small", null, _react.default.createElement("span", null, this.hasToken() ? '' : 'Login to enable session storage.'), _react.default.createElement("a", {
+        download: "export.json",
+        href: "data:application/octet-stream,".concat(encodeURIComponent(JSON.stringify(this.state.data, null, 2)))
+      }, "export")))));
     }
   }]);
 
@@ -39681,7 +41707,7 @@ function (_React$Component) {
 
 var _default = App;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/components/Header":"components/Header.js","~/services/remote":"services/remote.js","~/services/local":"services/local.js","~/services/messages":"services/messages.js","~/settings":"settings.js","./Auth":"Components/Auth.js","../settings":"settings.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/components/Header":"components/Header.js","~/components/Footer":"components/Footer.js","~/components/Auth":"components/Auth.js","~/components/Logo":"components/Logo.js","~/components/Message":"components/Message.js","~/services/remote":"services/remote.js","~/services/local":"services/local.js","~/services/messages":"services/messages.js","~/settings":"settings.js","~/utilities/uniqueId":"utilities/uniqueId.js","q":"../../node_modules/q/q.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -81712,221 +83738,7 @@ module.exports = scrypt
 },{"pbkdf2":"../../node_modules/pbkdf2/browser.js","buffer":"../../node_modules/buffer/index.js"}],"../../node_modules/scrypt.js/js.js":[function(require,module,exports) {
 module.exports = require('scryptsy')
 
-},{"scryptsy":"../../node_modules/scryptsy/lib/scrypt.js"}],"../../node_modules/uuid/lib/rng-browser.js":[function(require,module,exports) {
-// Unique ID creation requires a high quality random # generator.  In the
-// browser this is a little complicated due to unknown quality of Math.random()
-// and inconsistent support for the `crypto` API.  We do the best we can via
-// feature-detection
-
-// getRandomValues needs to be invoked in a context where "this" is a Crypto
-// implementation. Also, find the complete implementation of crypto on IE11.
-var getRandomValues = (typeof(crypto) != 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto)) ||
-                      (typeof(msCrypto) != 'undefined' && typeof window.msCrypto.getRandomValues == 'function' && msCrypto.getRandomValues.bind(msCrypto));
-
-if (getRandomValues) {
-  // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
-  var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
-
-  module.exports = function whatwgRNG() {
-    getRandomValues(rnds8);
-    return rnds8;
-  };
-} else {
-  // Math.random()-based (RNG)
-  //
-  // If all else fails, use Math.random().  It's fast, but is of unspecified
-  // quality.
-  var rnds = new Array(16);
-
-  module.exports = function mathRNG() {
-    for (var i = 0, r; i < 16; i++) {
-      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
-      rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
-    }
-
-    return rnds;
-  };
-}
-
-},{}],"../../node_modules/uuid/lib/bytesToUuid.js":[function(require,module,exports) {
-/**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */
-var byteToHex = [];
-for (var i = 0; i < 256; ++i) {
-  byteToHex[i] = (i + 0x100).toString(16).substr(1);
-}
-
-function bytesToUuid(buf, offset) {
-  var i = offset || 0;
-  var bth = byteToHex;
-  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
-  return ([bth[buf[i++]], bth[buf[i++]], 
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]],
-	bth[buf[i++]], bth[buf[i++]],
-	bth[buf[i++]], bth[buf[i++]]]).join('');
-}
-
-module.exports = bytesToUuid;
-
-},{}],"../../node_modules/uuid/v1.js":[function(require,module,exports) {
-var rng = require('./lib/rng');
-var bytesToUuid = require('./lib/bytesToUuid');
-
-// **`v1()` - Generate time-based UUID**
-//
-// Inspired by https://github.com/LiosK/UUID.js
-// and http://docs.python.org/library/uuid.html
-
-var _nodeId;
-var _clockseq;
-
-// Previous uuid creation time
-var _lastMSecs = 0;
-var _lastNSecs = 0;
-
-// See https://github.com/broofa/node-uuid for API details
-function v1(options, buf, offset) {
-  var i = buf && offset || 0;
-  var b = buf || [];
-
-  options = options || {};
-  var node = options.node || _nodeId;
-  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
-
-  // node and clockseq need to be initialized to random values if they're not
-  // specified.  We do this lazily to minimize issues related to insufficient
-  // system entropy.  See #189
-  if (node == null || clockseq == null) {
-    var seedBytes = rng();
-    if (node == null) {
-      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-      node = _nodeId = [
-        seedBytes[0] | 0x01,
-        seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]
-      ];
-    }
-    if (clockseq == null) {
-      // Per 4.2.2, randomize (14 bit) clockseq
-      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
-    }
-  }
-
-  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
-  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
-  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
-  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
-
-  // Per 4.2.1.2, use count of uuid's generated during the current clock
-  // cycle to simulate higher resolution clock
-  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
-
-  // Time since last uuid creation (in msecs)
-  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
-
-  // Per 4.2.1.2, Bump clockseq on clock regression
-  if (dt < 0 && options.clockseq === undefined) {
-    clockseq = clockseq + 1 & 0x3fff;
-  }
-
-  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
-  // time interval
-  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
-    nsecs = 0;
-  }
-
-  // Per 4.2.1.2 Throw error if too many uuids are requested
-  if (nsecs >= 10000) {
-    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
-  }
-
-  _lastMSecs = msecs;
-  _lastNSecs = nsecs;
-  _clockseq = clockseq;
-
-  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
-  msecs += 12219292800000;
-
-  // `time_low`
-  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
-  b[i++] = tl >>> 24 & 0xff;
-  b[i++] = tl >>> 16 & 0xff;
-  b[i++] = tl >>> 8 & 0xff;
-  b[i++] = tl & 0xff;
-
-  // `time_mid`
-  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
-  b[i++] = tmh >>> 8 & 0xff;
-  b[i++] = tmh & 0xff;
-
-  // `time_high_and_version`
-  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
-  b[i++] = tmh >>> 16 & 0xff;
-
-  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
-  b[i++] = clockseq >>> 8 | 0x80;
-
-  // `clock_seq_low`
-  b[i++] = clockseq & 0xff;
-
-  // `node`
-  for (var n = 0; n < 6; ++n) {
-    b[i + n] = node[n];
-  }
-
-  return buf ? buf : bytesToUuid(b);
-}
-
-module.exports = v1;
-
-},{"./lib/rng":"../../node_modules/uuid/lib/rng-browser.js","./lib/bytesToUuid":"../../node_modules/uuid/lib/bytesToUuid.js"}],"../../node_modules/uuid/v4.js":[function(require,module,exports) {
-var rng = require('./lib/rng');
-var bytesToUuid = require('./lib/bytesToUuid');
-
-function v4(options, buf, offset) {
-  var i = buf && offset || 0;
-
-  if (typeof(options) == 'string') {
-    buf = options === 'binary' ? new Array(16) : null;
-    options = null;
-  }
-  options = options || {};
-
-  var rnds = options.random || (options.rng || rng)();
-
-  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-  rnds[6] = (rnds[6] & 0x0f) | 0x40;
-  rnds[8] = (rnds[8] & 0x3f) | 0x80;
-
-  // Copy bytes to buffer, if provided
-  if (buf) {
-    for (var ii = 0; ii < 16; ++ii) {
-      buf[i + ii] = rnds[ii];
-    }
-  }
-
-  return buf || bytesToUuid(rnds);
-}
-
-module.exports = v4;
-
-},{"./lib/rng":"../../node_modules/uuid/lib/rng-browser.js","./lib/bytesToUuid":"../../node_modules/uuid/lib/bytesToUuid.js"}],"../../node_modules/uuid/index.js":[function(require,module,exports) {
-var v1 = require('./v1');
-var v4 = require('./v4');
-
-var uuid = v4;
-uuid.v1 = v1;
-uuid.v4 = v4;
-
-module.exports = uuid;
-
-},{"./v1":"../../node_modules/uuid/v1.js","./v4":"../../node_modules/uuid/v4.js"}],"../../node_modules/randombytes/browser.js":[function(require,module,exports) {
+},{"scryptsy":"../../node_modules/scryptsy/lib/scrypt.js"}],"../../node_modules/randombytes/browser.js":[function(require,module,exports) {
 
 var global = arguments[3];
 var process = require("process");
@@ -99008,7 +100820,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62295" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49879" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
