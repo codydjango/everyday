@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import DOMPurify from 'dompurify'
-import { debounce } from '~/utilities'
+import debounce from '~/utilities/debounce'
 import Button from '~/components/Button'
 
 export default props => {

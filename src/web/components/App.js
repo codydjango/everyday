@@ -6,8 +6,9 @@ import remote from '~/services/remote'
 import local from '~/services/local'
 import { messages, randomFromList } from '~/services/messages'
 import { DEFAULTLIST } from '~/settings'
-import Auth from './Auth';
-import { CODYLIST } from '../settings';
+import Auth from './Auth'
+import { CODYLIST } from '../settings'
+import uniqueId from '~/utilities/uniqueId'
 
 class App extends React.Component {
     static resetList(defaultList='default') {
@@ -124,6 +125,15 @@ class App extends React.Component {
             if (!App.hasActive(list)) {
                 list[0].active = true
             }
+
+            // give a default uniqueId if one is not already set.
+            list.map(li => {
+                if (!li.id) {
+                    li.id = uniqueId()
+                }
+
+                return li
+            })
 
             this.setState(state => {
                 state.data.mine = list

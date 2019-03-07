@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import TaskList from '~/components/TaskList'
 import Link from '~/components/Link'
 import CreateTask from '~/components/CreateTask'
+import uniqueId from '~/utilities/uniqueId'
 
 class Mine extends React.Component {
     constructor(props) {
@@ -39,7 +40,8 @@ class Mine extends React.Component {
 
         list.push({
             text: task,
-            checked: false
+            checked: false,
+            id: uniqueId()
         })
 
         this.updateList(list)

@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { ENDPOINT, ENVIRONMENT } from '~/settings'
-import { getOrdinal } from '~/utilities'
+import getOrdinal from '~/utilities/getOrdinal'
 
 import 'babel-polyfill'
 
