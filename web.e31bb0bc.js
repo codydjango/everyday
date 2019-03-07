@@ -25961,11 +25961,18 @@ function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) r
 
 var _default = function _default(props) {
   var className = props.className,
-      modifiedProps = _objectWithoutProperties(props, ["className"]);
+      onClick = props.onClick,
+      modifiedProps = _objectWithoutProperties(props, ["className", "onClick"]);
 
   return _react.default.createElement("a", _extends({
     href: "#",
-    className: "link ".concat(className ? className : '')
+    tabIndex: "0",
+    role: "button",
+    className: "link ".concat(className ? className : ''),
+    onKeyPress: function onKeyPress(e) {
+      if (e.key === 'Enter') onClick();
+    },
+    onClick: onClick
   }, modifiedProps), props.text);
 };
 
@@ -26368,9 +26375,7 @@ function (_React$Component) {
     _this.startEdit = _this.startEdit.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.stopEdit = _this.stopEdit.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.createNew = _this.createNew.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.pressHelp = _this.pressHelp.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.depressHelp = _this.depressHelp.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.leaveHelp = _this.leaveHelp.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.toggleHelp = _this.toggleHelp.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.handleAction = props.handleAction;
     _this.handleClearDone = props.handleClearDone;
     _this.updateList = props.updateList;
@@ -26392,6 +26397,7 @@ function (_React$Component) {
     key: "startEdit",
     value: function startEdit() {
       this.setState(function (state) {
+        state.help = false;
         state.edit = true;
         state.dragged = null;
         return state;
@@ -26409,7 +26415,7 @@ function (_React$Component) {
     }
   }, {
     key: "toggleEdit",
-    value: function toggleEdit() {
+    value: function toggleEdit(e) {
       if (this.state.edit) {
         this.stopEdit();
       } else {
@@ -26417,27 +26423,13 @@ function (_React$Component) {
       }
     }
   }, {
-    key: "pressHelp",
-    value: function pressHelp() {
-      this.setState({
-        help: true
+    key: "toggleHelp",
+    value: function toggleHelp() {
+      this.setState(function (state) {
+        if (state.help == false && state.edit == true) state.edit = false;
+        state.help = !state.help;
+        return state;
       });
-    }
-  }, {
-    key: "depressHelp",
-    value: function depressHelp() {
-      this.setState({
-        help: false
-      });
-    }
-  }, {
-    key: "leaveHelp",
-    value: function leaveHelp() {
-      if (this.state.help) {
-        this.setState({
-          help: false
-        });
-      }
     }
   }, {
     key: "onUpdate",
@@ -26478,31 +26470,18 @@ function (_React$Component) {
       }), _react.default.createElement(_CreateTask.default, {
         createNew: this.createNew
       }), _react.default.createElement("footer", null, _react.default.createElement("div", null, _react.default.createElement(_Link.default, {
-        text: this.state.edit ? 'done' : 'edit',
+        text: this.state.edit ? 'done edit' : 'edit',
         onClick: function onClick(e) {
           e.preventDefault();
 
           _this2.toggleEdit();
         }
       }), _react.default.createElement(_Link.default, {
-        text: this.state.help ? 'ahh!' : 'help',
-        onMouseLeave: function onMouseLeave(e) {
-          e.preventDefault();
-
-          _this2.leaveHelp();
-        },
-        onMouseUp: function onMouseUp(e) {
-          e.preventDefault();
-
-          _this2.depressHelp();
-        },
-        onMouseDown: function onMouseDown(e) {
-          e.preventDefault();
-
-          _this2.pressHelp();
-        },
+        text: this.state.help ? 'done help' : 'help',
         onClick: function onClick(e) {
           e.preventDefault();
+
+          _this2.toggleHelp();
         }
       }), _react.default.createElement(_Link.default, {
         text: "reset",
@@ -26522,6 +26501,7 @@ function (_React$Component) {
         state.list = props.list;
         state.edit = false;
         state.dragged = null;
+        state.help = false;
         return state;
       }
 
@@ -38700,6 +38680,72 @@ var _default = function _default(_ref) {
 };
 
 exports.default = _default;
+},{"react":"../../node_modules/react/index.js"}],"components/Import.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+var _default = function _default(props) {
+  var _useState = (0, _react.useState)(false),
+      _useState2 = _slicedToArray(_useState, 2),
+      input = _useState2[0],
+      setInput = _useState2[1];
+
+  var startImport = function startImport(importFile) {
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      props.onImport(JSON.parse(e.target.result), importFile.name);
+      setShow(false);
+    };
+
+    reader.readAsText(importFile);
+  };
+
+  var handleClick = function handleClick(e) {
+    input.click(e);
+  };
+
+  return _react.default.createElement("span", {
+    className: "import"
+  }, _react.default.createElement("input", {
+    ref: function ref(_ref) {
+      return setInput(_ref);
+    },
+    type: "file",
+    name: "importjson",
+    id: "importfile",
+    className: "inputfile",
+    onChange: function onChange(e) {
+      return startImport(e.target.files[0]);
+    }
+  }), _react.default.createElement("label", {
+    htmlFor: "importjson",
+    tabIndex: "0",
+    className: "link",
+    onKeyPress: function onKeyPress(e) {
+      if (e.key === 'Enter') handleClick(e);
+    },
+    onClick: handleClick
+  }, "import"));
+};
+
+exports.default = _default;
 },{"react":"../../node_modules/react/index.js"}],"services/remote.js":[function(require,module,exports) {
 "use strict";
 
@@ -41202,6 +41248,8 @@ var _Logo = _interopRequireDefault(require("~/components/Logo"));
 
 var _Message = _interopRequireDefault(require("~/components/Message"));
 
+var _Import = _interopRequireDefault(require("~/components/Import"));
+
 var _remote = _interopRequireDefault(require("~/services/remote"));
 
 var _local = _interopRequireDefault(require("~/services/local"));
@@ -41292,6 +41340,7 @@ function (_React$Component) {
     _this.handleSetActive = _this.handleSetActive.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.createSession = _this.createSession.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.load = _this.load.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.import = _this.import.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.save = _this.save.bind(_assertThisInitialized(_assertThisInitialized(_this))); // callback
 
     _this.updateList = _this.updateList.bind(_assertThisInitialized(_assertThisInitialized(_this)));
@@ -41372,66 +41421,96 @@ function (_React$Component) {
       return load;
     }()
   }, {
-    key: "save",
+    key: "import",
     value: function () {
-      var _save = _asyncToGenerator(
+      var _import2 = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2() {
-        var _this3 = this;
-
-        var storeType;
+      regeneratorRuntime.mark(function _callee2(data, source) {
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+                if (data.mine) this.updateList(data.mine, false);
+                if (data.notes) this.updateNotes(data.notes, false);
+                this.setState({
+                  message: "Loaded from ".concat(source, ".")
+                });
+
+              case 3:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function _import(_x, _x2) {
+        return _import2.apply(this, arguments);
+      }
+
+      return _import;
+    }()
+  }, {
+    key: "save",
+    value: function () {
+      var _save = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3() {
+        var _this3 = this;
+
+        var storeType;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
                 storeType = this.hasToken() ? _remote.default.name : _local.default.name;
-                _context2.prev = 1;
+                _context3.prev = 1;
                 this.setState({
                   message: 'Saving...'
                 });
 
                 if (!(storeType === _remote.default.name)) {
-                  _context2.next = 6;
+                  _context3.next = 6;
                   break;
                 }
 
-                _context2.next = 6;
+                _context3.next = 6;
                 return _remote.default.save(this.state.account, this.state.data);
 
               case 6:
-                _context2.next = 8;
+                _context3.next = 8;
                 return _local.default.save(this.state.account, this.state.data);
 
               case 8:
                 this.setState({
                   message: "Saved to ".concat(storeType, ".")
                 });
-                _context2.next = 15;
+                _context3.next = 15;
                 break;
 
               case 11:
-                _context2.prev = 11;
-                _context2.t0 = _context2["catch"](1);
-                console.log('err saving', _context2.t0);
+                _context3.prev = 11;
+                _context3.t0 = _context3["catch"](1);
+                console.log('err saving', _context3.t0);
                 this.setState({
                   message: "Error from ".concat(storeType, ".")
                 });
 
               case 15:
-                _context2.prev = 15;
+                _context3.prev = 15;
                 setTimeout(function () {
                   _this3.setState({
                     message: (0, _messages.randomFromList)(_messages.messages.working)
                   });
                 }, 1000 * 5);
-                return _context2.finish(15);
+                return _context3.finish(15);
 
               case 18:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this, [[1, 11, 15, 18]]);
+        }, _callee3, this, [[1, 11, 15, 18]]);
       }));
 
       function save() {
@@ -41490,60 +41569,6 @@ function (_React$Component) {
         /*#__PURE__*/
         _asyncToGenerator(
         /*#__PURE__*/
-        regeneratorRuntime.mark(function _callee3() {
-          return regeneratorRuntime.wrap(function _callee3$(_context3) {
-            while (1) {
-              switch (_context3.prev = _context3.next) {
-                case 0:
-                  if (!save) {
-                    _context3.next = 12;
-                    break;
-                  }
-
-                  _context3.prev = 1;
-                  _context3.next = 4;
-                  return _this5.save();
-
-                case 4:
-                  resolve(true);
-                  _context3.next = 10;
-                  break;
-
-                case 7:
-                  _context3.prev = 7;
-                  _context3.t0 = _context3["catch"](1);
-                  reject(_context3.t0);
-
-                case 10:
-                  _context3.next = 13;
-                  break;
-
-                case 12:
-                  resolve(true);
-
-                case 13:
-                case "end":
-                  return _context3.stop();
-              }
-            }
-          }, _callee3, this, [[1, 7]]);
-        })));
-      });
-    }
-  }, {
-    key: "updateNotes",
-    value: function updateNotes(notes) {
-      var _this6 = this;
-
-      var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-      return new Promise(function (resolve, reject) {
-        _this6.setState(function (state) {
-          state.data.notes = notes;
-          return state;
-        },
-        /*#__PURE__*/
-        _asyncToGenerator(
-        /*#__PURE__*/
         regeneratorRuntime.mark(function _callee4() {
           return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
@@ -41556,7 +41581,7 @@ function (_React$Component) {
 
                   _context4.prev = 1;
                   _context4.next = 4;
-                  return _this6.save();
+                  return _this5.save();
 
                 case 4:
                   resolve(true);
@@ -41585,21 +41610,75 @@ function (_React$Component) {
       });
     }
   }, {
+    key: "updateNotes",
+    value: function updateNotes(notes) {
+      var _this6 = this;
+
+      var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      return new Promise(function (resolve, reject) {
+        _this6.setState(function (state) {
+          state.data.notes = notes;
+          return state;
+        },
+        /*#__PURE__*/
+        _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee5() {
+          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            while (1) {
+              switch (_context5.prev = _context5.next) {
+                case 0:
+                  if (!save) {
+                    _context5.next = 12;
+                    break;
+                  }
+
+                  _context5.prev = 1;
+                  _context5.next = 4;
+                  return _this6.save();
+
+                case 4:
+                  resolve(true);
+                  _context5.next = 10;
+                  break;
+
+                case 7:
+                  _context5.prev = 7;
+                  _context5.t0 = _context5["catch"](1);
+                  reject(_context5.t0);
+
+                case 10:
+                  _context5.next = 13;
+                  break;
+
+                case 12:
+                  resolve(true);
+
+                case 13:
+                case "end":
+                  return _context5.stop();
+              }
+            }
+          }, _callee5, this, [[1, 7]]);
+        })));
+      });
+    }
+  }, {
     key: "updateAuthentication",
     value: function () {
       var _updateAuthentication = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee5(account) {
+      regeneratorRuntime.mark(function _callee6(account) {
         var _this7 = this;
 
         var token,
-            _args5 = arguments;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            _args6 = arguments;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                token = _args5.length > 1 && _args5[1] !== undefined ? _args5[1] : null;
-                _context5.next = 3;
+                token = _args6.length > 1 && _args6[1] !== undefined ? _args6[1] : null;
+                _context6.next = 3;
                 return new Promise(function (resolve, reject) {
                   _this7.setState(function (state) {
                     if (token === null || token === undefined) {
@@ -41621,13 +41700,13 @@ function (_React$Component) {
 
               case 4:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee6, this);
       }));
 
-      function updateAuthentication(_x) {
+      function updateAuthentication(_x3) {
         return _updateAuthentication.apply(this, arguments);
       }
 
@@ -41693,9 +41772,16 @@ function (_React$Component) {
         onClick: this.createSession
       }, " create a new session."))), _react.default.createElement(_Footer.default, null, _react.default.createElement("span", {
         className: "messageLeft"
-      }, _react.default.createElement("small", null, this.state.message)), _react.default.createElement("span", {
+      }, _react.default.createElement("small", {
+        className: "readout"
+      }, this.state.message)), _react.default.createElement("span", {
         className: "messageRight"
-      }, _react.default.createElement("small", null, _react.default.createElement("span", null, this.hasToken() ? '' : 'Login to enable session storage.'), _react.default.createElement("a", {
+      }, _react.default.createElement("small", null, _react.default.createElement("span", {
+        className: "readout"
+      }, this.hasToken() ? '' : 'Login to enable session storage.'), _react.default.createElement(_Import.default, {
+        onImport: this.import
+      }), _react.default.createElement("a", {
+        className: "link",
         download: "export.json",
         href: "data:application/octet-stream,".concat(encodeURIComponent(JSON.stringify(this.state.data, null, 2)))
       }, "export")))));
@@ -41707,7 +41793,7 @@ function (_React$Component) {
 
 var _default = App;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/components/Header":"components/Header.js","~/components/Footer":"components/Footer.js","~/components/Auth":"components/Auth.js","~/components/Logo":"components/Logo.js","~/components/Message":"components/Message.js","~/services/remote":"services/remote.js","~/services/local":"services/local.js","~/services/messages":"services/messages.js","~/settings":"settings.js","~/utilities/uniqueId":"utilities/uniqueId.js","q":"../../node_modules/q/q.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/components/Mine":"components/Mine.js","~/components/Next":"components/Next.js","~/components/Header":"components/Header.js","~/components/Footer":"components/Footer.js","~/components/Auth":"components/Auth.js","~/components/Logo":"components/Logo.js","~/components/Message":"components/Message.js","~/components/Import":"components/Import.js","~/services/remote":"services/remote.js","~/services/local":"services/local.js","~/services/messages":"services/messages.js","~/settings":"settings.js","~/utilities/uniqueId":"utilities/uniqueId.js","q":"../../node_modules/q/q.js"}],"components/SwitchNetwork.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -100820,7 +100906,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49879" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53705" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
