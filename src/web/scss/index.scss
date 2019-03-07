@@ -207,6 +207,8 @@ footer {
         transition : border 5500ms ease-out;
         margin-bottom: $padding;
         margin-top: 2px;
+        max-height: 500px;
+        overflow: scroll;
 
         &:focus {
             outline: none;
