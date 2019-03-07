@@ -1,7 +1,7 @@
 const map = new WeakMap()
 let index = 0;
 
-function weakKey(obj) {
+export default function weakKey(obj) {
     let key = map.get(obj)
     if (key) return key
 
@@ -10,5 +10,3 @@ function weakKey(obj) {
 
     return key
 }
-
-export default weakKey
