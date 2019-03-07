@@ -14,7 +14,11 @@ export default props => {
         reader.readAsText(importFile)
     }
 
-    return (<span className="import link">
+    const handleClick = (e) => {
+        input.click(e)
+    }
+
+    return (<span className="import">
         <input
             ref={ (ref) => setInput(ref) }
             type="file"
@@ -24,8 +28,10 @@ export default props => {
             onChange={ e => startImport(e.target.files[0]) } />
         <label
             htmlFor="importjson"
-            onClick={ e => {
-                input.click(e)
-            }}>import</label>
+            tabIndex="0"
+            className="link"
+            onKeyPress={ e => { if (e.key === 'Enter') handleClick(e) }}
+            onClick={ handleClick }>
+            import</label>
     </span>)
 }

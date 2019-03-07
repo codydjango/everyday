@@ -14,9 +14,7 @@ class Mine extends React.Component {
         this.startEdit = this.startEdit.bind(this)
         this.stopEdit = this.stopEdit.bind(this)
         this.createNew = this.createNew.bind(this)
-        this.pressHelp = this.pressHelp.bind(this)
-        this.depressHelp = this.depressHelp.bind(this)
-        this.leaveHelp = this.leaveHelp.bind(this)
+        this.toggleHelp = this.toggleHelp.bind(this)
         this.handleAction = props.handleAction
         this.handleClearDone = props.handleClearDone
         this.updateList = props.updateList
@@ -29,6 +27,7 @@ class Mine extends React.Component {
             state.list = props.list
             state.edit = false
             state.dragged = null
+            state.help = false
             return state
         }
 
@@ -49,6 +48,7 @@ class Mine extends React.Component {
 
     startEdit() {
         this.setState(state => {
+            state.help = false
             state.edit = true
             state.dragged = null
             return state
@@ -64,7 +64,7 @@ class Mine extends React.Component {
         })
     }
 
-    toggleEdit() {
+    toggleEdit(e) {
         if (this.state.edit) {
             this.stopEdit()
         } else {
@@ -72,18 +72,12 @@ class Mine extends React.Component {
         }
     }
 
-    pressHelp() {
-        this.setState({ help: true })
-    }
-
-    depressHelp() {
-        this.setState({ help: false})
-    }
-
-    leaveHelp() {
-        if (this.state.help) {
-            this.setState({ help: false})
-        }
+    toggleHelp() {
+        this.setState(state => {
+            if (state.help == false && state.edit == true) state.edit = false
+            state.help = !state.help
+            return state
+        })
     }
 
     onUpdate({ list, dragged }) {
@@ -125,26 +119,15 @@ class Mine extends React.Component {
             <CreateTask createNew={ this.createNew } />
             <footer>
                 <div>
-                    <Link text={ (this.state.edit) ? 'done' : 'edit' }
-                        onClick={ (e) => {
+                    <Link text={ (this.state.edit) ? 'done edit' : 'edit' }
+                        onClick={ e => {
                             e.preventDefault()
                             this.toggleEdit()
                         } } />
-                    <Link text={ (this.state.help) ? 'ahh!' : 'help' }
-                        onMouseLeave={ e => {
-                            e.preventDefault()
-                            this.leaveHelp()
-                        } }
-                        onMouseUp={ e => {
-                            e.preventDefault()
-                            this.depressHelp()
-                        } }
-                        onMouseDown={ e => {
-                            e.preventDefault()
-                            this.pressHelp()
-                        } }
+                    <Link text={ (this.state.help) ? 'done help' : 'help' }
                         onClick={ e => {
                             e.preventDefault()
+                            this.toggleHelp()
                         } } />
                     <Link text="reset"
                         onClick={ e => {
