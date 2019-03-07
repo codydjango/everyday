@@ -27,6 +27,14 @@ $backgroundYellowBorderFocus: rgb(209, 209, 3);
             user-select: text;
 }
 
+html {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
 html, body {
     border: 0;
     padding: 0;
