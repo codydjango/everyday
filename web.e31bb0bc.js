@@ -26059,12 +26059,8 @@ var _default = function _default(props) {
   };
 
   return _react.default.createElement("div", {
-    className: "createTask"
-  }, _react.default.createElement(_Button.default, {
-    className: "submitTask",
-    text: "add",
-    action: handleClick
-  }), _react.default.createElement("div", {
+    className: "formLine"
+  }, _react.default.createElement("div", {
     className: "field ".concat(error ? "error" : "")
   }, _react.default.createElement("label", {
     htmlFor: "taskName"
@@ -26080,7 +26076,11 @@ var _default = function _default(props) {
       if (key === 'Enter') handleClick();
     },
     onChange: handleChange
-  })));
+  })), _react.default.createElement(_Button.default, {
+    className: "button",
+    text: "add",
+    action: handleClick
+  }));
 };
 
 exports.default = _default;
@@ -28117,7 +28117,156 @@ function debounce(func, wait, immediate) {
     if (callNow) func.apply(context, args);
   };
 }
-},{}],"components/Notes.js":[function(require,module,exports) {
+},{}],"components/Archive.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+var _Button = _interopRequireDefault(require("~/components/Button"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+var Archive =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(Archive, _React$Component);
+
+  function Archive(props) {
+    var _this;
+
+    _classCallCheck(this, Archive);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Archive).call(this, props));
+    _this.nameRef = _react.default.createRef();
+    _this.state = {};
+    _this.saveNote = _this.saveNote.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.loadNote = _this.loadNote.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    return _this;
+  }
+
+  _createClass(Archive, [{
+    key: "setError",
+    value: function setError(error) {
+      var _this2 = this;
+
+      var resetError = function resetError() {
+        _this2.setState(function (state) {
+          delete state.error;
+          return state;
+        });
+      };
+
+      this.setState(function (state) {
+        setTimeout(resetError, 3000);
+        state.error = error;
+        return state;
+      });
+    }
+  }, {
+    key: "saveNote",
+    value: function saveNote() {
+      var name = this.nameRef.current.value;
+      var validLength = name.length > 3;
+      var availableName = this.props.notes.archive.map(function (v) {
+        return v[0];
+      }).indexOf(name) == -1;
+      if (!validLength) return this.setError('needs more characters');
+      if (!availableName) return this.setError('name already exists');
+      this.props.onSave(name);
+      this.nameRef.current.value = '';
+    }
+  }, {
+    key: "loadNote",
+    value: function loadNote(e) {
+      alert('loading coming soon!');
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this3 = this;
+
+      var archive = this.props.notes.archive;
+
+      var generatePreview = function generatePreview(html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var text = doc.body.textContent || '';
+        return "".concat(text.slice(0, 20), "...");
+      };
+
+      var listLink = function listLink(v) {
+        return _react.default.createElement("li", {
+          key: "key_".concat(v[0])
+        }, _react.default.createElement("a", {
+          role: "button",
+          href: "#",
+          onClick: function onClick(e) {
+            e.preventDefault();
+
+            _this3.loadNote(v);
+          }
+        }, _react.default.createElement("span", {
+          className: "title"
+        }, v[0]), _react.default.createElement("span", {
+          className: "preview"
+        }, generatePreview(v[1]))));
+      };
+
+      return _react.default.createElement("div", {
+        className: "archive"
+      }, _react.default.createElement("div", {
+        className: "formLine"
+      }, _react.default.createElement("div", {
+        className: "field ".concat(this.state.error ? "error" : "")
+      }, _react.default.createElement("label", {
+        htmlFor: "noteName"
+      }), _react.default.createElement("input", {
+        ref: this.nameRef,
+        type: "text",
+        name: "noteName",
+        onKeyPress: function onKeyPress(_ref) {
+          var key = _ref.key;
+          if (key === 'Enter') _this3.saveNote();
+        },
+        placeholder: "name"
+      })), _react.default.createElement(_Button.default, {
+        text: "archive",
+        className: "button",
+        action: this.saveNote
+      })), archive.length > 0 ? _react.default.createElement("ul", null, archive.map(listLink)) : '');
+    }
+  }]);
+
+  return Archive;
+}(_react.default.Component);
+
+var _default = Archive;
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js","~/components/Button":"components/Button.js"}],"components/Notes.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28131,7 +28280,7 @@ var _dompurify = _interopRequireDefault(require("dompurify"));
 
 var _debounce = _interopRequireDefault(require("~/utilities/debounce"));
 
-var _Button = _interopRequireDefault(require("~/components/Button"));
+var _Archive = _interopRequireDefault(require("~/components/Archive"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28160,15 +28309,15 @@ var _default = function _default(props) {
       dirty = _useState4[0],
       setDirty = _useState4[1];
 
-  var notes = props.notes;
+  var current = props.notes.current;
   var debouncedOnUpdate = (0, _debounce.default)(function (html) {
-    notes = html;
+    current = _dompurify.default.sanitize(html);
     setDirty(true);
   }, 100);
 
   var createMarkup = function createMarkup() {
     return {
-      __html: notes
+      __html: current
     };
   };
 
@@ -28178,19 +28327,20 @@ var _default = function _default(props) {
     var _ref = _asyncToGenerator(
     /*#__PURE__*/
     regeneratorRuntime.mark(function _callee(e) {
-      var here;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return props.onUpdate(_dompurify.default.sanitize(notes));
+              return props.onUpdate({
+                current: current,
+                archive: props.notes.archive
+              });
 
             case 2:
-              here = _context.sent;
               setDirty(false);
 
-            case 4:
+            case 3:
             case "end":
               return _context.stop();
           }
@@ -28203,25 +28353,67 @@ var _default = function _default(props) {
     };
   }();
 
+  var handleArchiveSave =
+  /*#__PURE__*/
+  function () {
+    var _ref2 = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee2(name) {
+      var archive;
+      return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              archive = props.notes.archive.slice(0);
+              archive.push([name, current]);
+              _context2.next = 4;
+              return props.onUpdate({
+                current: '',
+                archive: archive
+              });
+
+            case 4:
+              setDirty(false);
+
+            case 5:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, _callee2, this);
+    }));
+
+    return function handleArchiveSave(_x2) {
+      return _ref2.apply(this, arguments);
+    };
+  }();
+
   return _react.default.createElement("div", {
-    className: "notes field ".concat(error ? "error" : "")
-  }, _react.default.createElement("h4", null, "Scratchpad"), _react.default.createElement("div", {
-    className: "notesInput",
+    className: "notes"
+  }, _react.default.createElement("div", {
+    className: "flex"
+  }, _react.default.createElement("span", {
+    className: "flexLeft"
+  }, _react.default.createElement("h4", {
+    children: "Scratchpad"
+  })), _react.default.createElement("span", null, _react.default.createElement("small", {
+    children: dirty ? "Unsaved..." : "Saved."
+  }))), _react.default.createElement("div", {
+    className: "notesInput field ".concat(error ? "error" : ""),
     contentEditable: true,
     onInput: function onInput(e) {
       debouncedOnUpdate(e.currentTarget.innerHTML);
     },
     onBlur: handleSave,
     dangerouslySetInnerHTML: createMarkup()
-  }), _react.default.createElement("span", {
-    className: "readout"
-  }, _react.default.createElement("small", {
-    children: dirty ? "Unsaved..." : "Saved."
-  })));
+  }), _react.default.createElement(_Archive.default, {
+    notes: props.notes,
+    onSave: handleArchiveSave
+  }));
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","dompurify":"../../node_modules/dompurify/dist/purify.js","~/utilities/debounce":"utilities/debounce.js","~/components/Button":"components/Button.js"}],"components/Next.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","dompurify":"../../node_modules/dompurify/dist/purify.js","~/utilities/debounce":"utilities/debounce.js","~/components/Archive":"components/Archive.js"}],"components/Next.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28398,8 +28590,13 @@ function (_React$Component) {
     }
   }, {
     key: "handleNotesUpdate",
-    value: function handleNotesUpdate(text) {
-      return this.props.updateNotes(text);
+    value: function handleNotesUpdate(_ref) {
+      var current = _ref.current,
+          archive = _ref.archive;
+      return this.props.updateNotes({
+        current: current,
+        archive: archive
+      });
     }
   }, {
     key: "getTotals",
@@ -28435,7 +28632,12 @@ function (_React$Component) {
       }), _react.default.createElement(_Button.default, {
         action: this.handleToggleTimer,
         text: this.state.time
-      })) : _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "Your brain is so strong."), _react.default.createElement("p", null, _react.default.createElement("small", null, "Go drink more water.")))), _react.default.createElement(_Notes.default, {
+      }), _react.default.createElement("label", {
+        htmlFor: "autoStartTimer"
+      }, _react.default.createElement("input", {
+        id: "autoStartTimer",
+        type: "checkbox"
+      }), _react.default.createElement("span", null, "auto-start"))) : _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "Your brain is so strong."), _react.default.createElement("p", null, _react.default.createElement("small", null, "Go drink more water.")))), _react.default.createElement(_Notes.default, {
         notes: this.props.notes,
         onUpdate: this.handleNotesUpdate
       }));
@@ -41328,7 +41530,10 @@ function (_React$Component) {
       account: props.defaultAccount,
       token: props.token,
       data: {
-        notes: '<p>default paragraph notes</p>'
+        notes: {
+          current: '<p>default paragraph notes</p>',
+          archive: []
+        }
       },
       message: (0, _messages.randomFromList)(_messages.messages.hello)
     };
@@ -41615,9 +41820,25 @@ function (_React$Component) {
       var _this6 = this;
 
       var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      function parse(d) {
+        if (typeof d === 'string') return {
+          current: notes,
+          archive: []
+        };
+        return notes;
+      }
+
+      var _parse = parse(notes),
+          current = _parse.current,
+          archive = _parse.archive;
+
       return new Promise(function (resolve, reject) {
         _this6.setState(function (state) {
-          state.data.notes = notes;
+          state.data.notes = {
+            current: current,
+            archive: archive
+          };
           return state;
         },
         /*#__PURE__*/
@@ -100906,7 +101127,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53705" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57044" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
