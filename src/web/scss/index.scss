@@ -3,6 +3,7 @@
 
 $padding: 4px;
 $marginBottom: 14px;
+$shortMarginBottom: 5px;
 $titleMarginBottom: 10px;
 $backgroundYellow: rgb(243, 243, 0);
 $backgroundYellowBorder: #e5e700;
@@ -325,15 +326,17 @@ footer {
     }
 }
 
-.createTask {
+.formLine {
     display: flex;
     flex-flow: row nowrap;
     align-items: flex-start;
-    margin-bottom: $marginBottom;
+    margin-bottom: $shortMarginBottom;
+
+    .button {
+        margin: 0 0 0 2px;
+    }
 
     .field {
-        width: 100%;
-        box-sizing: border-box;
         flex: 1;
         padding: 0px;
         margin: 0px;
@@ -343,17 +346,9 @@ footer {
         }
 
         input {
-            // padding: 0px;
-            // margin: 0px;
-            // border: 1px;
-            box-sizing: border-box;
-            // border-width: 1px;
             background-color: $backgroundYellow;
             border: 1px solid $backgroundYellowBorder;
             width: 100%;
-            -webkit-transition : border 500ms ease-out;
-            -moz-transition : border 500ms ease-out;
-            -o-transition : border 500ms ease-out;
             transition : border 500ms ease-out;
         }
 
@@ -363,14 +358,53 @@ footer {
             }
         }
     }
-
-    .submitTask {
-        // flex: 0;
-        margin: 0 2px 0 0;
-        // margin: 0;
-        // border-width: 0px;
-        // box-sizing: border-box;
-    }
 }
 
 
+.archive {
+    height: 300px;
+    ul {
+        padding: 0px;
+        list-style-position: inside;
+        margin: 0;
+        border: 1px dashed $backgroundYellowBorder;
+
+        li {
+            border-bottom: 1px dashed $backgroundYellowBorder;
+            margin: 0px;
+            padding: 0px;
+            font-style: italic;
+            display: block;
+
+            a {
+                text-decoration: none;
+                width: 100%;
+                display: block;
+            }
+
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+    }
+}
+
+.flex {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+
+    .flexLeft {
+        flex: 1;
+        display: inline;
+
+        h4 {
+            display: inline;
+        }
+    }
+
+    .archorRight {
+        flex: 0;
+        display: inline;
+    }
+}

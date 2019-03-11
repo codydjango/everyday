@@ -123,19 +123,28 @@ $divisionPadding: 16px;
             padding-top: 0px;
             padding-bottom: 0px;
             flex: 1;
-            display: flex;
-            flex-direction: column;
+            // display: flex;
+            // flex-direction: column;
             position: relative;
+
+            .today {
+                height: auto;
+            }
 
             .notes {
                 position: relative;
                 display: block;
-                height: 100%;
-                padding-top: $marginBottom;
-                flex: 1;
+                height: auto;
+                margin-top: $marginBottom;
 
                 .notesInput {
                     height: 100%;
+                }
+
+                .archive {
+                    position: relative;
+                    display: block;
+                    height: auto;
                 }
             }
         }

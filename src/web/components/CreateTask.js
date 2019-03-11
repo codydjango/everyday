@@ -27,13 +27,7 @@ export default props => {
     }
 
     return (
-    <div className="createTask">
-
-        <Button
-            className="submitTask"
-            text="add"
-            action={ handleClick }/>
-
+    <div className="formLine">
         <div className={ `field ${ (error) ? "error" : "" }` }>
             <label htmlFor="taskName">task</label>
             <input
@@ -44,5 +38,11 @@ export default props => {
                 onKeyPress={ ({ key }) => { if (key === 'Enter') handleClick() }}
                 onChange={ handleChange } />
         </div>
+
+        <Button
+            className="button"
+            text="add"
+            action={ handleClick }/>
+
     </div>)
 }

@@ -111,8 +111,8 @@ class Next extends React.Component {
         ;(this.timer.active) ? this.timer.stop() : this.timer.start(timerType, limit)
     }
 
-    handleNotesUpdate(text) {
-        return this.props.updateNotes(text)
+    handleNotesUpdate({ current, archive }) {
+        return this.props.updateNotes({ current, archive })
     }
 
     getTotals() {
@@ -135,6 +135,10 @@ class Next extends React.Component {
 
                         <Button action={ this.handleNotNow } text="not now" />
                         <Button action={ this.handleToggleTimer } text={ this.state.time } />
+                        <label htmlFor="autoStartTimer">
+                            <input id="autoStartTimer" type="checkbox"></input>
+                            <span>auto-start</span>
+                        </label>
                         {/* <Totals totals={ this.getTotals() } /> */}
                     </React.Fragment>
                 ) : (
@@ -146,7 +150,7 @@ class Next extends React.Component {
             </div>
 
             <Notes
-                notes={ this.props.notes }
+                notes={this.props.notes}
                 onUpdate={ this.handleNotesUpdate } />
         </div>)
     }

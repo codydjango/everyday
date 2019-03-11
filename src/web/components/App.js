@@ -43,7 +43,10 @@ class App extends React.Component {
             account: props.defaultAccount,
             token: props.token,
             data: {
-                notes: '<p>default paragraph notes</p>'
+                notes: {
+                    current: '<p>default paragraph notes</p>',
+                    archive: []
+                }
             },
             message: randomFromList(messages.hello)
         }
@@ -170,9 +173,16 @@ class App extends React.Component {
     }
 
     updateNotes(notes, save=true) {
+        function parse(d) {
+            if (typeof d === 'string') return { current: notes, archive: [] }
+            return notes
+        }
+
+        const { current, archive } = parse(notes)
+
         return new Promise((resolve, reject) => {
             this.setState(state => {
-                state.data.notes = notes
+                state.data.notes = { current, archive }
                 return state
             }, async () => {
                 if (save) {
