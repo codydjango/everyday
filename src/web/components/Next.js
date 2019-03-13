@@ -128,7 +128,7 @@ class Next extends React.Component {
             <div className="today">
                 { (Next.hasTasksAndActive(this.props.list)) ? (
                     <React.Fragment>
-                        <h2>{ this.activeTask.text }</h2>
+                        <h2>{ this.activeTask.text.toLowerCase() }</h2>
                         { (this.activeTask.checked)
                             ? (<Button id="undo" ref={ this.props.doneRef } action={ this.handleUndo } text="undo" />)
                             : (<Button id="done" ref={ this.props.doneRef } action={ this.handleDone } text="done" />)}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import TaskList from '~/components/TaskList'
 import Link from '~/components/Link'
-import CreateTask from '~/components/CreateTask'
+import FormLine from '~/components/FormLine'
 import uniqueId from '~/utilities/uniqueId'
 
 class Mine extends React.Component {
@@ -13,7 +13,7 @@ class Mine extends React.Component {
         this.toggleEdit = this.toggleEdit.bind(this)
         this.startEdit = this.startEdit.bind(this)
         this.stopEdit = this.stopEdit.bind(this)
-        this.createNew = this.createNew.bind(this)
+        this.createNewTask = this.createNewTask.bind(this)
         this.toggleHelp = this.toggleHelp.bind(this)
         this.handleAction = props.handleAction
         this.handleClearDone = props.handleClearDone
@@ -34,7 +34,7 @@ class Mine extends React.Component {
         return null
     }
 
-    createNew(task) {
+    createNewTask(task) {
         let list = this.state.list.slice(0)
 
         list.push({
@@ -116,7 +116,15 @@ class Mine extends React.Component {
                 dragged={ this.state.dragged }
                 onUpdate={ this.onUpdate }
                 onClick={ this.handleAction } />
-            <CreateTask createNew={ this.createNew } />
+            <FormLine
+                onSubmit={ value => this.createNewTask(value) }
+                validators={ [value => {
+                    const validLength = (value && value.length > 3)
+                    if (!validLength) throw FormLine.validationError('needs more characters')
+                    return value
+                }] }
+                inputPlaceholder="task"
+                submitText="add" />
             <footer>
                 <div>
                     <Link text={ (this.state.edit) ? 'done edit' : 'edit' }

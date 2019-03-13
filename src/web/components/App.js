@@ -221,6 +221,7 @@ class App extends React.Component {
 
     handleReset(listType='default') {
         this.updateList(App.resetList(listType))
+        this.updateNotes({ current: 'hi cody', archive: [] })
     }
 
     handleSetActive(id) {

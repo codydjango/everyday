@@ -326,69 +326,6 @@ footer {
     }
 }
 
-.formLine {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: flex-start;
-    margin-bottom: $shortMarginBottom;
-
-    .button {
-        margin: 0 0 0 2px;
-    }
-
-    .field {
-        flex: 1;
-        padding: 0px;
-        margin: 0px;
-
-        label {
-            display: none;
-        }
-
-        input {
-            background-color: $backgroundYellow;
-            border: 1px solid $backgroundYellowBorder;
-            width: 100%;
-            transition : border 500ms ease-out;
-        }
-
-        &.error {
-            input {
-                border-color: #ff0202;
-            }
-        }
-    }
-}
-
-
-.archive {
-    height: 300px;
-    ul {
-        padding: 0px;
-        list-style-position: inside;
-        margin: 0;
-        border: 1px dashed $backgroundYellowBorder;
-
-        li {
-            border-bottom: 1px dashed $backgroundYellowBorder;
-            margin: 0px;
-            padding: 0px;
-            font-style: italic;
-            display: block;
-
-            a {
-                text-decoration: none;
-                width: 100%;
-                display: block;
-            }
-
-            &:last-child {
-                border-bottom: none;
-            }
-        }
-    }
-}
-
 .flex {
     display: flex;
     flex-flow: row nowrap;
