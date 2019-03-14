@@ -44,20 +44,20 @@ export default async function web3Init() {
         defaultAccount = (await window.ethereum.enable())[0]
         otherDefaultAccount = (await web3.eth.getAccounts())[0]
 
-        console.log(`web3 enabled with default account: ${ defaultAccount }`)
-        console.log(`web3 enabled with other default account: ${ otherDefaultAccount }`)
+        // console.log(`web3 enabled with default account: ${ defaultAccount }`)
+        // console.log(`web3 enabled with other default account: ${ otherDefaultAccount }`)
         // use the checksum address
         defaultAccount = otherDefaultAccount
     }
 
     const web3Version = web3.version.api || web3.version
-    console.log(`web3 version: ${ web3Version }`)
+    // console.log(`web3 version: ${ web3Version }`)
     const providerType = getProviderType(provider)
-    console.log(`web3 provider type: ${ providerType }`)
+    // console.log(`web3 provider type: ${ providerType }`)
     const isConnected = (providerType === "metamask") ? provider.isConnected() : provider.connected
-    console.log(`web3 provider connected: ${ isConnected }`)
+    // console.log(`web3 provider connected: ${ isConnected }`)
     const networkType = await getNetworkType(web3)
-    console.log(`web3 connected network: ${ networkType }`)
+    // console.log(`web3 connected network: ${ networkType }`)
 
     return {
         web3,
