@@ -4,7 +4,7 @@
 
 Everyday is an ethereum-integrated habit-former. As difficult tasks become habitual, update your routine for continuous improvement.
 
-It takes 30 days to ingrain a new habit. Get started now.
+It takes 30 days to normalize a new habit. Get started now.
 
 ### How does this work?
 
