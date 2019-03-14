@@ -1,63 +1,51 @@
 import React from 'react'
-import axios from 'axios'
-import Cookies from 'js-cookie'
-import { ENDPOINT, ENVIRONMENT } from '~/settings'
+
+import web3Init from '~/web3init'
+import { withContext } from '~/hoc'
+import { AuthenticationContext, StatusContext } from '~/context'
 import getOrdinal from '~/utilities/getOrdinal'
+import comms from '~/services/comms'
 
 import 'babel-polyfill'
 
 const noAccountError = new Error('no accounts')
 
 class Auth extends React.Component {
-    static parseJwt(token) {
-        const base64Url = token.split('.')[1]
-        const base64 = base64Url.replace('-', '+').replace('_', '/')
-
-        return JSON.parse(window.atob(base64))
-    }
-
-    static verifyTokenForAccount(account, token) {
-        if (!account) return false
-
-        try {
-            return (account === Auth.parseJwt(token).account)
-        } catch (err) {
-            // console.log(`Auth error parsing ${ token }`, err)
-            return false
-        }
-    }
-
     constructor(props) {
         super(props)
-
-        this.url = ENDPOINT
-        this.web3 = props.web3
-
-        // upstream callbacks
-        this.callback = props.callback
-
-        // handlers
+        this.web3 = window.web3
+        this.state = {}
         this.login = this.login.bind(this)
         this.logout = this.logout.bind(this)
-        this.attemptSwitchAccount = this.attemptSwitchAccount.bind(this)
         this.checkIfNewAccount = this.checkIfNewAccount.bind(this)
     }
 
-    componentDidMount() {
+    async componentDidMount() {
+        const { defaultAccount } = await web3Init(window)
+        const token = comms.getCookie(defaultAccount)
+
+        console.log(`default account: ${ defaultAccount }`)
+        console.log(`token: ${ token }`)
+
         setTimeout(() => {
             this.pingForActiveAccount()
         }, 1)
 
-        if (Auth.verifyTokenForAccount(this.props.account, this.props.token)) {
-            this.setToken(this.props.account, this.props.token)
-        }
+        this.props.updateAuth({ account: defaultAccount, token })
     }
 
     async checkIfNewAccount() {
         let account = (await this.web3.eth.getAccounts())[0]
         if (!account) throw noAccountError
         if (account !== this.props.account) {
-            this.callback(account, this.attemptSwitchAccount(account))
+            this.props.updateAuth({ account, token: comms.getCookie(account) })
+
+            if (this.props.verified) {
+                this.props.updateStatus('You have successfully switched verified accounts.')
+            } else {
+                this.props.updateStatus('You have successfully switched accounts but you are not verified.')
+            }
+
         }
     }
 
@@ -67,14 +55,13 @@ class Auth extends React.Component {
             this.checkIfNewAccount().catch(reject)
 
             // continue to check every 3 seconds
-            this.checkAccountTimer = setInterval(() => {
-                this.checkIfNewAccount().catch(reject)
-            }, 3000)
+            this.checkAccountTimer = setInterval(() => { this.checkIfNewAccount().catch(reject) }, 3000)
         })
 
         promise.catch(err => {
             if (err === noAccountError) {
-                this.callback(undefined, undefined)
+                this.props.updateAuth(undefined, undefined)
+                this.props.updateStatus('You don\'t have a session with this account.')
             } else {
                 console.error('err', err)
             }
@@ -91,20 +78,12 @@ class Auth extends React.Component {
     }
 
     async fetchNonce(account) {
-        const response = await axios.get(`${ this.url }/account/${ account }/nonce/`, {
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
+        const response = await comms.get(`/account/${ account }/nonce/`)
         return response.data.nonce
     }
 
     async authenticate(account, signature) {
-        const response = await axios.post(`${ this.url }/authentication/`, {
-            account,
-            signature
-        })
-
+        const response = await comms.post('/authentication/', { account, signature})
         return response.data.token
     }
 
@@ -118,49 +97,21 @@ class Auth extends React.Component {
             nonce = await this.fetchNonce(account)
             signature = await this.signMessage(account, nonce)
             token = await this.authenticate(account, signature)
+
+            this.props.updateStatus('Nice to see you again.')
         } catch (err) {
             console.error('error login with metamask', err)
-            alert('error logging in with metamask')
+            this.props.updateStatus('Error logging in with metamask.')
             return
         }
 
-        this.setToken(account, token)
-        this.callback(account, token)
+        this.props.updateAuth({ account, token })
     }
 
     logout(e) {
         e.preventDefault()
-        const account = this.props.account
-        Cookies.remove(account)
-        delete axios.defaults.headers.common['Authorization']
-        this.callback(account, null)
-    }
-
-    attemptSwitchAccount(account) {
-        const oldAccount = this.props.account
-        Cookies.remove(oldAccount)
-        delete axios.defaults.headers.common['Authorization']
-
-        const token = Cookies.get(account)
-
-        if (token) {
-            Cookies.set(account, token, { secure: (ENVIRONMENT === 'production') })
-            axios.defaults.headers.common['Authorization'] = token
-        }
-
-        return token
-    }
-
-    setToken(account, token) {
-        const oldAccount = this.props.account
-
-        Cookies.remove(oldAccount)
-        delete axios.defaults.headers.common['Authorization']
-
-        if (account && token) {
-            Cookies.set(account, token, { secure: (ENVIRONMENT === 'production') })
-            axios.defaults.headers.common['Authorization'] = token
-        }
+        this.props.updateAuth({ account: this.props.account, token: null}, true)
+        this.props.updateStatus('I hope to see you again soon')
     }
 
     isLoggedIn() {
@@ -168,6 +119,8 @@ class Auth extends React.Component {
     }
 
     hasAccount() {
+        console.log(`has verified: ${ this.props.account } ${ this.props.token } ${ this.props.verified }`)
+
         return (!!this.props.account)
     }
 
@@ -180,7 +133,7 @@ class Auth extends React.Component {
     }
 
     render() {
-        const showMetamaskPrompt = () => (<span className="authInfo">Log in to MetaMask</span>)
+        const showMetamaskPrompt = () => (<span className="authInfo">Log in to <a href="https://metamask.io/">MetaMask</a></span>)
 
         const showLoggedInName = () => (<span className="authInfo">
             <span className="loginWith">Logout from</span>
@@ -209,5 +162,5 @@ class Auth extends React.Component {
     }
 }
 
-export default Auth
+export default withContext(Auth, [AuthenticationContext, StatusContext])
 
