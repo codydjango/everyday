@@ -8,20 +8,17 @@
   box-sizing: border-box;
 }
 
-.container {
-  flex: 1;
-}
-
 .footer {
   height: 16px;
 }
 
-.container {
+.body {
+  flex: 1;
   min-width: 300px;
   display: block;
   position: relative;
 }
-.container .next {
+.body .work {
   width: auto;
   display: block;
   border-top: 1px dotted rgba(0, 0, 0, 0.2);
@@ -30,18 +27,12 @@
   margin-bottom: 16px;
   border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
 }
-.container .next .today {
+.body .work .now {
   height: auto;
 }
-.container .next .notes {
-  display: none;
-}
-.container .mine {
+.body .today {
   width: auto;
   display: block;
-}
-.container .theirs {
-  width: auto;
 }
 
 .header {
@@ -70,12 +61,12 @@
 }
 
 @media screen and (min-width: 576px) {
-  .container {
+  .body {
     display: flex;
     flex-flow: row nowrap;
     align-items: flex-start;
   }
-  .container .next {
+  .body .work {
     width: auto;
     order: 1;
     border: 0;
@@ -84,34 +75,14 @@
     flex: 1;
     position: relative;
   }
-  .container .next .today {
+  .body .work .now {
     height: auto;
   }
-  .container .next .notes {
-    position: relative;
-    display: block;
-    height: auto;
-    margin-top: 14px;
-  }
-  .container .next .notes .notesInput {
-    height: 100%;
-  }
-  .container .next .notes .archive {
-    position: relative;
-    display: block;
-    height: auto;
-  }
-  .container .mine {
-    width: 200px;
+  .body .today {
     order: 0;
     padding: 0;
     margin-right: 4px;
-  }
-  .container .theirs {
-    width: auto;
-    text-align: right;
-    flex: 1;
-    order: 2;
+    width: 200px;
   }
 }
 .noselect, body {
@@ -130,7 +101,7 @@
      supported by Chrome and Opera */
 }
 
-.selectable, .notes {
+.selectable {
   -webkit-touch-callout: text;
   -webkit-user-select: text;
   -khtml-user-select: text;
@@ -220,21 +191,6 @@ header {
   margin-bottom: 20px;
 }
 
-footer {
-  position: relative;
-}
-footer .messageLeft {
-  position: absolute;
-  text-align: left;
-  width: 100%;
-  font-weight: 700;
-}
-footer .messageRight {
-  position: absolute;
-  text-align: right;
-  width: 100%;
-}
-
 .messageScreen {
   display: flex;
   height: 98%;
@@ -310,32 +266,6 @@ footer .messageRight {
   font-style: italic;
 }
 
-.notes {
-  position: relative;
-}
-.notes .notesInput {
-  background-color: #f3f300;
-  border: 1px solid #e5e700;
-  margin: 0px;
-  padding: 4px;
-  width: 100%;
-  box-sizing: border-box;
-  min-width: 100%;
-  min-height: 100px;
-  -webkit-transition: border 5500ms ease-out;
-  -moz-transition: border 5500ms ease-out;
-  -o-transition: border 5500ms ease-out;
-  transition: border 5500ms ease-out;
-  margin-bottom: 4px;
-  margin-top: 2px;
-  max-height: 500px;
-  overflow: scroll;
-}
-.notes .notesInput:focus {
-  outline: none;
-  border: 1px solid #d1d103;
-}
-
 .duration {
   margin-right: 2px;
   color: green;
@@ -385,58 +315,6 @@ footer .messageRight {
 }
 .ascii-box .taskText.active {
   font-weight: 600;
-}
-
-.formLine {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: flex-start;
-  margin-bottom: 5px;
-}
-.formLine .button {
-  margin: 0 0 0 2px;
-}
-.formLine .field {
-  flex: 1;
-  padding: 0px;
-  margin: 0px;
-}
-.formLine .field label {
-  display: none;
-}
-.formLine .field input {
-  background-color: #f3f300;
-  border: 1px solid #e5e700;
-  width: 100%;
-  transition: border 500ms ease-out;
-}
-.formLine .field.error input {
-  border-color: #ff0202;
-}
-
-.archive {
-  height: 300px;
-}
-.archive ul {
-  padding: 0px;
-  list-style-position: inside;
-  margin: 0;
-  border: 1px dashed #e5e700;
-}
-.archive ul li {
-  border-bottom: 1px dashed #e5e700;
-  margin: 0px;
-  padding: 0px;
-  font-style: italic;
-  display: block;
-}
-.archive ul li a {
-  text-decoration: none;
-  width: 100%;
-  display: block;
-}
-.archive ul li:last-child {
-  border-bottom: none;
 }
 
 .flex {
