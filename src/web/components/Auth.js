@@ -2,7 +2,7 @@ import React from 'react'
 
 import web3Init from '~/web3init'
 import { withContext } from '~/hoc'
-import { AuthenticationContext, StatusContext } from '~/context'
+import { AuthContext, StatusContext } from '~/context'
 import getOrdinal from '~/utilities/getOrdinal'
 import comms from '~/services/comms'
 
@@ -45,7 +45,6 @@ class Auth extends React.Component {
             } else {
                 this.props.updateStatus('You have successfully switched accounts but you are not verified.')
             }
-
         }
     }
 
@@ -98,30 +97,18 @@ class Auth extends React.Component {
             signature = await this.signMessage(account, nonce)
             token = await this.authenticate(account, signature)
 
+            this.props.updateAuth({ account, token })
             this.props.updateStatus('Nice to see you again.')
         } catch (err) {
             console.error('error login with metamask', err)
             this.props.updateStatus('Error logging in with metamask.')
-            return
         }
-
-        this.props.updateAuth({ account, token })
     }
 
     logout(e) {
         e.preventDefault()
         this.props.updateAuth({ account: this.props.account, token: null}, true)
         this.props.updateStatus('I hope to see you again soon')
-    }
-
-    isLoggedIn() {
-        return (!!this.props.token)
-    }
-
-    hasAccount() {
-        console.log(`has verified: ${ this.props.account } ${ this.props.token } ${ this.props.verified }`)
-
-        return (!!this.props.account)
     }
 
     getShortAccount() {
@@ -146,8 +133,8 @@ class Auth extends React.Component {
         </div>)
 
         let show
-        if (this.hasAccount()) {
-            if (this.isLoggedIn()) {
+        if (this.props.hasAccount()) {
+            if (this.props.isLoggedIn()) {
                 show = showLoggedInName
             } else {
                 show = showLoginWithActiveMetamaskAccount
@@ -162,5 +149,5 @@ class Auth extends React.Component {
     }
 }
 
-export default withContext(Auth, [AuthenticationContext, StatusContext])
+export default withContext(Auth, [AuthContext, StatusContext])
 

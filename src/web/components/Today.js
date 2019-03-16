@@ -1,23 +1,42 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+import styled from 'styled-components'
+import produce from 'immer'
 import TaskList from '~/components/TaskList'
 import Link from '~/components/Link'
 import FormLine from '~/components/FormLine'
 import uniqueId from '~/utilities/uniqueId'
+import { StatusContext, ListContext } from '~/context'
+import { withContext } from '~/hoc'
 
-class Mine extends React.Component {
+const StyledDiv = styled.div`
+    margin-bottom: 14px;
+`
+
+export default withContext(class Today extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { list: props.list, edit: false, dragged: null, help: false }
+        this.state = {
+            edit: false,
+            dragged: null,
+            help: false,
+            list: props.list
+        }
+
         this.onUpdate = this.onUpdate.bind(this)
         this.toggleEdit = this.toggleEdit.bind(this)
         this.startEdit = this.startEdit.bind(this)
         this.stopEdit = this.stopEdit.bind(this)
         this.createNewTask = this.createNewTask.bind(this)
         this.toggleHelp = this.toggleHelp.bind(this)
-        this.handleAction = props.handleAction
-        this.handleClearDone = props.handleClearDone
-        this.updateList = props.updateList
+    }
+
+    componentDidMount() {
+        console.log('Today componentDidMount', this.props.list.length)
+    }
+
+    componentDidUpdate() {
+
     }
 
     static getDerivedStateFromProps(props, state) {
@@ -35,33 +54,27 @@ class Mine extends React.Component {
     }
 
     createNewTask(task) {
-        let list = this.state.list.slice(0)
-
-        list.push({
+        this.props.addToList({
             text: task,
             checked: false,
             id: uniqueId()
         })
-
-        this.updateList(list)
     }
 
     startEdit() {
-        this.setState(state => {
-            state.help = false
-            state.edit = true
-            state.dragged = null
-            return state
-        })
+        this.setState(produce(draft => {
+            draft.help = false
+            draft.edit = true
+            draft.dragged = null
+        }))
     }
 
     stopEdit() {
-        this.updateList(this.state.list)
-        this.setState(state => {
-            state.edit = false
-            state.dragged = null
-            return state
-        })
+        this.props.updateList(this.state.list)
+        this.setState(produce(draft => {
+            draft.edit = false
+            draft.dragged = null
+        }))
     }
 
     toggleEdit(e) {
@@ -81,11 +94,10 @@ class Mine extends React.Component {
     }
 
     onUpdate({ list, dragged }) {
-        this.setState(state => {
-            state.list = list
-            state.dragged = dragged
-            return state
-        })
+        this.setState(produce(draft => {
+            draft.list = list
+            draft.dragged = dragged
+        }))
     }
 
     render() {
@@ -108,14 +120,16 @@ class Mine extends React.Component {
             </ul>)
         }
 
-        return (<div className="mine">
+        return (<StyledDiv className={ this.props.className }>
             <h2>routine</h2>
+
             <TaskList
                 list={ this.state.list }
                 edit={ this.state.edit }
                 dragged={ this.state.dragged }
                 onUpdate={ this.onUpdate }
-                onClick={ this.handleAction } />
+                onClick={ this.props.setActiveListItem } />
+
             <FormLine
                 onSubmit={ value => this.createNewTask(value) }
                 validators={ [value => {
@@ -125,14 +139,15 @@ class Mine extends React.Component {
                 }] }
                 inputPlaceholder="task"
                 submitText="add" />
+
             <footer>
                 <div>
-                    <Link text={ (this.state.edit) ? 'done edit' : 'edit' }
+                    <Link text={ (this.state.edit) ? 'close' : 'edit' }
                         onClick={ e => {
                             e.preventDefault()
                             this.toggleEdit()
                         } } />
-                    <Link text={ (this.state.help) ? 'done help' : 'help' }
+                    <Link text={ (this.state.help) ? 'close' : 'help' }
                         onClick={ e => {
                             e.preventDefault()
                             this.toggleHelp()
@@ -140,14 +155,12 @@ class Mine extends React.Component {
                     <Link text="reset"
                         onClick={ e => {
                             e.preventDefault()
-                            this.handleClearDone()
+                            this.props.clearList()
                         } } />
                 </div>
                 { (this.state.edit) ? getEditInstruction() : '' }
                 { (this.state.help) ? getHelpInstruction() : '' }
             </footer>
-        </div>)
+        </StyledDiv>)
     }
-}
-
-export default Mine
+}, [ListContext, StatusContext])
