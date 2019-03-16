@@ -62,7 +62,6 @@ class Comms {
             token = null
         }
 
-        // always
         delete axios.defaults.headers.common['Authorization']
 
         if (account && token && Comms.verifyTokenForAccount(token, account)) {
@@ -74,11 +73,5 @@ class Comms {
         }
     }
 }
-
-
-
-
-
-
 
 export default new Comms()
