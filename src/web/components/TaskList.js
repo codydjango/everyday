@@ -2,6 +2,7 @@ import React from 'react'
 import Task from '~/components/Task'
 import getKey from '~/utilities/getKey'
 import throttle from '~/utilities/throttle'
+import produce from 'immer'
 
 function aggregates(list) {
     const counts = {}
@@ -34,7 +35,7 @@ export default props => {
         props.onUpdate({ list, dragged })
     }
 
-    const onDragEnd = (e) => {
+    const onDragEnd = e => {
         e.target.parentNode.classList.remove('dragged')
 
         let list = props.list
@@ -53,11 +54,15 @@ export default props => {
         props.onUpdate({ list, dragged })
     }
 
-    const onClick = (e, i) => {
+    const onClick = i => {
+        // delete
         let dragged = props.dragged
-        let list = props.list.slice(0)
-        list.splice(i, 1)
-        console.log('update the parent with the smaller list', list)
+        let list = produce(props.list, draft => {
+            if (draft.splice(i, 1)[0].active && draft.length > 0) {
+                draft[0].active = true
+            }
+        })
+
         props.onUpdate({ list, dragged })
     }
 
@@ -70,9 +75,9 @@ export default props => {
                         key={ getKey(item) }>
                         <div className="drag"
                             draggable
-                            onDragStart={ (e) => { onDragStart(e, i) }}
-                            onDragEnd={ (e) => { onDragEnd(e) }}
-                            onClick={ (e) => onClick(e, i) }>
+                            onDragStart={ e => { onDragStart(e, i) }}
+                            onDragEnd={ e => { onDragEnd(e) }}
+                            onClick={ e => onClick(i) }>
                             { editTask(item) }
                         </div>
                     </li>)
