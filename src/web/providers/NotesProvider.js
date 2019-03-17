@@ -2,6 +2,7 @@ import React from 'react'
 import produce from 'immer'
 import { NotesContext } from '~/context'
 import store from '~/services/store'
+import search from '~/services/search'
 
 function activeIndex(list) {
     const index = list.indexOf(list.filter(i => i.active)[0])

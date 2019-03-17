@@ -6,7 +6,12 @@ import store from '~/services/store'
 import { withContext } from '~/hoc'
 import { ListContext, NotesContext, AuthContext } from '~/context'
 
-const StyledDataInterface = styled.div``
+const StyledDataInterface = styled.small`
+    span {
+        display: inline-block;
+        overflow: hidden;
+    }
+`
 
 class DataInterface extends React.Component {
     render() {
@@ -35,16 +40,15 @@ class DataInterface extends React.Component {
             return `data:application/octet-stream,${ encoded }`
         }
 
-        return (<StyledDataInterface>
+        const className = this.props.className || ''
+
+        return (<StyledDataInterface className={ className }>
             { (hasData())
-            ? (<small>
-                    <span className="readout">{ (this.props.isLoggedIn()) ? '' : 'Login to enable session storage.'}</span>
+            ? ( <span>
                     <Import onImport={ handleImport }/>
                     <a className="link" download="export.json" href={ getHref() }>export</a>
-                </small>)
-            : (<small>
-                <span className="readout">Finding a session</span>
-                </small>)
+                </span>)
+            : ''
             }
         </StyledDataInterface>)
     }

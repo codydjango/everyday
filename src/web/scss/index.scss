@@ -111,52 +111,34 @@ p {
     padding-top: 0px;
 }
 
-header {
-    margin-bottom: 20px;
-}
-
-.messageScreen {
-    display: flex;
-    height: 98%;
-    align-items: center;
-    justify-content: center;
-
-    .message {
-        text-align: center;
-
-        .messageLine {
-            display: block;
-        }
-    }
-}
-
 .link {
     display: inline-block;
     padding: 2px;
     position: relative;
     color: #000;
     text-decoration: none;
-}
+    overflow: auto;
 
-.link::after {
-    content: '';
-    display: block;
-    position: absolute;
-    width: 92%;
-    height: 1px;
-    background: rgba(76, 76, 0, 1.000);
-    transition: height,margin-top .2s;
-    margin-top: -3px;
-}
+    &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        width: 92%;
+        height: 1px;
+        background: rgba(76, 76, 0, 1.000);
+        transition: height,margin-top .2s;
+        margin-top: -3px;
+    }
 
-.link:hover::after {
-    height: 2px;
-    margin-top: -1px;
-}
+    &:hover::after {
+        height: 2px;
+        margin-top: -1px;
+    }
 
-.link:focus::after {
-    height: 2px;
-    margin-top: -1px;
+    &:focus::after {
+        height: 2px;
+        margin-top: -1px;
+    }
 }
 
 .list {

@@ -1,6 +1,7 @@
 import React from 'react'
 import remote from '~/services/remote'
 import { messages, randomFromList } from '~/services/messages'
+import search from '~/services/search'
 
 class Store {
     register(name, context, deregister = false) {
@@ -11,10 +12,18 @@ class Store {
         }
     }
 
+    seed(data) {
+        if (data && data.notes) this.notes.updateNotes(data.notes, false)
+        if (data && data.list) this.list.updateList(data.list, false)
+
+        if (data && data.notes) search.addAll(data.notes)
+    }
+
     async load() {
         try {
             store.status.updateStatus('Loading from session...')
-            return await remote.load(this.auth.state.account)
+
+            this.seed(await remote.load(this.auth.state.account))
         } catch (err) {
             console.log('err loading', err)
             store.status.updateStatus(`Error retrieving from session storage.`)

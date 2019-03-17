@@ -1,11 +1,8 @@
 import React from 'react'
+import styled from 'styled-components'
 import { withContext } from '~/hoc'
 import { StatusContext } from '~/context'
 
-class Status extends React.Component {
-    render() {
-        return (<small className="readout">{ this.props.status }</small>)
-    }
-}
+const StyledSmall = styled.small``
 
-export default withContext(Status, StatusContext)
+export default withContext(({ className, status }) => (<StyledSmall className={ `${ className } status readout` }>{ status }</StyledSmall>), StatusContext)

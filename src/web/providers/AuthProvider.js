@@ -52,10 +52,7 @@ export default class AuthProvider extends React.Component {
                 })
             })
 
-            const data = await store.load()
-
-            if (data && data.notes) store.notes.updateNotes(data.notes, false)
-            if (data && data.list) store.list.updateList(data.list, false)
+            await store.load()
         } catch (err) {
             console.log('error updating auth', err)
         }

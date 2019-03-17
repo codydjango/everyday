@@ -5,7 +5,6 @@ $breakpoints: (
     lg: 1200px
 );
 
-$padding: 4px;
 $titleMarginBottom: 10px;
 $marginBottom: 14px;
 $divisionPadding: 16px;
@@ -28,26 +27,7 @@ $divisionPadding: 16px;
     }
 }
 
-
-#root {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-    padding: $padding;
-    box-sizing: border-box;
-}
-
-.footer {
-    height: 16px;
-}
-
-
 .body {
-    flex: 1;
-    min-width: 300px;
-    display: block;
-    position: relative;
-
     .work {
         width: auto;
         display: block;
@@ -56,43 +36,11 @@ $divisionPadding: 16px;
         padding-bottom: $divisionPadding;
         margin-bottom: $divisionPadding;
         border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
-
-        .now {
-            height: auto;
-        }
     }
 
     .today {
         width: auto;
         display: block;
-    }
-}
-
-.header {
-    min-width: 300px;
-    display: block;
-    position: relative;
-
-    .logo {
-        display: block;
-        h1 {
-            display: block
-        }
-    }
-}
-
-.header {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: flex-start;
-
-    .logo {
-        flex: 0;
-    }
-
-    .auth {
-        text-align: right;
-        flex: 1;
     }
 }
 
@@ -104,23 +52,19 @@ $divisionPadding: 16px;
         align-items: flex-start;
 
         .work {
+            flex: 1;
             width: auto;
             order: 1;
             border: 0;
             padding-top: 0px;
             padding-bottom: 0px;
-            flex: 1;
             position: relative;
-
-            .now {
-                height: auto;
-            }
         }
 
         .today {
             order: 0;
             padding: 0;
-            margin-right: $padding;
+            margin-right: 8px;
             width: 200px;
         }
     }

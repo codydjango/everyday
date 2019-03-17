@@ -1,24 +1,34 @@
 import React from 'react'
 import { render } from 'react-dom'
+
 import App from './Components/App'
-import SwitchNetwork from './components/SwitchNetwork'
-import InstallMetamask from './components/InstallMetamask'
 import web3Init from './web3init'
+import Message from '~/components/Message'
+import Layout from '~/components/Layout'
 
 import 'babel-polyfill'
 import './scss/index.scss'
 
-
 (async function init() {
     // figure out web3. we're gonna install our own and use an infura provider
     // if they don't have their own provider set up.
+
     const { providerType, networkType } = await web3Init(window)
 
-    // if no metamask ask to install
-    if (providerType !== "metamask") return render(<InstallMetamask />, document.getElementById('root'))
+    function getInitial() {
+        // if no metamask ask to install
+        if (providerType !== "metamask") return (<Message
+            className="container"
+            children="install metamask to continue" />)
 
-    // figure out network. If it's not on the mainnet give them a little prompt.
-    if (networkType !== 'main') return render(<SwitchNetwork />, document.getElementById('root'))
+        // figure out network. If it's not on the mainnet give them a little prompt.
+        if (networkType !== 'main') return (<Message
+                className="container"
+                children="please switch to the mainnet" />)
 
-    render(<App />, document.getElementById('root'))
+        // else return app
+        return (<App />)
+    }
+
+    render(<Layout>{ getInitial() }</Layout>, document.getElementById('root'))
 })()

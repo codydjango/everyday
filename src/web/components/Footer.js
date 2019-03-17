@@ -2,17 +2,21 @@ import React from 'react'
 import styled from 'styled-components'
 
 export default styled.footer`
+    display: flex;
     position: relative;
+    align-items: center;
+    flex-flow: row nowrap;
+    margin-bottom: 4px;
+
     .messageLeft {
-        position: absolute;
+        flex: 1;
+        display: block;
         text-align: left;
-        width: 100%;
         font-weight: 700;
     }
 
     .messageRight {
-        position: absolute;
+        display: block;
         text-align: right;
-        width: 100%;
     }
 `

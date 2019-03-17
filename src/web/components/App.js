@@ -8,6 +8,7 @@ import DataInterface from '~/components/DataInterface'
 import Today from '~/components/Today'
 import Now from '~/components/Now'
 import Scratchpad from '~/components/Scratchpad'
+import Header from '~/components/Header'
 import Footer from '~/components/Footer'
 
 import StatusProvider from '~/providers/StatusProvider'
@@ -16,20 +17,23 @@ import ListProvider from '~/providers/ListProvider'
 import NotesProvider from '~/providers/NotesProvider'
 import { withProvider } from '~/hoc'
 
-const Body = styled.div``
-const Header = styled.header``
+const Container = styled.div`
+    position: relative;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+`
+
+const Body = styled.div`
+    flex: 1;
+`
+
 const Work = styled.div``
 
 class App extends React.Component {
-
-    constructor(props) {
-        super(props)
-        // this.createSession = this.createSession.bind(this)
-    }
-
     render() {
         return (
-            <React.Fragment>
+            <Container className="container">
                 <Header className="header">
                     <Logo />
                     <Auth />
@@ -45,10 +49,10 @@ class App extends React.Component {
                 </Body>
 
                 <Footer className="footer">
-                    <span className="messageLeft"><Status /></span>
-                    <span className="messageRight"><DataInterface /></span>
+                    <Status className="messageLeft" />
+                    <DataInterface className="messageRight" />
                 </Footer>
-            </React.Fragment>
+            </Container>
         )
     }
 }
