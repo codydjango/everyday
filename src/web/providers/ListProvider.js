@@ -42,6 +42,11 @@ export default class ListProvider extends React.Component {
         this.undoActiveListItem = this.undoActiveListItem.bind(this)
         this.postponeActiveListItem = this.postponeActiveListItem.bind(this)
         this.addToList = this.addToList.bind(this)
+        this.syncToServer = this.syncToServer.bind(this)
+    }
+
+    syncToServer() {
+        setTimeout(() => { store.save() }, 100)
     }
 
     componentDidMount() {
@@ -73,13 +78,13 @@ export default class ListProvider extends React.Component {
 
             if (draft.list.length > 0)
                 draft.list[0].active = true
-        }))
+        }), this.syncToServer)
     }
 
     addToList(item) {
         this.setState(produce(draft => {
             draft.list.push(item)
-        }))
+        }), this.syncToServer)
     }
 
     setActiveListItem(id) {
@@ -90,6 +95,7 @@ export default class ListProvider extends React.Component {
             })
         }), () => {
             if (this.doneRef.current) this.doneRef.current.focus()
+            this.syncToServer()
         })
     }
 
@@ -100,13 +106,13 @@ export default class ListProvider extends React.Component {
             draft.list[index].checked = true
             draft.list[index].active = false
             draft.list = bumpActiveIndex(draft.list, index + 1)
-        }))
+        }), this.syncToServer)
     }
 
     undoActiveListItem() {
         this.setState(produce(draft => {
             draft.list.filter(i => i.active)[0].checked = false
-        }))
+        }), this.syncToServer)
     }
 
     postponeActiveListItem() {
@@ -114,7 +120,7 @@ export default class ListProvider extends React.Component {
             const index = activeIndex(draft.list)
             draft.list[index].active = false
             bumpActiveIndex(draft.list, index + 1)
-        }))
+        }), this.syncToServer)
     }
 
     render() {

@@ -1,5 +1,6 @@
 import React from 'react'
 import remote from '~/services/remote'
+import local from '~/services/local'
 import { messages, randomFromList } from '~/services/messages'
 import search from '~/services/search'
 
@@ -24,15 +25,21 @@ class Store {
      */
     async load() {
         if (this.auth.state.verified) {
-            this.status.updateStatus(`Loading from session account...`)
+            this.status.updateStatus(`loading from session storage...`)
             this.seed(await remote.load(this.auth.state.account))
         } else {
-            this.seed({ notes: [], list: []})
+            this.status.updateStatus(`Loading from local storage...`)
+            this.seed(await local.load(this.auth.state.account))
         }
 
         setTimeout(() => {
             this.status.updateStatus(randomFromList(messages.working))
         }, 1000 * 10)
+    }
+
+    create() {
+        this.seed({ notes: [], list: [] })
+        this.status.updateStatus('nice to have you with us.')
     }
 
     allData() {
@@ -55,11 +62,17 @@ class Store {
     async save() {
         try {
             this.status.updateStatus('Saving...')
-            await remote.save(this.auth.state.account, this.allData())
-            this.status.updateStatus(`Saved to session storage.`)
+            await local.save(this.auth.state.account, this.allData())
+
+            if (this.auth.state.verified) {
+                await remote.save(this.auth.state.account, this.allData())
+                this.status.updateStatus(`Saved to session storage.`)
+            } else {
+                this.status.updateStatus(`Saved to local storage.`)
+            }
         } catch (err) {
             console.log('error saving', err)
-            this.status.updateStatus(`Error retrieving from session storage.`)
+            this.status.updateStatus(`Error saving data.`)
         } finally {
             setTimeout(()=> {
                 this.status.updateStatus(randomFromList(messages.working))

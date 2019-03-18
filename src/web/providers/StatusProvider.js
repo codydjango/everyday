@@ -8,7 +8,7 @@ export default class StatusProvider extends React.Component {
         super(props)
 
         this.state = {
-            status: 'default message'
+            status: "it's so nice to see you!"
         }
 
         this.updateStatus = this.updateStatus.bind(this)

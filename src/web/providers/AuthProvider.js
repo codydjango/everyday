@@ -64,8 +64,11 @@ export default class AuthProvider extends React.Component {
         try {
             await store.load(this.state)
         } catch (err) {
-            if (err.response && err.response.status === 400) {
-                store.status.updateStatus(`Problem with authentication with account ${ auth.account }`)
+            if (err.response && err.response.status === 404) {
+                store.status.updateStatus(`no session data for ${ this.state.account }`)
+                await store.create(this.state)
+            } else if (err.response && err.response.status === 400) {
+                store.status.updateStatus(`Problem with authentication with account ${ this.state.account }`)
                 await this.forceLogout()
             } else {
                 store.status.updateStatus(`Error retrieving data from store`)

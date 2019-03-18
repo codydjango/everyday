@@ -18,6 +18,13 @@ class Remote {
 
     async load(account) {
         const response = await comms.get(`/account/${ account }/data/`)
+
+        if (response.status === 404) {
+            const err = new Error()
+            err.response = response
+            throw err
+        }
+
         return response.data
     }
 

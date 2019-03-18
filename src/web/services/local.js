@@ -1,4 +1,4 @@
-class Storage {
+class Local {
     constructor() {
         this.store = window.localStorage
         this.load = this.load.bind(this)
@@ -15,7 +15,12 @@ class Storage {
 
     async load(account) {
         const data = JSON.parse(this.store.getItem(account))
-        if (data === null || Object.entries(data).length === 0) throw new Error('nothing to be found in localstorage')
+        if (data === null || Object.entries(data).length === 0) {
+            const err = new Error('nothing to be found in localstorage')
+            err.response = {}
+            err.response.status = 404
+            throw err
+        }
         return data
     }
 
@@ -24,4 +29,4 @@ class Storage {
     }
 }
 
-export default new Storage()
+export default new Local()
