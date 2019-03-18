@@ -98785,7 +98785,7 @@ function (_React$Component) {
           className: "authInfo"
         }, _react.default.createElement("span", {
           className: "loginWith"
-        }, "Logout from"), _react.default.createElement("span", {
+        }, "logout from"), _react.default.createElement("span", {
           className: "loginAddress"
         }, _react.default.createElement("a", {
           href: "#",
@@ -98798,7 +98798,7 @@ function (_React$Component) {
           className: "authInfo"
         }, _react.default.createElement("span", {
           className: "loginWith"
-        }, "Login with"), _react.default.createElement("span", {
+        }, "login with"), _react.default.createElement("span", {
           className: "loginAddress"
         }, _react.default.createElement("a", {
           href: "#",
@@ -99025,7 +99025,7 @@ function () {
       var _load = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee2(account) {
-        var response;
+        var response, err;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -99035,9 +99035,20 @@ function () {
 
               case 2:
                 response = _context2.sent;
+
+                if (!(response.status === 404)) {
+                  _context2.next = 7;
+                  break;
+                }
+
+                err = new Error();
+                err.response = response;
+                throw err;
+
+              case 7:
                 return _context2.abrupt("return", response.data);
 
-              case 4:
+              case 8:
               case "end":
                 return _context2.stop();
             }
@@ -99090,7 +99101,141 @@ function () {
 var _default = new Remote();
 
 exports.default = _default;
-},{"~/services/comms":"services/comms.js"}],"services/messages.js":[function(require,module,exports) {
+},{"~/services/comms":"services/comms.js"}],"services/local.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Local =
+/*#__PURE__*/
+function () {
+  function Local() {
+    _classCallCheck(this, Local);
+
+    this.store = window.localStorage;
+    this.load = this.load.bind(this);
+    this.save = this.save.bind(this);
+  }
+
+  _createClass(Local, [{
+    key: "save",
+    value: function () {
+      var _save = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee(account, data) {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                this.store.setItem(account, JSON.stringify(data));
+
+              case 1:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function save(_x, _x2) {
+        return _save.apply(this, arguments);
+      }
+
+      return save;
+    }()
+  }, {
+    key: "load",
+    value: function () {
+      var _load = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee2(account) {
+        var data, err;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                data = JSON.parse(this.store.getItem(account));
+
+                if (!(data === null || Object.entries(data).length === 0)) {
+                  _context2.next = 6;
+                  break;
+                }
+
+                err = new Error('nothing to be found in localstorage');
+                err.response = {};
+                err.response.status = 404;
+                throw err;
+
+              case 6:
+                return _context2.abrupt("return", data);
+
+              case 7:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function load(_x3) {
+        return _load.apply(this, arguments);
+      }
+
+      return load;
+    }()
+  }, {
+    key: "clear",
+    value: function () {
+      var _clear = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3(account) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                this.store.removeItem(account);
+
+              case 1:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function clear(_x4) {
+        return _clear.apply(this, arguments);
+      }
+
+      return clear;
+    }()
+  }, {
+    key: "name",
+    get: function get() {
+      return 'local storage';
+    }
+  }]);
+
+  return Local;
+}();
+
+var _default = new Local();
+
+exports.default = _default;
+},{}],"services/messages.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -101026,6 +101171,8 @@ var _react = _interopRequireDefault(require("react"));
 
 var _remote = _interopRequireDefault(require("~/services/remote"));
 
+var _local = _interopRequireDefault(require("~/services/local"));
+
 var _messages = require("~/services/messages");
 
 var _search = _interopRequireDefault(require("~/services/search"));
@@ -101088,7 +101235,7 @@ function () {
                   break;
                 }
 
-                this.status.updateStatus("Loading from session account...");
+                this.status.updateStatus("loading from session storage...");
                 _context.t0 = this;
                 _context.next = 5;
                 return _remote.default.load(this.auth.state.account);
@@ -101098,21 +101245,26 @@ function () {
 
                 _context.t0.seed.call(_context.t0, _context.t1);
 
-                _context.next = 10;
+                _context.next = 15;
                 break;
 
               case 9:
-                this.seed({
-                  notes: [],
-                  list: []
-                });
+                this.status.updateStatus("Loading from local storage...");
+                _context.t2 = this;
+                _context.next = 13;
+                return _local.default.load(this.auth.state.account);
 
-              case 10:
+              case 13:
+                _context.t3 = _context.sent;
+
+                _context.t2.seed.call(_context.t2, _context.t3);
+
+              case 15:
                 setTimeout(function () {
                   _this.status.updateStatus((0, _messages.randomFromList)(_messages.messages.working));
                 }, 1000 * 10);
 
-              case 11:
+              case 16:
               case "end":
                 return _context.stop();
             }
@@ -101126,6 +101278,15 @@ function () {
 
       return load;
     }()
+  }, {
+    key: "create",
+    value: function create() {
+      this.seed({
+        notes: [],
+        list: []
+      });
+      this.status.updateStatus('nice to have you with us.');
+    }
   }, {
     key: "allData",
     value: function allData() {
@@ -101160,32 +101321,48 @@ function () {
                 _context2.prev = 0;
                 this.status.updateStatus('Saving...');
                 _context2.next = 4;
-                return _remote.default.save(this.auth.state.account, this.allData());
+                return _local.default.save(this.auth.state.account, this.allData());
 
               case 4:
+                if (!this.auth.state.verified) {
+                  _context2.next = 10;
+                  break;
+                }
+
+                _context2.next = 7;
+                return _remote.default.save(this.auth.state.account, this.allData());
+
+              case 7:
                 this.status.updateStatus("Saved to session storage.");
                 _context2.next = 11;
                 break;
 
-              case 7:
-                _context2.prev = 7;
-                _context2.t0 = _context2["catch"](0);
-                console.log('error saving', _context2.t0);
-                this.status.updateStatus("Error retrieving from session storage.");
+              case 10:
+                this.status.updateStatus("Saved to local storage.");
 
               case 11:
-                _context2.prev = 11;
+                _context2.next = 17;
+                break;
+
+              case 13:
+                _context2.prev = 13;
+                _context2.t0 = _context2["catch"](0);
+                console.log('error saving', _context2.t0);
+                this.status.updateStatus("Error saving data.");
+
+              case 17:
+                _context2.prev = 17;
                 setTimeout(function () {
                   _this2.status.updateStatus((0, _messages.randomFromList)(_messages.messages.working));
                 }, 1000 * 5);
-                return _context2.finish(11);
+                return _context2.finish(17);
 
-              case 14:
+              case 20:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[0, 7, 11, 14]]);
+        }, _callee2, this, [[0, 13, 17, 20]]);
       }));
 
       function save() {
@@ -101202,7 +101379,7 @@ function () {
 var _default = window.store = new Store();
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","~/services/remote":"services/remote.js","~/services/messages":"services/messages.js","~/services/search":"services/search.js"}],"components/DataInterface.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/services/remote":"services/remote.js","~/services/local":"services/local.js","~/services/messages":"services/messages.js","~/services/search":"services/search.js"}],"components/DataInterface.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -103510,7 +103687,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    margin-bottom: 14px;\n"]);
+  var data = _taggedTemplateLiteral(["\n    margin-bottom: 28px;\n"]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -103655,7 +103832,7 @@ function (_React$Component) {
         id: "timer",
         action: this.handleToggleTimer,
         text: this.state.time
-      })) : _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "Your brain is so strong."), _react.default.createElement("p", null, _react.default.createElement("small", null, "Go drink more water."))));
+      })) : _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "your brain is so strong."), _react.default.createElement("p", null, _react.default.createElement("small", null, "add a few items to your routine to get started."))));
     }
   }, {
     key: "activeTask",
@@ -105144,6 +105321,7 @@ function (_React$Component2) {
         }));
       };
 
+      if (notes.length === 0) return null;
       return _react.default.createElement("div", null, _react.default.createElement(StyledSearchContainer, null, _react.default.createElement(_Field.default, {
         name: "filterInput",
         ref: this.ref,
@@ -105153,7 +105331,7 @@ function (_React$Component2) {
       }), _react.default.createElement(_Button.default, {
         action: this.clearSearch,
         text: "clear filter"
-      })), notes.length > 0 && _react.default.createElement(StyledList, {
+      })), _react.default.createElement(StyledList, {
         children: notes.map(renderListItem)
       }));
     }
@@ -105538,7 +105716,7 @@ function (_React$Component) {
       }, _react.default.createElement("span", {
         className: "flexLeft"
       }, _react.default.createElement("h4", {
-        children: "Scratchpad"
+        children: "scratchpad"
       })), _react.default.createElement("span", null, _react.default.createElement("small", {
         children: this.state.dirty ? "Unsaved..." : "Saved."
       }))), _react.default.createElement(StyledInput, {
@@ -105685,7 +105863,7 @@ function (_React$Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(StatusProvider).call(this, props));
     _this.state = {
-      status: 'default message'
+      status: "it's so nice to see you!"
     };
     _this.updateStatus = _this.updateStatus.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
@@ -105933,35 +106111,50 @@ function (_React$Component) {
                 return _store.default.load(this.state);
 
               case 3:
-                _context3.next = 17;
+                _context3.next = 23;
                 break;
 
               case 5:
                 _context3.prev = 5;
                 _context3.t0 = _context3["catch"](0);
 
-                if (!(_context3.t0.response && _context3.t0.response.status === 400)) {
+                if (!(_context3.t0.response && _context3.t0.response.status === 404)) {
                   _context3.next = 13;
                   break;
                 }
 
-                _store.default.status.updateStatus("Problem with authentication with account ".concat(auth.account));
+                _store.default.status.updateStatus("no session data for ".concat(this.state.account));
 
                 _context3.next = 11;
-                return this.forceLogout();
+                return _store.default.create(this.state);
 
               case 11:
-                _context3.next = 17;
+                _context3.next = 23;
                 break;
 
               case 13:
-                _store.default.status.updateStatus("Error retrieving data from store");
+                if (!(_context3.t0.response && _context3.t0.response.status === 400)) {
+                  _context3.next = 19;
+                  break;
+                }
 
-                console.log('err response', _context3.t0);
+                _store.default.status.updateStatus("Problem with authentication with account ".concat(this.state.account));
+
                 _context3.next = 17;
                 return this.forceLogout();
 
               case 17:
+                _context3.next = 23;
+                break;
+
+              case 19:
+                _store.default.status.updateStatus("Error retrieving data from store");
+
+                console.log('err response', _context3.t0);
+                _context3.next = 23;
+                return this.forceLogout();
+
+              case 23:
               case "end":
                 return _context3.stop();
             }
@@ -106086,10 +106279,18 @@ function (_React$Component) {
     _this.undoActiveListItem = _this.undoActiveListItem.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.postponeActiveListItem = _this.postponeActiveListItem.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.addToList = _this.addToList.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.syncToServer = _this.syncToServer.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
 
   _createClass(ListProvider, [{
+    key: "syncToServer",
+    value: function syncToServer() {
+      setTimeout(function () {
+        _store.default.save();
+      }, 100);
+    }
+  }, {
     key: "componentDidMount",
     value: function componentDidMount() {
       _store.default.register('list', this);
@@ -106153,14 +106354,14 @@ function (_React$Component) {
           return i;
         });
         if (draft.list.length > 0) draft.list[0].active = true;
-      }));
+      }), this.syncToServer);
     }
   }, {
     key: "addToList",
     value: function addToList(item) {
       this.setState((0, _immer.default)(function (draft) {
         draft.list.push(item);
-      }));
+      }), this.syncToServer);
     }
   }, {
     key: "setActiveListItem",
@@ -106174,6 +106375,8 @@ function (_React$Component) {
         });
       }), function () {
         if (_this3.doneRef.current) _this3.doneRef.current.focus();
+
+        _this3.syncToServer();
       });
     }
   }, {
@@ -106184,7 +106387,7 @@ function (_React$Component) {
         draft.list[index].checked = true;
         draft.list[index].active = false;
         draft.list = bumpActiveIndex(draft.list, index + 1);
-      }));
+      }), this.syncToServer);
     }
   }, {
     key: "undoActiveListItem",
@@ -106193,7 +106396,7 @@ function (_React$Component) {
         draft.list.filter(function (i) {
           return i.active;
         })[0].checked = false;
-      }));
+      }), this.syncToServer);
     }
   }, {
     key: "postponeActiveListItem",
@@ -106202,7 +106405,7 @@ function (_React$Component) {
         var index = activeIndex(draft.list);
         draft.list[index].active = false;
         bumpActiveIndex(draft.list, index + 1);
-      }));
+      }), this.syncToServer);
     }
   }, {
     key: "render",
@@ -106824,7 +107027,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54059" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57688" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
