@@ -105321,7 +105321,6 @@ function (_React$Component2) {
         }));
       };
 
-      if (notes.length === 0) return null;
       return _react.default.createElement("div", null, _react.default.createElement(StyledSearchContainer, null, _react.default.createElement(_Field.default, {
         name: "filterInput",
         ref: this.ref,
@@ -105331,9 +105330,9 @@ function (_React$Component2) {
       }), _react.default.createElement(_Button.default, {
         action: this.clearSearch,
         text: "clear filter"
-      })), _react.default.createElement(StyledList, {
+      })), notes.length > 0 ? _react.default.createElement(StyledList, {
         children: notes.map(renderListItem)
-      }));
+      }) : '');
     }
   }]);
 
@@ -105534,7 +105533,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    position: relative;\n    height: auto;\n    margin-bottom: 14px;\n"]);
+  var data = _taggedTemplateLiteral(["\n    position: relative;\n    height: auto;\n    margin-bottom: 14px;\n\n    h4 {\n        font-style: italic;\n        text-transform: lowercase;\n    }\n"]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -106361,6 +106360,10 @@ function (_React$Component) {
     value: function addToList(item) {
       this.setState((0, _immer.default)(function (draft) {
         draft.list.push(item);
+
+        if (activeIndex(draft.list) === null) {
+          draft.list = bumpActiveIndex(draft.list);
+        }
       }), this.syncToServer);
     }
   }, {
@@ -107027,7 +107030,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57688" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59289" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
