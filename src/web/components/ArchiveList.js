@@ -147,18 +147,23 @@ export default class ArchiveList extends React.Component {
 
         this.doSearch = debounce(this.doSearch.bind(this), 100)
         this.onChange = this.onChange.bind(this)
+        this.onBlur = this.onBlur.bind(this)
         this.clearSearch = this.clearSearch.bind(this)
-        this.onKeyPress = this.onKeyPress.bind(this)
-    }
-
-    onKeyPress(e) {
-        if (e.key === 'Enter') this.doSearch()
     }
 
     onChange() {
         if (this.ref.current.value) {
             this.doSearch(this.ref.current.value)
         } else {
+            this.setState(state => {
+                state.search = false
+                return state
+            })
+        }
+    }
+
+    onBlur() {
+        if (!this.ref.current.value) {
             this.setState(state => {
                 state.search = false
                 return state
@@ -184,6 +189,8 @@ export default class ArchiveList extends React.Component {
         this.setState(state => {
             state.search = false
             return state
+        }, () => {
+            this.ref.current.focus()
         })
     }
 
@@ -216,7 +223,7 @@ export default class ArchiveList extends React.Component {
                     name="filterInput"
                     ref={ this.ref }
                     onChange={ this.onChange }
-                    onKeyPress={ this.onKeyPress }
+                    onBlur={ this.onBlur }
                     placeholder="search" />
                 <Button action={ this.clearSearch } text="clear filter" />
             </StyledSearchContainer>

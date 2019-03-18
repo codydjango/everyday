@@ -1,5 +1,4 @@
 import MiniSearch from 'minisearch'
-import { disconnect } from 'cluster';
 
 class Search {
     constructor() {
@@ -7,24 +6,27 @@ class Search {
         this.mini = new MiniSearch({
             fields: ['name', 'text'],
             searchOptions: {
-                boost: { title: 2 },
-                fuzzy: 0.2
+                boost: { name: 2 },
+                fuzzy: 0.6
             }
         })
+
+        this.add = this.add.bind(this)
+        this.remove = this.remove.bind(this)
+        this.update = this.update.bind(this)
     }
 
     addAll(docs) {
         // first remove all that exist already
         docs.forEach(doc => {
             if (this._docs[doc.id]) {
-                console.log('doc already exists, removing', doc.id)
                 this.mini.remove(this._docs[doc.id])
                 delete this._docs[doc.id]
             }
         })
 
         // then add individually to seach index
-        docs.forEach(doc => this.add)
+        docs.forEach(this.add)
     }
 
     remove(doc) {
@@ -43,7 +45,7 @@ class Search {
 
         const doc = {
             id: original.id,
-            title: original.title,
+            name: original.name,
             text: original.text
         }
 

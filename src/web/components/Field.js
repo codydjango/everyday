@@ -42,6 +42,7 @@ export default React.forwardRef((props, ref) => {
             name={ props.name }
             onChange={ props.onChange || noop }
             onKeyPress={ props.onKeyPress || noop }
+            onBlur={ props.onBlur || noop }
             placeholder={ props.placeholder || '' } />
     </StyledField>)
 })
