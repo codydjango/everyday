@@ -11,6 +11,11 @@ const StyledDiv = styled.div`
     position: relative;
     height: auto;
     margin-bottom: 14px;
+
+    h4 {
+        font-style: italic;
+        text-transform: lowercase;
+    }
 `
 
 const StyledInput = styled.div`

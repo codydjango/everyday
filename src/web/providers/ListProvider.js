@@ -84,6 +84,11 @@ export default class ListProvider extends React.Component {
     addToList(item) {
         this.setState(produce(draft => {
             draft.list.push(item)
+
+            if (activeIndex(draft.list) === null) {
+                draft.list = bumpActiveIndex(draft.list)
+            }
+
         }), this.syncToServer)
     }
 

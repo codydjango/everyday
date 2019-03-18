@@ -217,8 +217,6 @@ export default class ArchiveList extends React.Component {
             </StyledListItem>)
         }
 
-        if (notes.length === 0) return (null)
-
         return (<div>
             <StyledSearchContainer>
                 <Field
@@ -229,7 +227,8 @@ export default class ArchiveList extends React.Component {
                     placeholder="search" />
                 <Button action={ this.clearSearch } text="clear filter" />
             </StyledSearchContainer>
-            <StyledList children={ notes.map(renderListItem) } />
+
+            { (notes.length > 0) ? <StyledList children={ notes.map(renderListItem) } /> : '' }
         </div>)
     }
 }
