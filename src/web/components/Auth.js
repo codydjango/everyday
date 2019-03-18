@@ -24,23 +24,21 @@ class Auth extends React.Component {
         const { defaultAccount } = await web3Init(window)
         const token = comms.getCookie(defaultAccount)
 
-        console.log(`default account: ${ defaultAccount }`)
-        console.log(`token: ${ token }`)
-
         setTimeout(() => {
             this.pingForActiveAccount()
-        }, 1)
+        }, 1000)
 
-        this.props.updateAuth({ account: defaultAccount, token })
+        await this.props.updateAuth({ account: defaultAccount, token })
     }
 
     async checkIfNewAccount() {
         let account = (await this.web3.eth.getAccounts())[0]
         if (!account) throw noAccountError
         if (account !== this.props.account) {
-            this.props.updateAuth({ account, token: comms.getCookie(account) })
+            const token = comms.getCookie(account)
+            const verified = await this.props.updateAuth({ account, token })
 
-            if (this.props.verified) {
+            if (verified) {
                 this.props.updateStatus('You have successfully switched verified accounts.')
             } else {
                 this.props.updateStatus('You have successfully switched accounts but you are not verified.')
@@ -49,12 +47,14 @@ class Auth extends React.Component {
     }
 
     async pingForActiveAccount() {
+        if (this.checkAccountTimer) return
+
         const promise = new Promise(async (resolve, reject) => {
             // check immediately
             this.checkIfNewAccount().catch(reject)
 
             // continue to check every 3 seconds
-            this.checkAccountTimer = setInterval(() => { this.checkIfNewAccount().catch(reject) }, 3000)
+            this.checkAccountTimer = setInterval(() => { this.checkIfNewAccount().catch(reject) }, 5000)
         })
 
         promise.catch(err => {

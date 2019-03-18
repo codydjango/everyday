@@ -12,7 +12,7 @@ class Remote {
     }
 
     async save(account, data) {
-        const response = await comms.post(`/account/${ account }/data/`, data)
+        await comms.post(`/account/${ account }/data/`, data)
         return true
     }
 

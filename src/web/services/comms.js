@@ -2,7 +2,6 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { ENDPOINT, ENVIRONMENT } from '~/settings'
 
-
 class Comms {
     static parseJwt(token) {
         const base64Url = token.split('.')[1]
@@ -17,7 +16,7 @@ class Comms {
         try {
             return (account === Comms.parseJwt(token).account)
         } catch (err) {
-            console.log(`Auth error parsing ${ token }`, err)
+            console.log(`error parsing ${ token }`, err)
             return false
         }
     }
@@ -55,7 +54,7 @@ class Comms {
         Cookies.remove(name)
     }
 
-    updateAuth({ account, token }, logout = false) {
+    updateCredentials({ account, token }, logout = false) {
         if (logout) {
             this.clearCookie(account)
             account = null

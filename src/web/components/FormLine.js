@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import Button from '~/components/Button'
+import Field from '~/components/Field'
 import uniqueId from '~/utilities/uniqueId'
 
 import { StatusContext } from '~/context'
@@ -11,33 +12,10 @@ const StyledDiv = styled.div`
     display: flex;
     flex-flow: row nowrap;
     align-items: flex-start;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 
     .button {
-        margin: 0 0 0 2px;
-    }
-
-    .field {
-        flex: 1;
-        padding: 0px;
-        margin: 0px;
-
-        label {
-            display: none;
-        }
-
-        input {
-            background-color: rgb(243, 243, 0);
-            border: 1px solid #e5e700;
-            width: 100%;
-            transition : border 500ms ease-out;
-        }
-
-        &.error {
-            input {
-                border-color: tomato;
-            }
-        }
+        margin: 0 0 0 4px;
     }
 `
 
@@ -86,7 +64,7 @@ class FormLine extends React.Component {
 
     onClick(e) {
         const validators = this.props.validators || []
-        const  value = this.inputRef.current.value || this.inputRef.current.placeholder
+        const value = this.inputRef.current.value || this.inputRef.current.placeholder
 
         try {
             this.props.onSubmit(validators.reduce((acc, fn) => fn(acc), value))
@@ -108,17 +86,13 @@ class FormLine extends React.Component {
     render() {
         return (
             <StyledDiv>
-                <div className={ `field ${ (this.state.error) ? 'error' : '' }` }>
-                    <label
-                        htmlFor={ this.inputName }></label>
-                    <input
-                        type="text"
-                        ref={ this.inputRef }
-                        name={ this.inputName }
-                        value={ this.value }
-                        onKeyPress={ this.onKeyPress }
-                        placeholder={ this.props.inputPlaceholder || '' } />
-                </div>
+                <Field
+                    error={ this.state.error }
+                    name={ this.inputName }
+                    label={ this.inputName }
+                    ref={ this.inputRef }
+                    onKeyPress={ this.onKeyPress }
+                    placeholder={ this.props.inputPlaceholder || '' } />
                 <Button
                     text={ this.props.submitText || 'submit' }
                     action={ this.onClick } />

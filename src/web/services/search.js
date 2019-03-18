@@ -1,25 +1,63 @@
 import MiniSearch from 'minisearch'
-
-// const docs = [
-//     { id: 1, title: 'Moby Dick', text: 'Call me Ishmael. Some years ago...' },
-//     { id: 2, title: 'Zen and the Art of Motorcycle Maintenance', text: 'I can see by my watch...' },
-//     { id: 3, title: 'Neuromancer', text: 'The sky above the port was...' },
-//     { id: 4, title: 'Zen and the Art of Archery', text: 'At first sight it must seem...' }
-// ]
+import { disconnect } from 'cluster';
 
 class Search {
     constructor() {
-        this.mini = new MiniSearch({ fields: ['name', 'markup'] })
-    }
-
-    add(doc) {
-        this.mini.addAll(doc)
+        this._docs = {}
+        this.mini = new MiniSearch({
+            fields: ['name', 'text'],
+            searchOptions: {
+                boost: { title: 2 },
+                fuzzy: 0.2
+            }
+        })
     }
 
     addAll(docs) {
-        console.log('search addAll', docs)
+        // first remove all that exist already
+        docs.forEach(doc => {
+            if (this._docs[doc.id]) {
+                console.log('doc already exists, removing', doc.id)
+                this.mini.remove(this._docs[doc.id])
+                delete this._docs[doc.id]
+            }
+        })
 
-        this.mini.addAll(docs)
+        // then add individually to seach index
+        docs.forEach(doc => this.add)
+    }
+
+    remove(doc) {
+        try {
+            if (this._docs[doc.id]) {
+                this.mini.remove(this._docs[doc.id])
+                delete this._docs[doc.id]
+            }
+        } catch (err) {
+            console.log('error removing from search index', err)
+        }
+    }
+
+    add(original) {
+        if (original.id === 0) return
+
+        const doc = {
+            id: original.id,
+            title: original.title,
+            text: original.text
+        }
+
+        try {
+            this._docs[doc.id] = doc
+            this.mini.add(doc)
+        } catch (err) {
+            console.log('error adding to search index')
+        }
+    }
+
+    update(original) {
+        this.remove(original)
+        this.add(original)
     }
 
     for(str) {

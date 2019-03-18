@@ -51,13 +51,9 @@ export default async function web3Init() {
     }
 
     const web3Version = web3.version.api || web3.version
-    // console.log(`web3 version: ${ web3Version }`)
     const providerType = getProviderType(provider)
-    // console.log(`web3 provider type: ${ providerType }`)
     const isConnected = (providerType === "metamask") ? provider.isConnected() : provider.connected
-    // console.log(`web3 provider connected: ${ isConnected }`)
     const networkType = await getNetworkType(web3)
-    // console.log(`web3 connected network: ${ networkType }`)
 
     return {
         web3,

@@ -1,3 +1,6 @@
+import 'babel-polyfill'
+import './scss/index.scss'
+
 import React from 'react'
 import { render } from 'react-dom'
 
@@ -6,8 +9,6 @@ import web3Init from './web3init'
 import Message from '~/components/Message'
 import Layout from '~/components/Layout'
 
-import 'babel-polyfill'
-import './scss/index.scss'
 
 (async function init() {
     // figure out web3. we're gonna install our own and use an infura provider

@@ -19,20 +19,20 @@ class Store {
         if (data && data.notes) search.addAll(data.notes)
     }
 
+    /**
+     * Throws error if attempt to load from remote with invalid token (response 400)
+     */
     async load() {
-        try {
-            store.status.updateStatus('Loading from session...')
-
+        if (this.auth.state.verified) {
+            this.status.updateStatus(`Loading from session account...`)
             this.seed(await remote.load(this.auth.state.account))
-        } catch (err) {
-            console.log('err loading', err)
-            store.status.updateStatus(`Error retrieving from session storage.`)
-            return { notes: [], list: []}
-        } finally {
-            setTimeout(() => {
-                store.status.updateStatus(randomFromList(messages.working))
-            }, 1000 * 5)
+        } else {
+            this.seed({ notes: [], list: []})
         }
+
+        setTimeout(() => {
+            this.status.updateStatus(randomFromList(messages.working))
+        }, 1000 * 10)
     }
 
     allData() {
@@ -54,20 +54,18 @@ class Store {
 
     async save() {
         try {
-            store.status.updateStatus('Saving...')
+            this.status.updateStatus('Saving...')
             await remote.save(this.auth.state.account, this.allData())
-            store.status.updateStatus(`Saved to session storage.`)
+            this.status.updateStatus(`Saved to session storage.`)
         } catch (err) {
-            console.log('err saving', err)
-            store.status.updateStatus(`Error retrieving from session storage.`)
+            console.log('error saving', err)
+            this.status.updateStatus(`Error retrieving from session storage.`)
         } finally {
             setTimeout(()=> {
-                store.status.updateStatus(randomFromList(messages.working))
+                this.status.updateStatus(randomFromList(messages.working))
             }, 1000 * 5)
         }
     }
 }
 
-const store = window.store = new Store()
-
-export default store
+export default window.store = new Store()

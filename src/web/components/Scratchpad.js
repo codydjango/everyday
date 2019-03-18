@@ -1,7 +1,6 @@
 import React from 'react'
 
 import styled from 'styled-components'
-import uniqueId from '~/utilities/uniqueId'
 import sanitize from '~/utilities/sanitize'
 import Archive from '~/components/Archive'
 
@@ -27,16 +26,16 @@ const StyledInput = styled.div`
     width: 100%;
     box-sizing: border-box;
     min-width: 100%;
-    min-height: 100px;
+    min-height: 200px;
+    height: 400px;
+    max-height: 400px;
     transition : border 5500ms ease-out;
     margin: 2px 0 8px 0;
-    max-height: 500px;
     overflow: scroll;
-    max-height: 200px;
 
     &:focus {
         outline: none;
-        border: 1px solid rgb(209, 209, 3);
+        border: 1px solid rgb(209, 209, 5);
     }
 `
 
@@ -86,11 +85,6 @@ class Scratchpad extends React.Component {
         this.handleArchiveDelete = this.handleArchiveDelete.bind(this)
     }
 
-    componentDidCatch(error, info) {
-        console.log(this.constructor.name, 'error', error)
-        console.log(this.constructor.name, 'info', info)
-    }
-
     createMarkup() {
         const { markup } = Scratchpad.active(this.notes)
         return { __html: markup }
@@ -100,83 +94,42 @@ class Scratchpad extends React.Component {
         return this.props.notes
     }
 
-    notesCopy() {
-        return this.notes.slice(0)
-    }
-
     async handleSave() {
-        if (!this.state.dirty) return this.notes
+        if (!this.state.dirty) return
 
-        const notes = this.notesCopy()
-        notes[Scratchpad.activeIndex(notes)].markup = sanitize(this.inputRef.current.innerHTML)
-        await this.props.updateNotes(notes)
+        this.props.saveNote(sanitize(this.inputRef.current.innerHTML))
         this.setState({ dirty: false })
     }
 
-    async handleArchiveUpdate(id, name) {
-        const notes = this.notesCopy()
-        const index = notes.map(note => note.id).indexOf(id)
-
-        notes[index].name = name
-        notes[index].id = id
-        notes[index].timestamp = +new Date()
-
-        await this.props.updateNotes(notes)
+    handleArchiveUpdate(name) {
+        this.props.updateNote(name)
         this.inputRef.current.focus()
         this.props.updateStatus(`Updated.`)
     }
 
-    async handleArchiveDelete() {
-        const notes = this.notesCopy()
-        const index = Scratchpad.activeIndex(notes)
-        const note = notes.splice(index, 1)
-
+    handleArchiveDelete() {
         if (window.confirm("Of course you are absolutely sure about this, correct?")) {
-            await this.props.updateNotes(notes.map(note => {
-                note.active = (note.id === 0)
-                return note
-            }))
+            this.props.deleteNote()
         }
 
         this.inputRef.current.focus()
-        this.props.updateStatus(`Deleted ${ note.name }.`)
+        this.props.updateStatus(`Deleted note.`)
     }
 
-    async handleArchiveSave(name) {
-        const notes = this.notesCopy()
-
-        notes[0].name = name
-        notes[0].id = uniqueId()
-        notes[0].timestamp = +new Date()
-        delete notes[0].active
-
-        notes.unshift({
-            id: 0,
-            name: '',
-            markup: '',
-            active: true
-        })
-
-        await this.props.updateNotes(notes)
-
+    handleArchiveSave(name) {
+        this.props.archiveNote(name)
         this.inputRef.current.focus()
         this.props.updateStatus(`Saved new as '${ name }'.`)
     }
 
-    async handleArchiveClose() {
-        await this.props.updateNotes(this.notesCopy().map(note => {
-            note.active = (note.id === 0)
-            return note
-        }))
+    handleArchiveClose() {
+        this.props.closeNote()
         this.inputRef.current.focus()
         this.props.updateStatus(`Closed.`)
     }
 
-    async handleArchiveLoad(id) {
-        await this.props.updateNotes(this.notesCopy().map(note => {
-            note.active = (note.id === id)
-            return note
-        }))
+    handleArchiveLoad(id) {
+        this.props.loadNote(id)
         this.props.updateStatus(`Loaded.`)
     }
 

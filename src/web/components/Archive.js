@@ -2,6 +2,13 @@ import React from 'react'
 import styled from 'styled-components'
 import FormLine from '~/components/FormLine'
 import Button from '~/components/Button'
+import Field from '~/components/Field'
+import search from '~/services/search'
+import debounce from '~/utilities/debounce'
+
+
+window.search = search
+
 
 const StyledDiv = styled.div`
     max-height: 300px;
@@ -12,7 +19,7 @@ const StyledDiv = styled.div`
 const StyledList = styled.ul`
     padding: 0px;
     list-style-position: inside;
-    margin: 0;
+    margin: 0 0 4px 0;
     border: 1px dashed #e5e700;
 `
 
@@ -31,21 +38,22 @@ const StyledListItem = styled.li`
 const StyledLink = styled.a`
     text-decoration: none;
     width: 100%;
-    display: block;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
     font-style: normal;
 
     .title {
         font-style: normal;
     }
 
-    .sep {
-        font-style: normal;
-        padding-right: 1px;
-        padding-left: 1px;
-    }
-
     .preview {
         font-style: italic;
+        flex: 1;
+    }
+
+    .timestamp {
+        font-style: normal;
     }
 
     &.active {
@@ -54,6 +62,115 @@ const StyledLink = styled.a`
         }
     }
 `
+
+const StyledSearchContainer = styled.div`
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+    font-style: normal;
+    margin-bottom: 6px;
+
+    input {
+        flex: 1
+    }
+
+    .button {
+        margin: 0 0 0 4px;
+    }
+`
+
+class Search extends React.Component {
+    constructor(props) {
+        super(props)
+
+        this.ref = React.createRef()
+
+        this.state = { search: false }
+
+        this.doSearch = debounce(this.doSearch.bind(this), 100)
+        this.onChange = this.onChange.bind(this)
+        this.onBlur = this.onBlur.bind(this)
+        this.clearSearch = this.clearSearch.bind(this)
+        this.onKeyPress = this.onKeyPress.bind(this)
+    }
+
+    onKeyPress(e) {
+        if (e.key === 'Enter') this.doSearch()
+    }
+
+    onChange() {
+        if (this.ref.current.value) {
+            this.doSearch(this.ref.current.value)
+        } else {
+            this.setState(state => {
+                state.search = false
+                return state
+            })
+        }
+    }
+
+    onBlur() {}
+
+    doSearch(value) {
+        const ids = search.for(value).map(r => r.id)
+
+        this.sorted = this.props.notes
+            .filter(note => ids.indexOf(note.id) !== -1)
+            .sort(note => ids.indexOf(note.id))
+
+        this.setState(state => {
+            state.search = true
+            return state
+        })
+    }
+
+    clearSearch() {
+        this.ref.current.value = ''
+        this.setState(state => {
+            state.search = false
+            return state
+        })
+    }
+
+    render() {
+        let notes
+        if (this.state.search) {
+            notes = this.sorted
+        } else {
+            notes = this.props.notes
+        }
+
+        const renderListItem = ({ id, name, markup, active, timestamp, text }, index) => {
+            return (<StyledListItem
+                key={ `key_${ id }` }>
+                <ArchiveLink
+                    id={ id }
+                    index={ index }
+                    timestamp={ timestamp }
+                    active={ active || false }
+                    onClick={ this.props.onLoad }
+                    name={ name }
+                    markup={ markup }
+                    text={ text } />
+            </StyledListItem>)
+        }
+
+        return (<div>
+            <StyledSearchContainer>
+                <Field
+                    name="filterInput"
+                    ref={ this.ref }
+                    onChange={ this.onChange }
+                    onKeyPress={ this.onKeyPress }
+                    placeholder="search" />
+                <Button action={ this.clearSearch } text="clear filter" />
+            </StyledSearchContainer>
+
+            { ((notes.length > 0) && (<StyledList children={ notes.map(renderListItem) } />)) }
+        </div>)
+    }
+}
 
 class Archive extends React.Component {
     get date() {
@@ -71,32 +188,19 @@ class Archive extends React.Component {
             }
         }
 
-        throw new Error('no current1')
+        throw new Error('no current')
     }
 
     render() {
         const notes = this.props.notes
         const visibleNotes = notes.filter(n => n.name)
-        const isUpdate = (this.active.name)
-
-        const renderListItem = ({ id, name, markup, active }, index) => {
-            return (<StyledListItem
-                key={ `key_${ id }` }>
-                <ArchiveLink
-                    id={ id }
-                    index={ index }
-                    active={ active || false }
-                    onClick={ this.props.onLoad }
-                    name={ name }
-                    markup={ markup } />
-            </StyledListItem>)
-        }
+        const isUpdate = (!!this.active.name)
 
         return (<StyledDiv>
             { (isUpdate)
             ? (<FormLine
                     onSubmit={ name => {
-                        this.props.onUpdate(this.active.id, name)
+                        this.props.onUpdate(name)
                     } }
                     validators={ [value => {
                         if (!value) throw FormLine.validationError('Needs a name, please.')
@@ -132,19 +236,16 @@ class Archive extends React.Component {
                 submitText="archive" />)
             }
 
-            { ((visibleNotes.length > 0) && (
-            <StyledList children={ visibleNotes.map(renderListItem) } />
-            )) }
-
+            <Search
+                notes={ visibleNotes }
+                onLoad={ this.props.onLoad } />
         </StyledDiv>)
     }
 }
 
 class ArchiveLink extends React.Component {
-    generatePreview(markup) {
-        const doc = new DOMParser().parseFromString(markup, 'text/html')
-        const text = doc.body.textContent || ''
-
+    generatePreview(text) {
+        text = text || ''
         return `${ text.slice(0, 20) }...`
     }
 
@@ -164,7 +265,8 @@ class ArchiveLink extends React.Component {
                 } }>
                 <span className="title">{ this.normalizeName(this.props.name) }</span>
                 <span className="sep"></span>
-                <span className="preview">{ this.generatePreview(this.props.markup) }</span>
+                <span className="preview">{ this.generatePreview(this.props.text) }</span>
+                <span className="timestamp">{ this.props.timestamp }</span>
             </StyledLink>
         )
     }

@@ -28,33 +28,50 @@ export default class AuthProvider extends React.Component {
     }
 
     hasAccount() {
-        console.log(`has verified: ${ this.state.account } ${ this.state.verified }`)
         return (!!this.state.account)
     }
 
     isLoggedIn() {
-        return (!!this.state.token)
+        return (!!this.state.verified)
+    }
+
+    async forceLogout() {
+        await this.updateAuth({ account: this.state.account, token: null}, true)
+        store.status.updateStatus(`You've been logged out.`)
     }
 
     // account has been switched, so pull new data. do a lot, basically.
     async updateAuth(auth, logout = false) {
-        try {
-            await new Promise((resolve, reject) => {
-                const verified = comms.updateAuth(auth, logout)
+        const verified = comms.updateCredentials(auth, logout)
 
-                this.setState(state => {
-                    state.token = auth.token
-                    state.account = auth.account
-                    state.verified = verified
-                    return state
-                }, () => {
-                    resolve(true)
-                })
+        await new Promise((resolve, reject) => {
+            this.setState(produce(draft => {
+                draft.token = auth.token
+                draft.account = auth.account
+                draft.verified = verified
+            }), () => {
+                setTimeout(() => { resolve(true) }, 500)
             })
+        })
 
-            await store.load()
+        await this.attemptLoad()
+
+        return verified
+    }
+
+    // just error handling around store.load
+    async attemptLoad() {
+        try {
+            await store.load(this.state)
         } catch (err) {
-            console.log('error updating auth', err)
+            if (err.response && err.response.status === 400) {
+                store.status.updateStatus(`Problem with authentication with account ${ auth.account }`)
+                await this.forceLogout()
+            } else {
+                store.status.updateStatus(`Error retrieving data from store`)
+                console.log('err response', err)
+                await this.forceLogout()
+            }
         }
     }
 

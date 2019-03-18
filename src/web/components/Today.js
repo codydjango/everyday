@@ -31,14 +31,6 @@ export default withContext(class Today extends React.Component {
         this.toggleHelp = this.toggleHelp.bind(this)
     }
 
-    componentDidMount() {
-        console.log('Today componentDidMount', this.props.list.length)
-    }
-
-    componentDidUpdate() {
-
-    }
-
     static getDerivedStateFromProps(props, state) {
         if (state.edit) return null
 
