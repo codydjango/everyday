@@ -100921,8 +100921,6 @@ exports.default = void 0;
 
 var _minisearch = _interopRequireDefault(require("minisearch"));
 
-var _cluster = require("cluster");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -100942,11 +100940,14 @@ function () {
       fields: ['name', 'text'],
       searchOptions: {
         boost: {
-          title: 2
+          name: 2
         },
-        fuzzy: 0.2
+        fuzzy: 0.6
       }
     });
+    this.add = this.add.bind(this);
+    this.remove = this.remove.bind(this);
+    this.update = this.update.bind(this);
   }
 
   _createClass(Search, [{
@@ -100957,17 +100958,13 @@ function () {
       // first remove all that exist already
       docs.forEach(function (doc) {
         if (_this._docs[doc.id]) {
-          console.log('doc already exists, removing', doc.id);
-
           _this.mini.remove(_this._docs[doc.id]);
 
           delete _this._docs[doc.id];
         }
       }); // then add individually to seach index
 
-      docs.forEach(function (doc) {
-        return _this.add;
-      });
+      docs.forEach(this.add);
     }
   }, {
     key: "remove",
@@ -100987,7 +100984,7 @@ function () {
       if (original.id === 0) return;
       var doc = {
         id: original.id,
-        title: original.title,
+        name: original.name,
         text: original.text
       };
 
@@ -101017,7 +101014,7 @@ function () {
 var _default = new Search();
 
 exports.default = _default;
-},{"minisearch":"../../node_modules/minisearch/dist/minisearch.js","cluster":"../../node_modules/parcel-bundler/src/builtins/_empty.js"}],"services/store.js":[function(require,module,exports) {
+},{"minisearch":"../../node_modules/minisearch/dist/minisearch.js"}],"services/store.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -102881,6 +102878,7 @@ var _default = _react.default.forwardRef(function (props, ref) {
     name: props.name,
     onChange: props.onChange || noop,
     onKeyPress: props.onKeyPress || noop,
+    onBlur: props.onBlur || noop,
     placeholder: props.placeholder || ''
   }));
 });
@@ -104895,7 +104893,7 @@ function debounce(func, wait, immediate) {
     if (callNow) func.apply(context, args);
   };
 }
-},{}],"components/Archive.js":[function(require,module,exports) {
+},{}],"components/ArchiveList.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -104907,13 +104905,11 @@ var _react = _interopRequireDefault(require("react"));
 
 var _styledComponents = _interopRequireDefault(require("styled-components"));
 
-var _FormLine = _interopRequireDefault(require("~/components/FormLine"));
-
-var _Button = _interopRequireDefault(require("~/components/Button"));
+var _search = _interopRequireDefault(require("~/services/search"));
 
 var _Field = _interopRequireDefault(require("~/components/Field"));
 
-var _search = _interopRequireDefault(require("~/services/search"));
+var _Button = _interopRequireDefault(require("~/components/Button"));
 
 var _debounce = _interopRequireDefault(require("~/utilities/debounce"));
 
@@ -104929,26 +104925,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _templateObject5() {
-  var data = _taggedTemplateLiteral(["\n    width: 100%;\n    display: flex;\n    flex-flow: row nowrap;\n    align-items: flex-start;\n    font-style: normal;\n    margin-bottom: 6px;\n\n    input {\n        flex: 1\n    }\n\n    .button {\n        margin: 0 0 0 4px;\n    }\n"]);
-
-  _templateObject5 = function _templateObject5() {
-    return data;
-  };
-
-  return data;
-}
-
 function _templateObject4() {
-  var data = _taggedTemplateLiteral(["\n    text-decoration: none;\n    width: 100%;\n    display: flex;\n    flex-flow: row nowrap;\n    align-items: flex-start;\n    font-style: normal;\n\n    .title {\n        font-style: normal;\n    }\n\n    .preview {\n        font-style: italic;\n        flex: 1;\n    }\n\n    .timestamp {\n        font-style: normal;\n    }\n\n    &.active {\n        .title {\n            font-weight: 700;\n        }\n    }\n"]);
+  var data = _taggedTemplateLiteral(["\n    text-decoration: none;\n    display: flex;\n    flex-flow: row nowrap;\n    align-items: flex-start;\n    font-style: normal;\n    margin: 0px;\n    padding: 0px;\n    position: relative;\n\n    .title {\n        display: block;\n        flex: 0;\n        font-style: normal;\n        white-space: nowrap;\n        margin: 0px;\n        padding: 0px;\n    }\n\n    .preview {\n        display: block;\n        flex: 1;\n        min-width: 0px;\n        position: relative;\n        margin: 0px;\n        padding: 0px;\n\n        .cell {\n            position: absolute;\n            top: 0;\n            right: 1em;\n            bottom: 0;\n            left: 0;\n            display: block;\n        }\n\n        .cell-overflow {\n            font-style: italic;\n            max-width: 100%;\n            display: inline-block;\n            overflow: hidden;\n            text-overflow: ellipsis;\n            white-space: nowrap;\n        }\n    }\n\n    .timestamp {\n        flex: 0;\n        display: block;\n        white-space: nowrap;\n        font-style: normal;\n        margin: 0px;\n        padding: 0px;\n    }\n\n    &.active {\n        .title {\n            font-weight: 700;\n        }\n    }\n"]);
 
   _templateObject4 = function _templateObject4() {
     return data;
@@ -104958,7 +104944,7 @@ function _templateObject4() {
 }
 
 function _templateObject3() {
-  var data = _taggedTemplateLiteral(["\n    border-bottom: 1px dashed #e5e700;\n    margin: 0px;\n    padding: 0px;\n    font-style: italic;\n    display: block;\n\n    &:last-child {\n        border-bottom: none;\n    }\n"]);
+  var data = _taggedTemplateLiteral(["\n    width: 100%;\n    display: flex;\n    flex-flow: row nowrap;\n    align-items: flex-start;\n    font-style: normal;\n    margin-bottom: 6px;\n\n    input {\n        flex: 1\n    }\n\n    .button {\n        margin: 0 0 0 4px;\n    }\n"]);
 
   _templateObject3 = function _templateObject3() {
     return data;
@@ -104968,7 +104954,7 @@ function _templateObject3() {
 }
 
 function _templateObject2() {
-  var data = _taggedTemplateLiteral(["\n    padding: 0px;\n    list-style-position: inside;\n    margin: 0 0 4px 0;\n    border: 1px dashed #e5e700;\n"]);
+  var data = _taggedTemplateLiteral(["\n    border-bottom: 1px dashed #e5e700;\n    margin: 0px;\n    padding: 0px;\n    font-style: italic;\n    display: block;\n\n    &:last-child {\n        border-bottom: none;\n    }\n"]);
 
   _templateObject2 = function _templateObject2() {
     return data;
@@ -104978,7 +104964,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    max-height: 300px;\n    position: relative;\n    display: block;\n"]);
+  var data = _taggedTemplateLiteral(["\n    padding: 0px;\n    list-style-position: inside;\n    margin: 0 0 4px 0;\n    border: 1px dashed #e5e700;\n"]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -104989,47 +104975,90 @@ function _templateObject() {
 
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
-window.search = _search.default;
+var StyledList = _styledComponents.default.ul(_templateObject());
 
-var StyledDiv = _styledComponents.default.div(_templateObject());
+var StyledListItem = _styledComponents.default.li(_templateObject2());
 
-var StyledList = _styledComponents.default.ul(_templateObject2());
-
-var StyledListItem = _styledComponents.default.li(_templateObject3());
+var StyledSearchContainer = _styledComponents.default.div(_templateObject3());
 
 var StyledLink = _styledComponents.default.a(_templateObject4());
 
-var StyledSearchContainer = _styledComponents.default.div(_templateObject5());
-
-var Search =
+var ArchiveLink =
 /*#__PURE__*/
 function (_React$Component) {
-  _inherits(Search, _React$Component);
+  _inherits(ArchiveLink, _React$Component);
 
-  function Search(props) {
-    var _this;
+  function ArchiveLink() {
+    _classCallCheck(this, ArchiveLink);
 
-    _classCallCheck(this, Search);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Search).call(this, props));
-    _this.ref = _react.default.createRef();
-    _this.state = {
-      search: false
-    };
-    _this.doSearch = (0, _debounce.default)(_this.doSearch.bind(_assertThisInitialized(_assertThisInitialized(_this))), 100);
-    _this.onChange = _this.onChange.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.onBlur = _this.onBlur.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.clearSearch = _this.clearSearch.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    _this.onKeyPress = _this.onKeyPress.bind(_assertThisInitialized(_assertThisInitialized(_this)));
-    return _this;
+    return _possibleConstructorReturn(this, _getPrototypeOf(ArchiveLink).apply(this, arguments));
   }
 
-  _createClass(Search, [{
-    key: "onKeyPress",
-    value: function onKeyPress(e) {
-      if (e.key === 'Enter') this.doSearch();
+  _createClass(ArchiveLink, [{
+    key: "generatePreview",
+    value: function generatePreview(text) {
+      text = text || '';
+      return "".concat(text.slice(0, 80), "...");
     }
   }, {
+    key: "normalizeName",
+    value: function normalizeName(name) {
+      return name.slice(0, 12).padEnd(16, "\xA0");
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this = this;
+
+      return _react.default.createElement(StyledLink, {
+        role: "button",
+        href: "#",
+        className: this.props.active ? 'active' : '',
+        onClick: function onClick(e) {
+          e.preventDefault();
+
+          _this.props.onClick(_this.props.id);
+        }
+      }, _react.default.createElement("div", {
+        className: "title"
+      }, this.normalizeName(this.props.name)), _react.default.createElement("div", {
+        className: "preview"
+      }, _react.default.createElement("div", {
+        className: "cell"
+      }, _react.default.createElement("span", {
+        className: "cell-overflow"
+      }, this.generatePreview(this.props.text)))), _react.default.createElement("div", {
+        className: "timestamp"
+      }, this.props.timestamp));
+    }
+  }]);
+
+  return ArchiveLink;
+}(_react.default.Component);
+
+var ArchiveList =
+/*#__PURE__*/
+function (_React$Component2) {
+  _inherits(ArchiveList, _React$Component2);
+
+  function ArchiveList(props) {
+    var _this2;
+
+    _classCallCheck(this, ArchiveList);
+
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(ArchiveList).call(this, props));
+    _this2.ref = _react.default.createRef();
+    _this2.state = {
+      search: false
+    };
+    _this2.doSearch = (0, _debounce.default)(_this2.doSearch.bind(_assertThisInitialized(_assertThisInitialized(_this2))), 100);
+    _this2.onChange = _this2.onChange.bind(_assertThisInitialized(_assertThisInitialized(_this2)));
+    _this2.onBlur = _this2.onBlur.bind(_assertThisInitialized(_assertThisInitialized(_this2)));
+    _this2.clearSearch = _this2.clearSearch.bind(_assertThisInitialized(_assertThisInitialized(_this2)));
+    return _this2;
+  }
+
+  _createClass(ArchiveList, [{
     key: "onChange",
     value: function onChange() {
       if (this.ref.current.value) {
@@ -105043,7 +105072,14 @@ function (_React$Component) {
     }
   }, {
     key: "onBlur",
-    value: function onBlur() {}
+    value: function onBlur() {
+      if (!this.ref.current.value) {
+        this.setState(function (state) {
+          state.search = false;
+          return state;
+        });
+      }
+    }
   }, {
     key: "doSearch",
     value: function doSearch(value) {
@@ -105064,16 +105100,20 @@ function (_React$Component) {
   }, {
     key: "clearSearch",
     value: function clearSearch() {
+      var _this3 = this;
+
       this.ref.current.value = '';
       this.setState(function (state) {
         state.search = false;
         return state;
+      }, function () {
+        _this3.ref.current.focus();
       });
     }
   }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
+      var _this4 = this;
 
       var notes;
 
@@ -105097,7 +105137,7 @@ function (_React$Component) {
           index: index,
           timestamp: timestamp,
           active: active || false,
-          onClick: _this2.props.onLoad,
+          onClick: _this4.props.onLoad,
           name: name,
           markup: markup,
           text: text
@@ -105108,7 +105148,7 @@ function (_React$Component) {
         name: "filterInput",
         ref: this.ref,
         onChange: this.onChange,
-        onKeyPress: this.onKeyPress,
+        onBlur: this.onBlur,
         placeholder: "search"
       }), _react.default.createElement(_Button.default, {
         action: this.clearSearch,
@@ -105119,13 +105159,66 @@ function (_React$Component) {
     }
   }]);
 
-  return Search;
+  return ArchiveList;
 }(_react.default.Component);
+
+exports.default = ArchiveList;
+},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/services/search":"services/search.js","~/components/Field":"components/Field.js","~/components/Button":"components/Button.js","~/utilities/debounce":"utilities/debounce.js"}],"components/Archive.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _styledComponents = _interopRequireDefault(require("styled-components"));
+
+var _FormLine = _interopRequireDefault(require("~/components/FormLine"));
+
+var _Button = _interopRequireDefault(require("~/components/Button"));
+
+var _ArchiveList = _interopRequireDefault(require("~/components/ArchiveList"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _templateObject() {
+  var data = _taggedTemplateLiteral(["\n    position: relative;\n    display: block;\n"]);
+
+  _templateObject = function _templateObject() {
+    return data;
+  };
+
+  return data;
+}
+
+function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+var StyledDiv = _styledComponents.default.div(_templateObject());
 
 var Archive =
 /*#__PURE__*/
-function (_React$Component2) {
-  _inherits(Archive, _React$Component2);
+function (_React$Component) {
+  _inherits(Archive, _React$Component);
 
   function Archive() {
     _classCallCheck(this, Archive);
@@ -105136,7 +105229,7 @@ function (_React$Component2) {
   _createClass(Archive, [{
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this = this;
 
       var notes = this.props.notes;
       var visibleNotes = notes.filter(function (n) {
@@ -105145,11 +105238,11 @@ function (_React$Component2) {
       var isUpdate = !!this.active.name;
       return _react.default.createElement(StyledDiv, null, isUpdate ? _react.default.createElement(_FormLine.default, {
         onSubmit: function onSubmit(name) {
-          _this3.props.onUpdate(name);
+          _this.props.onUpdate(name);
         },
         validators: [function (value) {
           if (!value) throw _FormLine.default.validationError('Needs a name, please.');
-          if (value === _this3.active.name) return value; // allow it through
+          if (value === _this.active.name) return value; // allow it through
 
           if (value && value.length < 2) throw _FormLine.default.validationError('Longer name, please.');
           if (!(visibleNotes.map(function (note) {
@@ -105177,7 +105270,7 @@ function (_React$Component2) {
         }],
         inputPlaceholder: this.date,
         submitText: "archive"
-      }), _react.default.createElement(Search, {
+      }), visibleNotes.length > 0 && _react.default.createElement(_ArchiveList.default, {
         notes: visibleNotes,
         onLoad: this.props.onLoad
       }));
@@ -105206,60 +105299,9 @@ function (_React$Component2) {
   return Archive;
 }(_react.default.Component);
 
-var ArchiveLink =
-/*#__PURE__*/
-function (_React$Component3) {
-  _inherits(ArchiveLink, _React$Component3);
-
-  function ArchiveLink() {
-    _classCallCheck(this, ArchiveLink);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(ArchiveLink).apply(this, arguments));
-  }
-
-  _createClass(ArchiveLink, [{
-    key: "generatePreview",
-    value: function generatePreview(text) {
-      text = text || '';
-      return "".concat(text.slice(0, 20), "...");
-    }
-  }, {
-    key: "normalizeName",
-    value: function normalizeName(name) {
-      return name.slice(0, 12).padEnd(16, "\xA0");
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var _this4 = this;
-
-      return _react.default.createElement(StyledLink, {
-        role: "button",
-        href: "#",
-        className: this.props.active ? 'active' : '',
-        onClick: function onClick(e) {
-          e.preventDefault();
-
-          _this4.props.onClick(_this4.props.id);
-        }
-      }, _react.default.createElement("span", {
-        className: "title"
-      }, this.normalizeName(this.props.name)), _react.default.createElement("span", {
-        className: "sep"
-      }), _react.default.createElement("span", {
-        className: "preview"
-      }, this.generatePreview(this.props.text)), _react.default.createElement("span", {
-        className: "timestamp"
-      }, this.props.timestamp));
-    }
-  }]);
-
-  return ArchiveLink;
-}(_react.default.Component);
-
 var _default = Archive;
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/components/FormLine":"components/FormLine.js","~/components/Button":"components/Button.js","~/components/Field":"components/Field.js","~/services/search":"services/search.js","~/utilities/debounce":"utilities/debounce.js"}],"components/Scratchpad.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/components/FormLine":"components/FormLine.js","~/components/Button":"components/Button.js","~/components/ArchiveList":"components/ArchiveList.js"}],"components/Scratchpad.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -106075,9 +106117,6 @@ function (_React$Component) {
                 _context.next = 3;
                 return new Promise(function (resolve, reject) {
                   _this2.setState((0, _immer.default)(function (draft) {
-                    // if ((!activeIndex(list)) && (list.length > 0)) {
-                    //     list[0].active = true
-                    // }
                     draft.list = list;
                   }), function () {
                     if (save) setTimeout(function () {
@@ -106128,18 +106167,13 @@ function (_React$Component) {
     value: function setActiveListItem(id) {
       var _this3 = this;
 
-      console.log('set active list item', id);
       this.setState((0, _immer.default)(function (draft) {
         draft.list = draft.list.map(function (i) {
           i.active = i.id == id;
           return i;
         });
       }), function () {
-        console.log('done?');
-
-        if (_this3.doneRef.current) {
-          _this3.doneRef.current.focus();
-        }
+        if (_this3.doneRef.current) _this3.doneRef.current.focus();
       });
     }
   }, {
@@ -106790,7 +106824,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57028" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54059" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

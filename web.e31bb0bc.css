@@ -9,6 +9,13 @@
   margin-bottom: 16px;
   border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
 }
+.body .work .title {
+  flex: 1;
+}
+.body .work .preview {
+  flex: 0;
+  display: none;
+}
 .body .today {
   width: auto;
   display: block;
@@ -29,11 +36,20 @@
     padding-bottom: 0px;
     position: relative;
   }
+  .body .work .title {
+    flex: 0;
+  }
+  .body .work .preview {
+    flex: 1;
+    display: block;
+  }
   .body .today {
     order: 0;
     padding: 0;
     margin-right: 8px;
     width: 200px;
+    min-width: 200px;
+    position: relative;
   }
 }
 .noselect, body {
