@@ -9,7 +9,7 @@ import { StatusContext, ListContext } from '~/context'
 import { withContext } from '~/hoc'
 
 const StyledDiv = styled.div`
-    margin-bottom: 14px;
+    margin-bottom: 28px;
 `
 
 export default withContext(class Now extends React.Component {
@@ -125,8 +125,8 @@ export default withContext(class Now extends React.Component {
                 </React.Fragment>
             ) : (
                 <React.Fragment>
-                    <h2>Your brain is so strong.</h2>
-                    <p><small>Go drink more water.</small></p>
+                    <h2>your brain is so strong.</h2>
+                    <p><small>add a few items to your routine to get started.</small></p>
                 </React.Fragment>
             ) }
         </StyledDiv>)

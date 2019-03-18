@@ -152,7 +152,7 @@ class Scratchpad extends React.Component {
         return (
         <StyledDiv>
             <div className="flex">
-                <span className="flexLeft"><h4 children="Scratchpad" /></span>
+                <span className="flexLeft"><h4 children="scratchpad" /></span>
                 <span><small children={ (this.state.dirty) ? "Unsaved..." : "Saved." } /></span>
             </div>
 

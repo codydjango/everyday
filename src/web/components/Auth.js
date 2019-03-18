@@ -123,12 +123,12 @@ class Auth extends React.Component {
         const showMetamaskPrompt = () => (<span className="authInfo">Log in to <a href="https://metamask.io/">MetaMask</a></span>)
 
         const showLoggedInName = () => (<span className="authInfo">
-            <span className="loginWith">Logout from</span>
+            <span className="loginWith">logout from</span>
             <span className="loginAddress"><a href="#" onClick={ this.logout }>{ this.getShortAccount() }</a></span>
         </span>)
 
         const showLoginWithActiveMetamaskAccount = () => (<div className="authInfo">
-            <span className="loginWith">Login with</span>
+            <span className="loginWith">login with</span>
             <span className="loginAddress"><a href="#" onClick={ this.login }>{ this.getShortAccount() }</a></span>
         </div>)
 
