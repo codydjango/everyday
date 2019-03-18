@@ -55,9 +55,6 @@ export default class ListProvider extends React.Component {
     async updateList(list, save = true) {
         return await new Promise((resolve, reject) => {
             this.setState(produce(draft => {
-                // if ((!activeIndex(list)) && (list.length > 0)) {
-                //     list[0].active = true
-                // }
                 draft.list = list
             }), () => {
                 if (save) setTimeout(() => { store.save() }, 100)
@@ -86,18 +83,13 @@ export default class ListProvider extends React.Component {
     }
 
     setActiveListItem(id) {
-        console.log('set active list item', id)
-
         this.setState(produce(draft => {
             draft.list = draft.list.map(i => {
                 i.active = (i.id == id)
                 return i
             })
         }), () => {
-            console.log('done?')
-            if (this.doneRef.current) {
-                this.doneRef.current.focus()
-            }
+            if (this.doneRef.current) this.doneRef.current.focus()
         })
     }
 
