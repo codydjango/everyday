@@ -26,13 +26,11 @@ async function getNetworkType(web3) {
 }
 
 export default async function web3Init() {
-    let provider, web3, enabled, defaultAccount, otherDefaultAccount
+    let provider, web3, defaultAccount, otherDefaultAccount
 
     // https://metamask.github.io/metamask-docs/Advanced_Concepts/Provider_API
-    if (typeof window.ethereum !== 'undefined'
-        || (typeof window.web3 !== 'undefined')) {
-
-          // Web3 browser user detected. You can now use the provider.
+    if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
+        // Web3 browser user detected. You can now use the provider.
         provider = window['ethereum'] || window.web3.currentProvider
     } else {
         provider = new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/c63d2ec360ce413ea4dc8b10e0cf1fac")
@@ -40,20 +38,16 @@ export default async function web3Init() {
 
     window.web3 = web3 = new Web3(provider)
 
-    if (window.ethereum) {
-        defaultAccount = (await window.ethereum.enable())[0]
-        otherDefaultAccount = (await web3.eth.getAccounts())[0]
-
-        // console.log(`web3 enabled with default account: ${ defaultAccount }`)
-        // console.log(`web3 enabled with other default account: ${ otherDefaultAccount }`)
-        // use the checksum address
-        defaultAccount = otherDefaultAccount
-    }
-
     const web3Version = web3.version.api || web3.version
     const providerType = getProviderType(provider)
     const isConnected = (providerType === "metamask") ? provider.isConnected() : provider.connected
     const networkType = await getNetworkType(web3)
+
+    if (providerType === "metamask" && window.ethereum) {
+        await window.ethereum.enable()
+    }
+
+    defaultAccount = (await web3.eth.getAccounts())[0]
 
     return {
         web3,
