@@ -10,6 +10,7 @@ import Now from '~/components/Now'
 import Scratchpad from '~/components/Scratchpad'
 import Header from '~/components/Header'
 import Footer from '~/components/Footer'
+import Activity from '~/components/Activity'
 
 import StatusProvider from '~/providers/StatusProvider'
 import AuthProvider  from '~/providers/AuthProvider'
@@ -43,6 +44,7 @@ class App extends React.Component {
                     <Work className="work">
                         <Now className="now" />
                         <Scratchpad className="scratchpad" />
+                        <Activity />
                     </Work>
 
                     <Today className="today" />

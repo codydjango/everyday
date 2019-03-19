@@ -13,10 +13,57 @@ class Store {
         }
     }
 
+    updateActivity(data, daysMissing) {
+        // process last day
+        if (data.list.every(a => a)) {
+            data.activity.log += '1'
+        } else if (data.list.reduce((a, b) => a ^ b)) {
+            data.activity.log += 's'
+        } else {
+            data.activity.log += '0'
+        }
+
+        // subtract last days from remaining days
+        daysMissing -= 1
+
+        // backfill remaining days
+        ;[...Array(daysMissing).keys()].forEach(i => {
+            data.activity.log += '0'
+        })
+
+        // timestamp today
+        data.activity.today = +new Date()
+
+        // reset for today
+        data.list.forEach(item => {
+            item.checked = false
+            item.active = false
+        })
+
+        if (data.list.length > 0) data.list[0].active = true
+    }
+
+    normalizeDay(data) {
+        if (!data.activity) data.activity = {
+            log: '',
+            timestamp: +new Date()
+        }
+
+        const date1 = new Date()
+        const date2 = new Date(data.activity.timestamp)
+        const differentDay = (date1.getDay() !== date2.getDay())
+        const difference = date1.getTime() - date2.getTime()
+        const daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24)
+
+        if (differentDay && daysDifference) this.updateActivity(data, daysDifference)
+    }
+
     seed(data) {
+        this.normalizeDay(data)
+
         if (data && data.notes) this.notes.updateNotes(data.notes, false)
         if (data && data.list) this.list.updateList(data.list, false)
-
+        if (data) this.status.updateActivity(data.activity, false)
         if (data && data.notes) search.addAll(data.notes)
     }
 
@@ -45,7 +92,11 @@ class Store {
     allData() {
         return {
             list: this.list.state.list,
-            notes: this.notes.state.notes
+            notes: this.notes.state.notes,
+            activity: {
+                timestamp: this.status.state.timestamp,
+                log: this.status.state.log
+            }
         }
     }
 

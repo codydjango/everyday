@@ -8,10 +8,15 @@ export default class StatusProvider extends React.Component {
         super(props)
 
         this.state = {
-            status: "it's so nice to see you!"
+            status: "it's so nice to see you!",
+            timestamp: +new Date(),
+            log: ''
         }
 
+        this.today = +new Date()
+
         this.updateStatus = this.updateStatus.bind(this)
+        this.updateActivity = this.updateActivity.bind(this)
     }
 
     componentDidMount() {
@@ -22,8 +27,20 @@ export default class StatusProvider extends React.Component {
         store.register('status', this, true)
     }
 
-    async updateStatus(status) {
+    updateStatus(status) {
         this.setState({ status })
+    }
+
+    updateActivity(data) {
+        data = data || {
+            log: '',
+            timestamp: +new Date()
+        }
+
+        this.setState(produce(draft => {
+            draft.log = data.log
+            draft.timestamp = data.timestamp
+        }))
     }
 
     render() {
