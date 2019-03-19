@@ -18,8 +18,8 @@ export default withContext(class Now extends React.Component {
         return (index !== -1) ? index : null
     }
 
-    static nothingActive(list) {
-        return (list.filter(i => (i.active)).length === 0)
+    static hasActive(list) {
+        return (list.filter(i => (i.active)).length === 1)
     }
 
     static hasTasks(list) {
@@ -29,7 +29,15 @@ export default withContext(class Now extends React.Component {
     }
 
     static hasTasksAndActive(list) {
-        return (Now.hasTasks(list) && (Now.nothingActive(list) === false))
+        return (Now.hasTasks(list) && Now.hasActive(list))
+    }
+
+    static hasTasksAndDone(list) {
+        return (Now.hasTasks(list) && list.every(i => i.checked === true))
+    }
+
+    static baby(list) {
+        return (list.length === 0)
     }
 
     static getDerivedStateFromError(error) {
@@ -93,7 +101,7 @@ export default withContext(class Now extends React.Component {
         if (this.state.hasError) return this.renderError()
 
         return (<StyledDiv>
-            { (Now.hasTasksAndActive(this.props.list)) ? (
+            { (Now.hasTasksAndActive(this.props.list)) && (
                 <React.Fragment>
                     <h2>{ this.activeTask.text.toLowerCase() }</h2>
 
@@ -104,7 +112,10 @@ export default withContext(class Now extends React.Component {
                             text="undo" />)
                         : (<Button
                             id="done"
-                            action={ this.props.doneActiveListItem }
+                            action={ () => {
+                                this.props.doneActiveListItem()
+                                audios.playBeep()
+                            } }
                             text="done"
                             ref={ this.props.doneRef } />)
                     }
@@ -123,10 +134,19 @@ export default withContext(class Now extends React.Component {
                     </label> */}
                     {/* <Totals totals={ this.getTotals() } /> */}
                 </React.Fragment>
-            ) : (
+            ) }
+
+            { (Now.hasTasksAndDone(this.props.list)) && (
                 <React.Fragment>
                     <h2>your brain is so strong.</h2>
-                    <p><small>add a few items to your routine to get started.</small></p>
+                    <p><small>go relax. you deserve it.</small></p>
+                </React.Fragment>
+            ) }
+
+            { (Now.baby(this.props.list)) && (
+                <React.Fragment>
+                    <h2>your brain is ready.</h2>
+                    <p><small>add a few tasks to your routine to get started.</small></p>
                 </React.Fragment>
             ) }
         </StyledDiv>)
