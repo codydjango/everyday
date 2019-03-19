@@ -96336,7 +96336,7 @@ function _web3Init() {
   _web3Init = _asyncToGenerator(
   /*#__PURE__*/
   regeneratorRuntime.mark(function _callee2() {
-    var provider, web3, enabled, defaultAccount, otherDefaultAccount, web3Version, providerType, isConnected, networkType;
+    var provider, web3, defaultAccount, otherDefaultAccount, web3Version, providerType, isConnected, networkType;
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
@@ -96350,36 +96350,29 @@ function _web3Init() {
             }
 
             window.web3 = web3 = new _web.default(provider);
-
-            if (!window.ethereum) {
-              _context2.next = 10;
-              break;
-            }
-
-            _context2.next = 5;
-            return window.ethereum.enable();
-
-          case 5:
-            defaultAccount = _context2.sent[0];
-            _context2.next = 8;
-            return web3.eth.getAccounts();
-
-          case 8:
-            otherDefaultAccount = _context2.sent[0];
-            // console.log(`web3 enabled with default account: ${ defaultAccount }`)
-            // console.log(`web3 enabled with other default account: ${ otherDefaultAccount }`)
-            // use the checksum address
-            defaultAccount = otherDefaultAccount;
-
-          case 10:
             web3Version = web3.version.api || web3.version;
             providerType = getProviderType(provider);
             isConnected = providerType === "metamask" ? provider.isConnected() : provider.connected;
-            _context2.next = 15;
+            _context2.next = 7;
             return getNetworkType(web3);
 
-          case 15:
+          case 7:
             networkType = _context2.sent;
+
+            if (!(providerType === "metamask" && window.ethereum)) {
+              _context2.next = 11;
+              break;
+            }
+
+            _context2.next = 11;
+            return window.ethereum.enable();
+
+          case 11:
+            _context2.next = 13;
+            return web3.eth.getAccounts();
+
+          case 13:
+            defaultAccount = _context2.sent[0];
             return _context2.abrupt("return", {
               web3: web3,
               web3Version: web3Version,
@@ -96389,7 +96382,7 @@ function _web3Init() {
               defaultAccount: defaultAccount
             });
 
-          case 17:
+          case 15:
           case "end":
             return _context2.stop();
         }
@@ -101183,6 +101176,14 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -101208,10 +101209,59 @@ function () {
       }
     }
   }, {
+    key: "updateActivity",
+    value: function updateActivity(data, daysMissing) {
+      // process last day
+      if (data.list.every(function (a) {
+        return a;
+      })) {
+        data.activity.log += '1';
+      } else if (data.list.reduce(function (a, b) {
+        return a ^ b;
+      })) {
+        data.activity.log += 's';
+      } else {
+        data.activity.log += '0';
+      } // subtract last days from remaining days
+
+
+      daysMissing -= 1 // backfill remaining days
+      ;
+
+      _toConsumableArray(Array(daysMissing).keys()).forEach(function (i) {
+        data.activity.log += '0';
+      }); // timestamp today
+
+
+      data.activity.today = +new Date(); // reset for today
+
+      data.list.forEach(function (item) {
+        item.checked = false;
+        item.active = false;
+      });
+      if (data.list.length > 0) data.list[0].active = true;
+    }
+  }, {
+    key: "normalizeDay",
+    value: function normalizeDay(data) {
+      if (!data.activity) data.activity = {
+        log: '',
+        timestamp: +new Date()
+      };
+      var date1 = new Date();
+      var date2 = new Date(data.activity.timestamp);
+      var differentDay = date1.getDay() !== date2.getDay();
+      var difference = date1.getTime() - date2.getTime();
+      var daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24);
+      if (differentDay && daysDifference) this.updateActivity(data, daysDifference);
+    }
+  }, {
     key: "seed",
     value: function seed(data) {
+      this.normalizeDay(data);
       if (data && data.notes) this.notes.updateNotes(data.notes, false);
       if (data && data.list) this.list.updateList(data.list, false);
+      if (data) this.status.updateActivity(data.activity, false);
       if (data && data.notes) _search.default.addAll(data.notes);
     }
     /**
@@ -101292,7 +101342,11 @@ function () {
     value: function allData() {
       return {
         list: this.list.state.list,
-        notes: this.notes.state.notes
+        notes: this.notes.state.notes,
+        activity: {
+          timestamp: this.status.state.timestamp,
+          log: this.status.state.log
+        }
       };
     }
   }, {
@@ -105806,7 +105860,146 @@ function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(
 var _default = _styledComponents.default.footer(_templateObject());
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js"}],"providers/StatusProvider.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js"}],"components/Activity.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _styledComponents = _interopRequireDefault(require("styled-components"));
+
+var _hoc = require("~/hoc");
+
+var _context = require("~/context");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _templateObject3() {
+  var data = _taggedTemplateLiteral(["\n    padding: 0px;\n    margin: 0px;\n    display: inline-block;\n    font-weight: 700;\n\n    &:before {\n        content: \"\u2610\";\n    }\n\n    &.started {\n        &:before {\n            content: \"\u2611\";\n        }\n    }\n\n    &.done {\n        &:before {\n            content: \"\u2612\";\n        }\n    }\n"]);
+
+  _templateObject3 = function _templateObject3() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject2() {
+  var data = _taggedTemplateLiteral(["\n    position: relative;\n    padding: 0px;\n    margin: 0px;\n    list-style: none;\n"]);
+
+  _templateObject2 = function _templateObject2() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject() {
+  var data = _taggedTemplateLiteral(["\n    position: relative;\n    height: auto;\n    margin-bottom: 14px;\n\n    h4 {\n        font-style: italic;\n        text-transform: lowercase;\n    }\n"]);
+
+  _templateObject = function _templateObject() {
+    return data;
+  };
+
+  return data;
+}
+
+function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+var StyledDiv = _styledComponents.default.div(_templateObject());
+
+var StyledList = _styledComponents.default.ul(_templateObject2());
+
+var StyledListItem = _styledComponents.default.li(_templateObject3());
+
+function calculateStreak(log) {
+  return log.reduce(function (acc, current) {
+    if (current === '1') {
+      acc.streak += 1;
+    } else {
+      acc.streak = 0;
+    }
+
+    if (acc.streak > acc.max) {
+      acc.max = acc.streak;
+    }
+
+    return acc;
+  }, {
+    max: 0,
+    streak: 0
+  });
+}
+
+var Activity =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(Activity, _React$Component);
+
+  function Activity() {
+    _classCallCheck(this, Activity);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Activity).apply(this, arguments));
+  }
+
+  _createClass(Activity, [{
+    key: "render",
+    value: function render() {
+      var log = this.props.log && this.props.log.split ? this.props.log.split('') : [];
+      var streak = calculateStreak(log);
+
+      var getClass = function getClass(v) {
+        if (v === '1') {
+          return 'done';
+        } else if (v === 's') {
+          return 'started';
+        } else {
+          return '';
+        }
+      };
+
+      if (log.length === 0) return null;
+      return _react.default.createElement(StyledDiv, null, _react.default.createElement("h4", {
+        children: "activity",
+        title: "Longest streak: ".concat(streak.max)
+      }), _react.default.createElement(StyledList, null, log.map(function (v, i) {
+        return _react.default.createElement(StyledListItem, {
+          key: i,
+          className: getClass(v)
+        });
+      })));
+    }
+  }]);
+
+  return Activity;
+}(_react.default.Component);
+
+var _default = (0, _hoc.withContext)(Activity, [_context.StatusContext]);
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/hoc":"hoc/index.js","~/context":"context/index.js"}],"providers/StatusProvider.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -105818,7 +106011,7 @@ var _react = _interopRequireDefault(require("react"));
 
 var _immer = _interopRequireDefault(require("immer"));
 
-var _context2 = require("~/context");
+var _context = require("~/context");
 
 var _store = _interopRequireDefault(require("~/services/store"));
 
@@ -105829,10 +106022,6 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -105862,9 +106051,13 @@ function (_React$Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(StatusProvider).call(this, props));
     _this.state = {
-      status: "it's so nice to see you!"
+      status: "it's so nice to see you!",
+      timestamp: +new Date(),
+      log: ''
     };
+    _this.today = +new Date();
     _this.updateStatus = _this.updateStatus.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.updateActivity = _this.updateActivity.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
 
@@ -105880,36 +106073,27 @@ function (_React$Component) {
     }
   }, {
     key: "updateStatus",
-    value: function () {
-      var _updateStatus = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee(status) {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                this.setState({
-                  status: status
-                });
-
-              case 1:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
+    value: function updateStatus(status) {
+      this.setState({
+        status: status
+      });
+    }
+  }, {
+    key: "updateActivity",
+    value: function updateActivity(data) {
+      data = data || {
+        log: '',
+        timestamp: +new Date()
+      };
+      this.setState((0, _immer.default)(function (draft) {
+        draft.log = data.log;
+        draft.timestamp = data.timestamp;
       }));
-
-      function updateStatus(_x) {
-        return _updateStatus.apply(this, arguments);
-      }
-
-      return updateStatus;
-    }()
+    }
   }, {
     key: "render",
     value: function render() {
-      return _react.default.createElement(_context2.StatusContext.Provider, {
+      return _react.default.createElement(_context.StatusContext.Provider, {
         value: _objectSpread({}, this.state, {
           updateStatus: this.updateStatus
         })
@@ -106741,6 +106925,8 @@ var _Header = _interopRequireDefault(require("~/components/Header"));
 
 var _Footer = _interopRequireDefault(require("~/components/Footer"));
 
+var _Activity = _interopRequireDefault(require("~/components/Activity"));
+
 var _StatusProvider = _interopRequireDefault(require("~/providers/StatusProvider"));
 
 var _AuthProvider = _interopRequireDefault(require("~/providers/AuthProvider"));
@@ -106835,7 +107021,7 @@ function (_React$Component) {
         className: "now"
       }), _react.default.createElement(_Scratchpad.default, {
         className: "scratchpad"
-      })), _react.default.createElement(_Today.default, {
+      }), _react.default.createElement(_Activity.default, null)), _react.default.createElement(_Today.default, {
         className: "today"
       })), _react.default.createElement(_Footer.default, {
         className: "footer"
@@ -106853,7 +107039,7 @@ function (_React$Component) {
 var _default = (0, _hoc.withProvider)(App, [_StatusProvider.default, _AuthProvider.default, _ListProvider.default, _NotesProvider.default]);
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/components/Auth":"components/Auth.js","~/components/Logo":"components/Logo.js","~/components/Status":"components/Status.js","~/components/DataInterface":"components/DataInterface.js","~/components/Today":"components/Today.js","~/components/Now":"components/Now.js","~/components/Scratchpad":"components/Scratchpad.js","~/components/Header":"components/Header.js","~/components/Footer":"components/Footer.js","~/providers/StatusProvider":"providers/StatusProvider.js","~/providers/AuthProvider":"providers/AuthProvider.js","~/providers/ListProvider":"providers/ListProvider.js","~/providers/NotesProvider":"providers/NotesProvider.js","~/hoc":"hoc/index.js"}],"components/Message.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/components/Auth":"components/Auth.js","~/components/Logo":"components/Logo.js","~/components/Status":"components/Status.js","~/components/DataInterface":"components/DataInterface.js","~/components/Today":"components/Today.js","~/components/Now":"components/Now.js","~/components/Scratchpad":"components/Scratchpad.js","~/components/Header":"components/Header.js","~/components/Footer":"components/Footer.js","~/components/Activity":"components/Activity.js","~/providers/StatusProvider":"providers/StatusProvider.js","~/providers/AuthProvider":"providers/AuthProvider.js","~/providers/ListProvider":"providers/ListProvider.js","~/providers/NotesProvider":"providers/NotesProvider.js","~/hoc":"hoc/index.js"}],"components/Message.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -107030,7 +107216,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59289" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53122" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
