@@ -1,6 +1,6 @@
 # everyday
 
-## Get your minimum done, every day.
+## Get the minimum done, every day.
 
 Everyday is an ethereum-integrated habit-former. As difficult tasks become habitual, update your routine for continuous improvement.
 
