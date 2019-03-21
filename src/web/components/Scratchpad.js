@@ -109,7 +109,7 @@ class Scratchpad extends React.Component {
     handleArchiveUpdate(name) {
         this.props.updateNote(name)
         this.inputRef.current.focus()
-        this.props.updateStatus(`Updated.`)
+        this.props.updateStatus(`updated`)
     }
 
     handleArchiveDelete() {
@@ -118,24 +118,23 @@ class Scratchpad extends React.Component {
         }
 
         this.inputRef.current.focus()
-        this.props.updateStatus(`Deleted note.`)
+        this.props.updateStatus(`deleted`)
     }
 
     handleArchiveSave(name) {
         this.props.archiveNote(name)
         this.inputRef.current.focus()
-        this.props.updateStatus(`Saved new as '${ name }'.`)
+        this.props.updateStatus(`saved as '${ name }'`)
     }
 
     handleArchiveClose() {
         this.props.closeNote()
         this.inputRef.current.focus()
-        this.props.updateStatus(`Closed.`)
     }
 
     handleArchiveLoad(id) {
         this.props.loadNote(id)
-        this.props.updateStatus(`Loaded.`)
+        this.props.updateStatus(`loaded`)
     }
 
     onInput() {
@@ -158,11 +157,11 @@ class Scratchpad extends React.Component {
         <StyledDiv>
             <div className="flex">
                 <span className="flexLeft"><h4 children="scratchpad" /></span>
-                <span><small children={ (this.state.dirty) ? "Unsaved..." : "Saved." } /></span>
+                <span><small children={ (this.state.dirty) ? 'unsaved' : 'saved' } /></span>
             </div>
 
             <StyledInput
-                className={ `field ${ (this.state.error) ? "error" : "" }` }
+                className={ `field ${ (this.state.error) ? 'error' : '' }` }
                 contentEditable
                 data-gramm_editor="false"
                 ref={ this.inputRef }

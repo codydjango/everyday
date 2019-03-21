@@ -12,8 +12,6 @@ function activeIndex(list) {
 }
 
 const defaultString = `
-    Hello and welcome. It's so nice to meet you.
-
     This app is very simple:
     * Add tasks to your daily routine.
     * Order tasks to strategize your day.
@@ -24,11 +22,10 @@ const defaultString = `
     * Archive notes that are no longer relevant.
     * Find old notes with the full-text search.
 
-    It's suggested you install the MetaMask browser extension so your data will be persistent and synced with the cloud. MetaMask is an easier and more secure way to log in to web applications using cryptography. No passwords!
+    It's suggested you log in with MetaMask to keep your data persistent.
     `
 
 const defaultMarkup = `
-    <p>Hello and welcome. It's nice to meet you.</p>
     <p>This app is very simple:</p>
     <div>* Add tasks to your daily routine.</div>
     <div>* Order tasks to strategize your day.<br></div>
@@ -39,7 +36,7 @@ const defaultMarkup = `
     <div>* Archive notes that are no longer relevant.</div>
     <div>* Find old notes with the full-text search.</div>
     <div><br></div>
-    <p>It's suggested you login with the MetaMask browser extension so your data will be persistent and synced with the cloud.</p>
+    <p>It's suggested you log in with MetaMask to keep your data persistent..</p>
     `
 
 
