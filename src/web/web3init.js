@@ -67,26 +67,26 @@ export default async function web3Init() {
     if (web3.eth.net.isListening) await writer.add('listening procedure initiated')
     if (web3.eth.net.isListening) {
         try {
-            listening = await web3.eth.net.isListening()
+            listening = await web3.eth.net.isListening(async()=>{ await writer.add('listening callback1')})
             await writer.add(`listening: ${ listening }`)
         } catch(err) {
-            await writer.add(err.message)
+            await writer.add('1 ' + err.message)
         }
 
         try {
-            listening = web3.eth.net.isListening()
+            listening = web3.eth.net.isListening(async()=>{ await writer.add('listening callback2')})
             await writer.add(`listening: ${ listening }`)
         } catch(err) {
-            await writer.add(err.message)
+            await writer.add('2 ' + err.message)
         }
 
 
         try {
             web3.eth.net.isListening(async () => {
-                await writer.add(`listening callback`)
+                await writer.add(`listening callback 3`)
             })
         } catch(err) {
-            await writer.add(err.message)
+            await writer.add('3 ' + err.message)
         }
 
 
@@ -98,7 +98,7 @@ export default async function web3Init() {
             let connected = await web3.eth.net.isConnected()
             await writer.add(`connected: ${ connected }`)
         } catch(err) {
-            await writer.add(err.message)
+            await writer.add('4 ' + err.message)
         }
     }
 
@@ -111,7 +111,7 @@ export default async function web3Init() {
             isConnected = isConnected()
             await writer.add(`connected: ${ isConnected }`)
         } catch (err) {
-            await writer.add(err.message)
+            await writer.add('5 ' + err.message)
         }
     }
 
@@ -132,7 +132,8 @@ export default async function web3Init() {
         if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
         if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
 
-        await writer.add()
+        await web3.eth.getAccounts(async()=>{ await writer.add('accounts callback5')})
+
 
         const accounts = await web3.eth.getAccounts(async (d) => {
             await writer.add(`accounts callback activated`)
@@ -146,13 +147,13 @@ export default async function web3Init() {
         if (accounts && accounts.length > 0) {
             await writer.add(`accounts accessed: ${ accounts.length }`)
             defaultAccount = accounts[0]
-            await writer.add(`${ defaultAccount }`)
+            await writer.add(`6 ${ defaultAccount }`)
         } else {
             await writer.add(`accounts denied`)
             defaultAccount = null
         }
     } catch(err) {
-        await writer.add(`${ err.message }`)
+        await writer.add(`7 ${ err.message }`)
     }
 
     await writer.add('program initialization complete')
