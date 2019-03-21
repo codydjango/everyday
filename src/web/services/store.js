@@ -32,7 +32,7 @@ class Store {
         })
 
         // timestamp today
-        data.activity.today = +new Date()
+        data.activity.timestamp = +new Date()
 
         // reset for today
         data.list.forEach(item => {
@@ -44,9 +44,11 @@ class Store {
     }
 
     normalizeDay(data) {
-        if (!data.activity) data.activity = {
-            log: '',
-            timestamp: +new Date()
+        if (!data.activity) {
+            data.activity = {
+                log: '',
+                timestamp: +new Date()
+            }
         }
 
         const date1 = new Date()
