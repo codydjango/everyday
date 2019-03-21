@@ -82,16 +82,16 @@ export default async function web3Init() {
         const accounts = await web3.eth.getAccounts()
         if (accounts && accounts.length > 0) {
             await writer.add(`accounts accessed: ${ accounts.length }`)
+            defaultAccount = accounts[0]
+            await writer.add(`${ defaultAccount }`)
         } else {
             await writer.add(`accounts denied`)
+            defaultAccount = null
         }
-
-        defaultAccount = ()[0]
     } catch(err) {
         await writer.add(`${ err.message }`)
     }
 
-    await writer.add(`${ defaultAccount }`)
     await writer.add('program initialization complete')
     await writer.end(3000)
 
