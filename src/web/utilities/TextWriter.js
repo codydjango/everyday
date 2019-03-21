@@ -15,10 +15,15 @@ function easeInQuad(t, b, c, d) {
 
 class TextWriter {
     constructor(id) {
-        this._root = document.getElementById(id)
-        this._processString = this._processString.bind(this)
+        this._el = document.createElement('pre')
+        this._el.setAttribute('class', 'textwriter')
+        this._el.setAttribute('style', 'max-width: 100%; width: 100%;')
 
-        this._root.setAttribute('style', 'max-width: 100%; width: 100%;')
+        this._root = document.getElementById('root')
+
+        document.body.insertBefore(this._el, this._root)
+
+        this._processString = this._processString.bind(this)
     }
 
     writeWithEasing(str) {
@@ -57,7 +62,7 @@ class TextWriter {
     async end(time = 3000) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                this._root.parentNode.removeChild(this._root)
+                this._el.parentNode.removeChild(this._el)
                 resolve(true)
             }, time)
         })
@@ -75,7 +80,7 @@ class TextWriter {
 
     writeChar() {
         if (this._str[0] !== undefined) {
-            this._root.innerText += this._str[0]
+            this._el.innerText += this._str[0]
         }
 
         this._str = this._str.substring(1, (this._str.length))
