@@ -67,29 +67,11 @@ export default async function web3Init() {
     if (web3.eth.net.isListening) await writer.add('listening procedure initiated')
     if (web3.eth.net.isListening) {
         try {
-            listening = await web3.eth.net.isListening(async()=>{ await writer.add('listening callback1')})
+            listening = await web3.eth.net.isListening()
             await writer.add(`listening: ${ listening }`)
         } catch(err) {
-            await writer.add('1 ' + err.message)
+            await writer.add(err.message)
         }
-
-        try {
-            listening = web3.eth.net.isListening(async()=>{ await writer.add('listening callback2')})
-            await writer.add(`listening: ${ listening }`)
-        } catch(err) {
-            await writer.add('2 ' + err.message)
-        }
-
-
-        try {
-            web3.eth.net.isListening(async () => {
-                await writer.add(`listening callback 3`)
-            })
-        } catch(err) {
-            await writer.add('3 ' + err.message)
-        }
-
-
     }
 
     if (web3.eth.net.isConnected) await writer.add('connection procedure initiated')
@@ -98,7 +80,7 @@ export default async function web3Init() {
             let connected = await web3.eth.net.isConnected()
             await writer.add(`connected: ${ connected }`)
         } catch(err) {
-            await writer.add('4 ' + err.message)
+            await writer.add(err.message)
         }
     }
 
@@ -106,12 +88,11 @@ export default async function web3Init() {
 
     if (typeof isConnected === 'function') {
         await writer.add(`forcing connection`)
-
         try {
             isConnected = isConnected()
             await writer.add(`connected: ${ isConnected }`)
         } catch (err) {
-            await writer.add('5 ' + err.message)
+            await writer.add(err.message)
         }
     }
 
@@ -119,6 +100,7 @@ export default async function web3Init() {
     await writer.add(`configuring darknet proxy`)
 
     const networkType = await getNetworkType(web3)
+
     await writer.add(`network: ${ networkType }`)
 
     if (window.ethereum) {
@@ -132,17 +114,7 @@ export default async function web3Init() {
         if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
         if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
 
-        await web3.eth.getAccounts(async()=>{ await writer.add('accounts callback5')})
-
-
-        const accounts = await web3.eth.getAccounts(async (d) => {
-            await writer.add(`accounts callback activated`)
-
-            if (d && d.length > 0) {
-                await writer.add('1', d.length)
-                await writer.add(d['2', 0])
-            }
-        })
+        const accounts = web3.eth.accounts
 
         if (accounts && accounts.length > 0) {
             await writer.add(`accounts accessed: ${ accounts.length }`)
