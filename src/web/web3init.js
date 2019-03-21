@@ -67,14 +67,14 @@ export default async function web3Init() {
     if (web3.eth.net.isConnected) await writer.add('connection procedure initiated')
 
     try {
-        listening = await web.eth.net.isListening()
+        listening = await web3.eth.net.isListening()
         await writer.add(listening)
     } catch(err) {
         await writer.add(err.message)
     }
 
     try {
-        let connected = await web.eth.net.isConnected()
+        let connected = await web3.eth.net.isConnected()
         await writer.add(connected)
     } catch(err) {
         await writer.add(err.message)
@@ -89,11 +89,11 @@ export default async function web3Init() {
         await writer.add(`forcing connection`)
 
         try {
-            isConnected = icConnected()
+            isConnected = isConnected()
+            await writer.add(`connected: ${ isConnected }`)
         } catch (err) {
             await writer.add(err.message)
         }
-
     }
 
     isConnected = isListening
