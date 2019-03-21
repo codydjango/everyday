@@ -28,40 +28,50 @@ async function getNetworkType(web3) {
 
 export default async function web3Init() {
     const writer = new TextWriter('init')
-    await writer.add('initiating')
-    let provider, web3, defaultAccount, otherDefaultAccount
+
+    await writer.add('commencing initialization of "everyday" routine management software account interface')
+    let provider, web3, defaultAccount, otherDefaultAccount, providerType
     await writer.add(`seeking provider`)
     if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
         // Web3 browser user detected. You can now use the provider.
-        if (window.ethereum) await writer.add(`found ethereum`)
-        provider = window.ethereum || window.web3.currentProvider
+        // if (window.ethereum) await writer.add(`found ethereum`)
+        provider = window.web3.currentProvider
+        providerType = getProviderType(provider)
+        await writer.add(`identified provider: ${ providerType }`)
     } else {
-        await writer.add(`setting up infura`)
         provider = new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/c63d2ec360ce413ea4dc8b10e0cf1fac")
+        providerType = getProviderType(provider)
+        await writer.add(`integrating with infura socket pipeline`)
     }
 
-    const providerType = getProviderType(provider)
-    await writer.add(`found provider: ${ providerType }`)
-    await writer.add(`host: ${ provider.host }`)
-    await writer.add(`setting up web3`)
+
+    await writer.add(`configuring web3`)
     window.web3 = web3 = new Web3(provider)
+    provider = window.web3.currentProvider
+
+    await writer.add(`host: ${ provider.host }`)
+    await writer.add(`syncing with deep web`)
+    await writer.add(`randomizing blockchains`)
     const web3Version = web3.version.api || web3.version
     await writer.add(`version: ${ web3Version }`)
-    const isConnected = (providerType === "metamask") ? provider.isConnected() : provider.connected
+    const isConnected = provider.connected || (provider.isConnected || provider.isConnected())
     await writer.add(`connected: ${ isConnected }`)
+    await writer.add(`configuring darknet proxy`)
+
     const networkType = await getNetworkType(web3)
     await writer.add(`network: ${ networkType }`)
 
-    if (providerType === "metamask" && window.ethereum) {
+    if (window.ethereum) {
         await writer.add(`enabling ethereum`)
         await window.ethereum.enable()
     }
 
     await writer.add(`sourcing default account`)
     defaultAccount = (await web3.eth.getAccounts())[0]
-    await writer.add(`default account: ${ defaultAccount }`)
-    await writer.add('done')
-    await writer.end()
+    await writer.add(`${ defaultAccount }`)
+    await writer.add('program initialization complete')
+    await writer.add('wishing you a beautiful day')
+    await writer.end(3000)
 
     return {
         web3,

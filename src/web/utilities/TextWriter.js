@@ -1,3 +1,18 @@
+
+function easeInOutQuad(t, b, c, d) {
+    if ((t/=d/2) < 1) return c/2*t*t + b;
+    return -c/2 * ((--t)*(t-2) - 1) + b;
+}
+
+function easeOutQuad(t, b, c, d) {
+    return -c * (t/=d)*(t-2) + b;
+}
+
+function easeInQuad(t, b, c, d) {
+    return c*(t/=d)*t + b;
+}
+
+
 class TextWriter {
     constructor(id) {
         this._root = document.getElementById(id)
@@ -6,14 +21,24 @@ class TextWriter {
         this._root.setAttribute('style', 'max-width: 100%; width: 100%;')
     }
 
-    startWriting(str) {
+    writeWithEasing(str) {
+        let time = 100;
+
+        const diff = str.length;
+        const minTime = 80;
+        const maxTime = 1000;
+
         this._str = str
-        this._el = document.createElement('span')
-        this._el.innerText = ''
-        this._root.appendChild(this._el)
 
         this.pEnd = new Promise((resolve, reject) => {
-            this._int = setInterval(this._processString, 12)
+            for( let i = 0, len = diff; i <= len; i++ ) {
+                setTimeout(() => {
+                    this._processString()
+                    if (i === diff) resolve(true)
+                }, time)
+                time = easeOutQuad(i, minTime, maxTime, diff);
+            }
+
             this.resolve = resolve
             this.reject = reject
         })
@@ -21,26 +46,20 @@ class TextWriter {
         return this.pEnd
     }
 
-    stopWriting() {
-        clearInterval(this._int)
-    }
-
-    addSpacer() {
-        this._root.appendChild(document.createTextNode(' '))
+    startWriting(str) {
+        return this.writeWithEasing(str)
     }
 
     add(str) {
-        return this.startWriting(`${ str }...`)
+        return this.startWriting(`${ str.trim() }... `)
     }
 
-    async end() {
-        this.stopWriting()
-
+    async end(time = 3000) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 this._root.parentNode.removeChild(this._root)
                 resolve(true)
-            }, 3000)
+            }, time)
         })
     }
 
@@ -55,14 +74,15 @@ class TextWriter {
     }
 
     writeChar() {
-        this._el.innerText += this._str[0]
+        if (this._str[0] !== undefined) {
+            this._root.innerText += this._str[0]
+        }
+
         this._str = this._str.substring(1, (this._str.length))
     }
 
     check() {
         if (this._str.length === 0) {
-            this.stopWriting()
-            this.addSpacer()
             this.resolve(true)
         }
     }

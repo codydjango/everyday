@@ -10,7 +10,6 @@ import Message from '~/components/Message'
 import Layout from '~/components/Layout'
 
 
-
 (async function init() {
     // figure out web3. we're gonna install our own and use an infura provider
     // if they don't have their own provider set up.
