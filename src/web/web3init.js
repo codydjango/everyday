@@ -16,7 +16,7 @@ function getProviderType(provider) {
     return 'unknown'
 }
 
-async function getNetworkType(web3) {
+async function getNetworkType(web3, writer) {
     let networkType
 
     try {
@@ -24,6 +24,7 @@ async function getNetworkType(web3) {
     } catch (err) {
         console.log('can\'t detect web3 network type')
         networkType = 'unknown'
+        await writer.add(err)
     }
 
     return networkType
@@ -95,13 +96,13 @@ export default async function web3Init() {
         } catch (err) {
             await writer.add(err.message)
         }
+    } else {
+        await writer.add(`connected: ${ isConnected }`)
     }
 
-    await writer.add(`connected: ${ isConnected }`)
+
     await writer.add(`configuring darknet proxy`)
-
-    const networkType = await getNetworkType(web3)
-
+    const networkType = await getNetworkType(web3, writer)
     await writer.add(`network: ${ networkType }`)
 
     if (window.ethereum) {
@@ -116,7 +117,7 @@ export default async function web3Init() {
         if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
         if (web3.eth.defaultAccount) await writer.add(`new ${ web3.eth.defaultAccount}`)
 
-        myWeb3.eth.defaultAccount = window.web3.eth.defaultAccount;
+        web3.eth.defaultAccount = window.web3.eth.defaultAccount;
 
         if (web3.eth.defaultAccount) await writer.add(`from window ${ web3.eth.defaultAccount}`)
 
