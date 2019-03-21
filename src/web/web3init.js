@@ -59,7 +59,26 @@ export default async function web3Init() {
     const web3Version = web3.version.api || web3.version
     await writer.add(`version: ${ web3Version }`)
 
-    let isConnected
+    let isConnected, listening
+
+    if (web3.eth) await writer.add('connection gateway detected')
+    if (web3.eth.net) await writer.add('net portal activated')
+    if (web3.eth.net.isListening) await writer.add('listening procedure initiated')
+    if (web3.eth.net.isConnected) await writer.add('connection procedure initiated')
+
+    try {
+        listening = await web.eth.net.isListening()
+        await writer.add(listening)
+    } catch(err) {
+        await writer.add(err.message)
+    }
+
+    try {
+        let connected = await web.eth.net.isConnected()
+        await writer.add(connected)
+    } catch(err) {
+        await writer.add(err.message)
+    }
 
     await writer.add(`connected (1): ${ provider.connected }`)
     await writer.add(`connected (2): ${ provider.isConnected }`)
@@ -68,8 +87,16 @@ export default async function web3Init() {
 
     if (typeof isConnected === 'function') {
         await writer.add(`forcing connection`)
-        isConnected = icConnected()
+
+        try {
+            isConnected = icConnected()
+        } catch (err) {
+            await writer.add(err.message)
+        }
+
     }
+
+    isConnected = isListening
 
     await writer.add(`connected: ${ isConnected }`)
     await writer.add(`configuring darknet proxy`)
