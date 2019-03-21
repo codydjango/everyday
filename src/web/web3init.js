@@ -63,10 +63,9 @@ export default async function web3Init() {
 
     if (web3.eth) await writer.add('connection gateway detected')
     if (web3.eth.net) await writer.add('net portal activated')
-    if (web3.eth.net.isListening) await writer.add('listening procedure initiated')
-    if (web3.eth.net.isConnected) await writer.add('connection procedure initiated')
 
-    if (web3.ether.net.isListening) {
+    if (web3.eth.net.isListening) await writer.add('listening procedure initiated')
+    if (web3.eth.net.isListening) {
         try {
             listening = await web3.eth.net.isListening()
             await writer.add(`listening: ${ listening }`)
@@ -75,6 +74,7 @@ export default async function web3Init() {
         }
     }
 
+    if (web3.eth.net.isConnected) await writer.add('connection procedure initiated')
     if (web3.eth.net.isConnected) {
         try {
             let connected = await web3.eth.net.isConnected()
