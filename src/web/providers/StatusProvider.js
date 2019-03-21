@@ -28,7 +28,9 @@ export default class StatusProvider extends React.Component {
     }
 
     updateStatus(status) {
-        this.setState({ status })
+        this.setState(produce(draft => {
+            draft.status = status
+        }))
     }
 
     updateActivity(data) {
