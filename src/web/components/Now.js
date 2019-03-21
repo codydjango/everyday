@@ -138,14 +138,14 @@ export default withContext(class Now extends React.Component {
 
             { (Now.hasTasksAndDone(this.props.list)) && (
                 <React.Fragment>
-                    <h2>your brain is so strong.</h2>
+                    <h2>your brain is so strong</h2>
                     <p><small>go relax. you deserve it.</small></p>
                 </React.Fragment>
             ) }
 
             { (Now.baby(this.props.list)) && (
                 <React.Fragment>
-                    <h2>your brain is ready.</h2>
+                    <h2>your brain is ready</h2>
                     <p><small>add a few tasks to your routine to get started.</small></p>
                 </React.Fragment>
             ) }
