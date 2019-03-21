@@ -50,7 +50,8 @@ export default async function web3Init() {
 
 
     await writer.add(`configuring web3`)
-    const web3 = new Web3(provider)
+
+    web3 = new Web3(provider)
     provider = window.web3.currentProvider
 
     await writer.add(`host: ${ provider.host }`)
