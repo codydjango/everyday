@@ -91,6 +91,16 @@ html, body {
   margin: 0;
 }
 
+pre {
+  white-space: normal;
+  overflow: auto;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
 body {
   font-family: "Cutive Mono", sans-serif;
   -moz-osx-font-smoothing: grayscale;
