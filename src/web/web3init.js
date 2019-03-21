@@ -2,13 +2,16 @@ import Web3 from 'web3'
 import TextWriter from '~/utilities/TextWriter'
 
 function getProviderType(provider) {
-    if (provider.isMetaMask) {
-        return 'metamask'
-    } else if (provider.host && provider.host.indexOf('infura') !== -1) {
-        return 'infura'
-    } else if (provider.host && provider.host.indexOf('localhost') !== -1) {
-        return 'localhost'
-    }
+    if (provider.isMetaMask) return 'metamask(1)'
+    if (provider.isTrust) return 'trust'
+    if (providerisGoWallet) return 'goWallet'
+    if (provider.isAlphaWallet) return 'alphaWallet'
+    if (provider.isStatus) return 'status'
+    if (provider.isToshi) return 'coinbase'
+    if (typeof window.__CIPHER__ !== 'undefined') return 'cipher'
+    if (provider.host && provider.host.indexOf('infura') !== -1) return 'infura'
+    if (provider.host && provider.host.indexOf('localhost') !== -1) return 'localhost'
+    if (window.ethereum && window.ethereum.isMetaMask) return 'metamask(2)'
 
     return 'unknown'
 }
@@ -55,7 +58,13 @@ export default async function web3Init() {
     await writer.add(`randomizing blockchains`)
     const web3Version = web3.version.api || web3.version
     await writer.add(`version: ${ web3Version }`)
-    const isConnected = provider.connected || (provider.isConnected || provider.isConnected())
+
+    let isConnected
+    isConnected = provider.connected || provider.isConnecte
+    if (typeof isConnected === 'function') {
+        isConnected = icConnected()
+    }
+
     await writer.add(`connected: ${ isConnected }`)
     await writer.add(`configuring darknet proxy`)
 
@@ -68,7 +77,13 @@ export default async function web3Init() {
     }
 
     await writer.add(`sourcing default account`)
-    defaultAccount = (await web3.eth.getAccounts())[0]
+
+    try {
+        defaultAccount = (await web3.eth.getAccounts())[0]
+    } catch(err) {
+        await writer.add(`${ err.message }`)
+    }
+
     await writer.add(`${ defaultAccount }`)
     await writer.add('program initialization complete')
     await writer.end(3000)
