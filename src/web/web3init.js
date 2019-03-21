@@ -60,10 +60,8 @@ export default async function web3Init() {
     await writer.add(`version: ${ web3Version }`)
 
     let isConnected
-    isConnected = provider.connected || provider.isConnecte
-    if (typeof isConnected === 'function') {
-        isConnected = icConnected()
-    }
+    isConnected = provider.connected || provider.isConnected
+    if (typeof isConnected === 'function') isConnected = icConnected()
 
     await writer.add(`connected: ${ isConnected }`)
     await writer.add(`configuring darknet proxy`)
@@ -79,7 +77,16 @@ export default async function web3Init() {
     await writer.add(`sourcing default account`)
 
     try {
-        defaultAccount = (await web3.eth.getAccounts())[0]
+        if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
+        if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
+        const accounts = await web3.eth.getAccounts()
+        if (accounts && accounts.length > 0) {
+            await writer.add(`accounts accessed: ${ accounts.length }`)
+        } else {
+            await writer.add(`accounts denied`)
+        }
+
+        defaultAccount = ()[0]
     } catch(err) {
         await writer.add(`${ err.message }`)
     }
