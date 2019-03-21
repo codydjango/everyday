@@ -1,6 +1,5 @@
 import React from 'react'
 
-import web3Init from '~/web3init'
 import { withContext } from '~/hoc'
 import { AuthContext, StatusContext } from '~/context'
 import getOrdinal from '~/utilities/getOrdinal'
@@ -21,7 +20,7 @@ class Auth extends React.Component {
     }
 
     async componentDidMount() {
-        const { defaultAccount } = await web3Init(window)
+        const defaultAccount = (await window.web3.eth.getAccounts())[0]
         const token = comms.getCookie(defaultAccount)
 
         setTimeout(() => {
