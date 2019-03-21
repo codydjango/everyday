@@ -66,22 +66,26 @@ export default async function web3Init() {
     if (web3.eth.net.isListening) await writer.add('listening procedure initiated')
     if (web3.eth.net.isConnected) await writer.add('connection procedure initiated')
 
-    try {
-        listening = await web3.eth.net.isListening()
-        await writer.add(listening)
-    } catch(err) {
-        await writer.add(err.message)
+    if (web3.ether.net.isListening) {
+        try {
+            listening = await web3.eth.net.isListening()
+            await writer.add(`listening: ${ listening }`)
+        } catch(err) {
+            await writer.add(err.message)
+        }
     }
 
-    try {
-        let connected = await web3.eth.net.isConnected()
-        await writer.add(connected)
-    } catch(err) {
-        await writer.add(err.message)
+    if (web3.eth.net.isConnected) {
+        try {
+            let connected = await web3.eth.net.isConnected()
+            await writer.add(`connected: ${ connected }`)
+        } catch(err) {
+            await writer.add(err.message)
+        }
     }
 
-    await writer.add(`connected (1): ${ provider.connected }`)
-    await writer.add(`connected (2): ${ provider.isConnected }`)
+    await writer.add(`(1): ${ provider.connected }`)
+    await writer.add(`(2): ${ provider.isConnected }`)
 
     isConnected = provider.connected || provider.isConnected
 
@@ -95,8 +99,6 @@ export default async function web3Init() {
             await writer.add(err.message)
         }
     }
-
-    isConnected = isListening
 
     await writer.add(`connected: ${ isConnected }`)
     await writer.add(`configuring darknet proxy`)
