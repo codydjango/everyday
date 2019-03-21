@@ -23,6 +23,8 @@ export default withContext(class Today extends React.Component {
             list: props.list
         }
 
+        this.createTaskRef = React.createRef()
+
         this.onUpdate = this.onUpdate.bind(this)
         this.toggleEdit = this.toggleEdit.bind(this)
         this.startEdit = this.startEdit.bind(this)
@@ -43,6 +45,10 @@ export default withContext(class Today extends React.Component {
         }
 
         return null
+    }
+
+    componentDidMount() {
+        setTimeout(() => { this.createTaskRef.current.focus() }, 1000)
     }
 
     createNewTask(task) {
@@ -123,6 +129,7 @@ export default withContext(class Today extends React.Component {
                 onClick={ this.props.setActiveListItem } />
 
             <FormLine
+                ref={ this.createTaskRef }
                 onSubmit={ value => this.createNewTask(value) }
                 validators={ [value => {
                     const validLength = (value && value.length > 3)

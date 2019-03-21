@@ -25,12 +25,12 @@ class FormLine extends React.Component {
         return validationErr
     }
 
-    constructor(props) {
+    constructor(props, context) {
         super(props)
         this.id = uniqueId()
 
         this.inputName = `_${ this.id }`
-        this.inputRef = React.createRef()
+        this.inputRef = props.forwardedRef || React.createRef()
 
         this.state = {}
         this.state.error = false
@@ -104,4 +104,8 @@ class FormLine extends React.Component {
 
 FormLine.contextType = StatusContext
 
-export default FormLine
+export default (() => {
+    const enhanced = React.forwardRef((props, ref) => <FormLine { ...props } forwardedRef={ ref } />)
+    enhanced.validationError = FormLine.validationError
+    return enhanced
+})()
