@@ -29,8 +29,8 @@ async function getNetworkType(web3) {
 export default async function web3Init() {
     const writer = new TextWriter('init')
 
-    await writer.add('initialization...')
-    await writer.add('browser and web3 detection...')
+    await writer.add('initialization')
+    await writer.add('browser and web3 detection')
     let provider, web3, defaultAccount, otherDefaultAccount, providerType
     await writer.add(`seeking provider`)
     if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
