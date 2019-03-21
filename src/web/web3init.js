@@ -60,8 +60,16 @@ export default async function web3Init() {
     await writer.add(`version: ${ web3Version }`)
 
     let isConnected
+
+    await writer.add(`connected (1): ${ provider.connected }`)
+    await writer.add(`connected (2): ${ provider.isConnected }`)
+
     isConnected = provider.connected || provider.isConnected
-    if (typeof isConnected === 'function') isConnected = icConnected()
+
+    if (typeof isConnected === 'function') {
+        await writer.add(`forcing connection`)
+        isConnected = icConnected()
+    }
 
     await writer.add(`connected: ${ isConnected }`)
     await writer.add(`configuring darknet proxy`)
