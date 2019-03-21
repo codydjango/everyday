@@ -40154,11 +40154,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.randomFromList = exports.messages = void 0;
-var almostDone = ['Oh wow, you\'re almost done!', 'I believe in you!', 'You\'re almost there!', 'Let\'s do this.'];
-var halfway = ['You are so focused!', 'Have you had a break lately?', 'Can I interest you in a nice cup of water?', 'You\'re a beast!'];
-var beginning = ['Wow, so many tasks... You are very ambitious!', 'You look so smart today!', 'What a good day to get a thing done :D'];
-var hello = ['I knew you\'d be back! :)', 'You look so smart today.', 'It really makes me happy to see you so motivated and studious.', 'What a diligent person you are!', 'Welcome back! It\'s so nice to see you.'];
-var working = ['Feelings check...', 'Time for water...', 'A wet brain is a happy brain...', 'One day at a time...', 'Slow breaths...', 'Slow and steady...'];
+var almostDone = ['you are almost done!', 'i believe in you', 'almost there', 'you are making this day count'];
+var halfway = ['you are very focused', 'time for a walk?', 'time for a nice cup of water?'];
+var beginning = ['you are ambitious and motivated', 'you look very smart today', 'what a good day to get a thing done :D'];
+var hello = ['thanks for coming back :)', 'you look smart today', 'It makes me happy to see you so motivated', 'what a hard-working person you are', 'it\'s so nice to see you'];
+var working = ['feelings check', 'time for water?', 'a wet brain is a happy brain', 'one step at a time', 'slow breaths', 'slow and steady', 'deep breath'];
 
 var randomFromList = function randomFromList(list) {
   return list[Math.floor(Math.random() * list.length)];
@@ -42152,7 +42152,7 @@ function () {
       }); // timestamp today
 
 
-      data.activity.today = +new Date(); // reset for today
+      data.activity.timestamp = +new Date(); // reset for today
 
       data.list.forEach(function (item) {
         item.checked = false;
@@ -42163,13 +42163,21 @@ function () {
   }, {
     key: "normalizeDay",
     value: function normalizeDay(data) {
-      if (!data.activity) data.activity = {
-        log: '',
-        timestamp: +new Date()
-      };
+      console.log('data', 'activity?', data.activity, data);
+
+      if (!data.activity) {
+        data.activity = {
+          log: '',
+          timestamp: +new Date()
+        };
+        console.log('no activity found, initialized.');
+      }
+
       var date1 = new Date();
       var date2 = new Date(data.activity.timestamp);
       var differentDay = date1.getDay() !== date2.getDay();
+      console.log(date1.getDay(), date2.getDay());
+      console.log('differentDay', differentDay);
       var difference = date1.getTime() - date2.getTime();
       var daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24);
       if (differentDay && daysDifference) this.updateActivity(data, daysDifference);
@@ -44285,6 +44293,8 @@ var _context = require("~/context");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -44332,7 +44342,7 @@ function (_React$Component) {
     }
   }]);
 
-  function FormLine(props) {
+  function FormLine(props, context) {
     var _this;
 
     _classCallCheck(this, FormLine);
@@ -44340,7 +44350,7 @@ function (_React$Component) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(FormLine).call(this, props));
     _this.id = (0, _uniqueId.default)();
     _this.inputName = "_".concat(_this.id);
-    _this.inputRef = _react.default.createRef();
+    _this.inputRef = props.forwardedRef || _react.default.createRef();
     _this.state = {};
     _this.state.error = false;
     _this.onClick = _this.onClick.bind(_assertThisInitialized(_assertThisInitialized(_this)));
@@ -44353,7 +44363,7 @@ function (_React$Component) {
     value: function setError(error) {
       var _this2 = this;
 
-      this.updateStatus(error);
+      this.context.updateStatus(error);
 
       var resetError = function resetError() {
         _this2.setState(function (state) {
@@ -44422,7 +44432,18 @@ function (_React$Component) {
 }(_react.default.Component);
 
 FormLine.contextType = _context.StatusContext;
-var _default = FormLine;
+
+var _default = function () {
+  var enhanced = _react.default.forwardRef(function (props, ref) {
+    return _react.default.createElement(FormLine, _extends({}, props, {
+      forwardedRef: ref
+    }));
+  });
+
+  enhanced.validationError = FormLine.validationError;
+  return enhanced;
+}();
+
 exports.default = _default;
 },{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/components/Button":"components/Button.js","~/components/Field":"components/Field.js","~/utilities/uniqueId":"utilities/uniqueId.js","~/context":"context/index.js"}],"components/Today.js":[function(require,module,exports) {
 "use strict";
@@ -44501,6 +44522,7 @@ function (_React$Component) {
       help: false,
       list: props.list
     };
+    _this.createTaskRef = _react.default.createRef();
     _this.onUpdate = _this.onUpdate.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.toggleEdit = _this.toggleEdit.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.startEdit = _this.startEdit.bind(_assertThisInitialized(_assertThisInitialized(_this)));
@@ -44511,6 +44533,15 @@ function (_React$Component) {
   }
 
   _createClass(Today, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      setTimeout(function () {
+        _this2.createTaskRef.current.focus();
+      }, 1000);
+    }
+  }, {
     key: "createNewTask",
     value: function createNewTask(task) {
       this.props.addToList({
@@ -44568,7 +44599,7 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
+      var _this3 = this;
 
       var getEditInstruction = function getEditInstruction() {
         return _react.default.createElement("ul", {
@@ -44591,8 +44622,9 @@ function (_React$Component) {
         onUpdate: this.onUpdate,
         onClick: this.props.setActiveListItem
       }), _react.default.createElement(_FormLine.default, {
+        ref: this.createTaskRef,
         onSubmit: function onSubmit(value) {
-          return _this2.createNewTask(value);
+          return _this3.createNewTask(value);
         },
         validators: [function (value) {
           var validLength = value && value.length > 3;
@@ -44606,21 +44638,21 @@ function (_React$Component) {
         onClick: function onClick(e) {
           e.preventDefault();
 
-          _this2.toggleEdit();
+          _this3.toggleEdit();
         }
       }), _react.default.createElement(_Link.default, {
         text: this.state.help ? 'close' : 'help',
         onClick: function onClick(e) {
           e.preventDefault();
 
-          _this2.toggleHelp();
+          _this3.toggleHelp();
         }
       }), _react.default.createElement(_Link.default, {
         text: "reset",
         onClick: function onClick(e) {
           e.preventDefault();
 
-          _this2.props.clearList();
+          _this3.props.clearList();
         }
       })), this.state.edit ? getEditInstruction() : '', this.state.help ? getHelpInstruction() : ''));
     }
@@ -44914,28 +44946,23 @@ function (_React$Component) {
       }).length === 1;
     }
   }, {
-    key: "hasTasks",
-    value: function hasTasks(list) {
-      return list.filter(function (i) {
-        return i && i.checked === false;
-      }).length > 0;
-    }
-  }, {
-    key: "hasTasksAndActive",
-    value: function hasTasksAndActive(list) {
-      return Now.hasTasks(list) && Now.hasActive(list);
-    }
-  }, {
-    key: "hasTasksAndDone",
-    value: function hasTasksAndDone(list) {
-      return Now.hasTasks(list) && list.every(function (i) {
-        return i.checked === true;
-      });
-    }
-  }, {
-    key: "baby",
-    value: function baby(list) {
+    key: "starting",
+    value: function starting(list) {
       return list.length === 0;
+    }
+  }, {
+    key: "processing",
+    value: function processing(list) {
+      return list.length > 0 && list.every(function (i) {
+        return i.checked === true;
+      }) === false;
+    }
+  }, {
+    key: "finished",
+    value: function finished(list) {
+      return list.length > 0 && list.every(function (i) {
+        return i.checked === true;
+      }) === true;
     }
   }, {
     key: "getDerivedStateFromError",
@@ -45022,7 +45049,7 @@ function (_React$Component) {
       var _this2 = this;
 
       if (this.state.hasError) return this.renderError();
-      return _react.default.createElement(StyledDiv, null, Now.hasTasksAndActive(this.props.list) && _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, this.activeTask.text.toLowerCase()), this.activeTask.checked ? _react.default.createElement(_Button.default, {
+      return _react.default.createElement(StyledDiv, null, Now.starting(this.props.list) && _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "your brain is ready"), _react.default.createElement("p", null, _react.default.createElement("small", null, "add a few tasks to your routine to get started."))), Now.processing(this.props.list) && _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, this.activeTask.text.toLowerCase()), this.activeTask.checked ? _react.default.createElement(_Button.default, {
         id: "undo",
         action: this.props.undoActiveListItem,
         text: "undo"
@@ -45043,7 +45070,7 @@ function (_React$Component) {
         id: "timer",
         action: this.handleToggleTimer,
         text: this.state.time
-      })), Now.hasTasksAndDone(this.props.list) && _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "your brain is so strong."), _react.default.createElement("p", null, _react.default.createElement("small", null, "go relax. you deserve it."))), Now.baby(this.props.list) && _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "your brain is ready."), _react.default.createElement("p", null, _react.default.createElement("small", null, "add a few tasks to your routine to get started."))));
+      })), Now.finished(this.props.list) && _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "your brain is so strong"), _react.default.createElement("p", null, _react.default.createElement("small", null, "go relax. you deserve it."))));
     }
   }, {
     key: "activeTask",
@@ -47054,7 +47081,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _templateObject3() {
-  var data = _taggedTemplateLiteral(["\n    padding: 0px;\n    margin: 0px;\n    display: inline-block;\n    font-weight: 700;\n\n    &:before {\n        content: \"\u2610\";\n    }\n\n    &.started {\n        &:before {\n            content: \"\u2611\";\n        }\n    }\n\n    &.done {\n        &:before {\n            content: \"\u2612\";\n        }\n    }\n"]);
+  var data = _taggedTemplateLiteral(["\n    padding: 0px;\n    margin: 0px;\n    display: inline-block;\n\n    &:before {\n        content: \"\u2610\";\n    }\n\n    &.started {\n        &:before {\n            content: \"\u2611\";\n        }\n    }\n\n    &.done {\n        &:before {\n            content: \"\u2612\";\n        }\n    }\n"]);
 
   _templateObject3 = function _templateObject3() {
     return data;
@@ -47231,9 +47258,9 @@ function (_React$Component) {
   }, {
     key: "updateStatus",
     value: function updateStatus(status) {
-      this.setState({
-        status: status
-      });
+      this.setState((0, _immer.default)(function (draft) {
+        draft.status = status;
+      }));
     }
   }, {
     key: "updateActivity",
@@ -106967,10 +106994,15 @@ function () {
   function TextWriter(id) {
     _classCallCheck(this, TextWriter);
 
-    this._root = document.getElementById(id);
-    this._processString = this._processString.bind(this);
+    this._el = document.createElement('pre');
 
-    this._root.setAttribute('style', 'max-width: 100%; width: 100%;');
+    this._el.setAttribute('class', 'textwriter');
+
+    this._el.setAttribute('style', 'max-width: 100%; width: 100%;');
+
+    this._root = document.getElementById('root');
+    document.body.insertBefore(this._el, this._root);
+    this._processString = this._processString.bind(this);
   }
 
   _createClass(TextWriter, [{
@@ -106980,8 +107012,8 @@ function () {
 
       var time = 100;
       var diff = str.length;
-      var minTime = 80;
-      var maxTime = 1000;
+      var minTime = 10;
+      var maxTime = 400;
       this._str = str;
       this.pEnd = new Promise(function (resolve, reject) {
         var _loop = function _loop(i, len) {
@@ -107010,7 +107042,7 @@ function () {
   }, {
     key: "add",
     value: function add(str) {
-      return this.startWriting("".concat(str.trim(), "... "));
+      return this.startWriting("".concat(str.trim(), "...\n"));
     }
   }, {
     key: "end",
@@ -107029,7 +107061,7 @@ function () {
                 time = _args.length > 0 && _args[0] !== undefined ? _args[0] : 3000;
                 return _context.abrupt("return", new Promise(function (resolve, reject) {
                   setTimeout(function () {
-                    _this2._root.parentNode.removeChild(_this2._root);
+                    _this2._el.parentNode.removeChild(_this2._el);
 
                     resolve(true);
                   }, time);
@@ -107064,7 +107096,7 @@ function () {
     key: "writeChar",
     value: function writeChar() {
       if (this._str[0] !== undefined) {
-        this._root.innerText += this._str[0];
+        this._el.innerText += this._str[0];
       }
 
       this._str = this._str.substring(1, this._str.length);
@@ -107169,15 +107201,19 @@ function _web3Init() {
           case 0:
             writer = new _TextWriter.default('init');
             _context2.next = 3;
-            return writer.add('commencing initialization of "everyday" routine management software account interface');
+            return writer.add('initialization');
 
           case 3:
             _context2.next = 5;
-            return writer.add("seeking provider");
+            return writer.add('browser and web3 detection');
 
           case 5:
+            _context2.next = 7;
+            return writer.add("seeking provider");
+
+          case 7:
             if (!(typeof window.ethereum !== 'undefined' || typeof window.web3 !== 'undefined')) {
-              _context2.next = 12;
+              _context2.next = 14;
               break;
             }
 
@@ -107185,93 +107221,89 @@ function _web3Init() {
             // if (window.ethereum) await writer.add(`found ethereum`)
             provider = window.web3.currentProvider;
             providerType = getProviderType(provider);
-            _context2.next = 10;
+            _context2.next = 12;
             return writer.add("identified provider: ".concat(providerType));
 
-          case 10:
-            _context2.next = 16;
+          case 12:
+            _context2.next = 18;
             break;
 
-          case 12:
+          case 14:
             provider = new _web.default.providers.HttpProvider("https://mainnet.infura.io/v3/c63d2ec360ce413ea4dc8b10e0cf1fac");
             providerType = getProviderType(provider);
-            _context2.next = 16;
+            _context2.next = 18;
             return writer.add("integrating with infura socket pipeline");
 
-          case 16:
-            _context2.next = 18;
+          case 18:
+            _context2.next = 20;
             return writer.add("configuring web3");
 
-          case 18:
+          case 20:
             window.web3 = web3 = new _web.default(provider);
             provider = window.web3.currentProvider;
-            _context2.next = 22;
-            return writer.add("host: ".concat(provider.host));
-
-          case 22:
             _context2.next = 24;
-            return writer.add("syncing with deep web");
+            return writer.add("host: ".concat(provider.host));
 
           case 24:
             _context2.next = 26;
-            return writer.add("randomizing blockchains");
+            return writer.add("syncing with deep web");
 
           case 26:
+            _context2.next = 28;
+            return writer.add("randomizing blockchains");
+
+          case 28:
             web3Version = web3.version.api || web3.version;
-            _context2.next = 29;
+            _context2.next = 31;
             return writer.add("version: ".concat(web3Version));
 
-          case 29:
+          case 31:
             isConnected = provider.connected || provider.isConnected || provider.isConnected();
-            _context2.next = 32;
-            return writer.add("connected: ".concat(isConnected));
-
-          case 32:
             _context2.next = 34;
-            return writer.add("configuring darknet proxy");
+            return writer.add("connected: ".concat(isConnected));
 
           case 34:
             _context2.next = 36;
-            return getNetworkType(web3);
+            return writer.add("configuring darknet proxy");
 
           case 36:
+            _context2.next = 38;
+            return getNetworkType(web3);
+
+          case 38:
             networkType = _context2.sent;
-            _context2.next = 39;
+            _context2.next = 41;
             return writer.add("network: ".concat(networkType));
 
-          case 39:
+          case 41:
             if (!window.ethereum) {
-              _context2.next = 44;
+              _context2.next = 46;
               break;
             }
 
-            _context2.next = 42;
-            return writer.add("enabling ethereum");
-
-          case 42:
             _context2.next = 44;
-            return window.ethereum.enable();
+            return writer.add("enabling ethereum");
 
           case 44:
             _context2.next = 46;
-            return writer.add("sourcing default account");
+            return window.ethereum.enable();
 
           case 46:
             _context2.next = 48;
-            return web3.eth.getAccounts();
+            return writer.add("sourcing default account");
 
           case 48:
-            defaultAccount = _context2.sent[0];
-            _context2.next = 51;
-            return writer.add("".concat(defaultAccount));
+            _context2.next = 50;
+            return web3.eth.getAccounts();
 
-          case 51:
+          case 50:
+            defaultAccount = _context2.sent[0];
             _context2.next = 53;
-            return writer.add('program initialization complete');
+            return writer.add("".concat(defaultAccount));
 
           case 53:
             _context2.next = 55;
-            return writer.add('wishing you a beautiful day');
+            return writer.add('program initialization complete');
 
           case 55:
             _context2.next = 57;
@@ -107473,7 +107505,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60771" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53500" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

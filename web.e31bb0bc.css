@@ -103,6 +103,8 @@ pre {
 
 .textwriter {
   font-style: italic;
+  padding: 8px;
+  font-size: 12px;
 }
 
 body {
