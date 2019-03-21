@@ -26,7 +26,6 @@ const StyledListItem = styled.li`
     padding: 0px;
     margin: 0px;
     display: inline-block;
-    font-weight: 700;
 
     &:before {
         content: "☐";
