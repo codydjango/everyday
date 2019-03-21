@@ -22,22 +22,16 @@ export default withContext(class Now extends React.Component {
         return (list.filter(i => (i.active)).length === 1)
     }
 
-    static hasTasks(list) {
-        return (list.filter(i => {
-            return (i && (i.checked === false))
-        }).length > 0)
-    }
-
-    static hasTasksAndActive(list) {
-        return (Now.hasTasks(list) && Now.hasActive(list))
-    }
-
-    static hasTasksAndDone(list) {
-        return (Now.hasTasks(list) && list.every(i => i.checked === true))
-    }
-
-    static baby(list) {
+    static starting(list) {
         return (list.length === 0)
+    }
+
+    static processing(list) {
+        return (list.length > 0) && (list.every(i => i.checked === true) === false)
+    }
+
+    static finished(list) {
+        return (list.length > 0) && (list.every(i => i.checked === true) === true)
     }
 
     static getDerivedStateFromError(error) {
@@ -101,7 +95,14 @@ export default withContext(class Now extends React.Component {
         if (this.state.hasError) return this.renderError()
 
         return (<StyledDiv>
-            { (Now.hasTasksAndActive(this.props.list)) && (
+            { (Now.starting(this.props.list)) && (
+                <React.Fragment>
+                    <h2>your brain is ready</h2>
+                    <p><small>add a few tasks to your routine to get started.</small></p>
+                </React.Fragment>
+            ) }
+
+            { (Now.processing(this.props.list)) && (
                 <React.Fragment>
                     <h2>{ this.activeTask.text.toLowerCase() }</h2>
 
@@ -136,17 +137,10 @@ export default withContext(class Now extends React.Component {
                 </React.Fragment>
             ) }
 
-            { (Now.hasTasksAndDone(this.props.list)) && (
+            { (Now.finished(this.props.list)) && (
                 <React.Fragment>
                     <h2>your brain is so strong</h2>
                     <p><small>go relax. you deserve it.</small></p>
-                </React.Fragment>
-            ) }
-
-            { (Now.baby(this.props.list)) && (
-                <React.Fragment>
-                    <h2>your brain is ready</h2>
-                    <p><small>add a few tasks to your routine to get started.</small></p>
                 </React.Fragment>
             ) }
         </StyledDiv>)
