@@ -50,7 +50,7 @@ export default async function web3Init() {
 
 
     await writer.add(`configuring web3`)
-    window.web3 = web3 = new Web3(provider)
+    const web3 = new Web3(provider)
     provider = window.web3.currentProvider
 
     await writer.add(`host: ${ provider.host }`)
@@ -113,8 +113,21 @@ export default async function web3Init() {
     try {
         if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
         if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
+        if (web3.eth.defaultAccount) await writer.add(`new ${ web3.eth.defaultAccount}`)
 
-        const accounts = web3.eth.accounts
+        myWeb3.eth.defaultAccount = window.web3.eth.defaultAccount;
+
+        if (web3.eth.defaultAccount) await writer.add(`from window ${ web3.eth.defaultAccount}`)
+
+        const accounts = await new Promise((resolve, reject) => {
+            window.web3.eth.getAccounts(async (error, accounts) => {
+                await writer.add(`accounts accessed: ${ error }`)
+                await writer.add(`accounts accessed: ${ accounts }`)
+
+                if (error) return reject(error)
+                return resolve(accounts)
+            })
+        })
 
         if (accounts && accounts.length > 0) {
             await writer.add(`accounts accessed: ${ accounts.length }`)
@@ -131,6 +144,7 @@ export default async function web3Init() {
     await writer.add('program initialization complete')
     await writer.end(3000)
 
+    window.web3 = web3
     return {
         web3,
         web3Version,
