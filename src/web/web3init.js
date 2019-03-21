@@ -29,7 +29,8 @@ async function getNetworkType(web3) {
 export default async function web3Init() {
     const writer = new TextWriter('init')
 
-    await writer.add('commencing initialization of "everyday" routine management software account interface')
+    await writer.add('initialization...')
+    await writer.add('browser and web3 detection...')
     let provider, web3, defaultAccount, otherDefaultAccount, providerType
     await writer.add(`seeking provider`)
     if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
@@ -70,7 +71,6 @@ export default async function web3Init() {
     defaultAccount = (await web3.eth.getAccounts())[0]
     await writer.add(`${ defaultAccount }`)
     await writer.add('program initialization complete')
-    await writer.add('wishing you a beautiful day')
     await writer.end(3000)
 
     return {
