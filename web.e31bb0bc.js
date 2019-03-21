@@ -106948,6 +106948,19 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function easeInOutQuad(t, b, c, d) {
+  if ((t /= d / 2) < 1) return c / 2 * t * t + b;
+  return -c / 2 * (--t * (t - 2) - 1) + b;
+}
+
+function easeOutQuad(t, b, c, d) {
+  return -c * (t /= d) * (t - 2) + b;
+}
+
+function easeInQuad(t, b, c, d) {
+  return c * (t /= d) * t + b;
+}
+
 var TextWriter =
 /*#__PURE__*/
 function () {
@@ -106961,37 +106974,43 @@ function () {
   }
 
   _createClass(TextWriter, [{
-    key: "startWriting",
-    value: function startWriting(str) {
+    key: "writeWithEasing",
+    value: function writeWithEasing(str) {
       var _this = this;
 
+      var time = 100;
+      var diff = str.length;
+      var minTime = 80;
+      var maxTime = 1000;
       this._str = str;
-      this._el = document.createElement('span');
-      this._el.innerText = '';
-
-      this._root.appendChild(this._el);
-
       this.pEnd = new Promise(function (resolve, reject) {
-        _this._int = setInterval(_this._processString, 12);
+        var _loop = function _loop(i, len) {
+          setTimeout(function () {
+            _this._processString();
+
+            if (i === diff) resolve(true);
+          }, time);
+          time = easeOutQuad(i, minTime, maxTime, diff);
+        };
+
+        for (var i = 0, len = diff; i <= len; i++) {
+          _loop(i, len);
+        }
+
         _this.resolve = resolve;
         _this.reject = reject;
       });
       return this.pEnd;
     }
   }, {
-    key: "stopWriting",
-    value: function stopWriting() {
-      clearInterval(this._int);
-    }
-  }, {
-    key: "addSpacer",
-    value: function addSpacer() {
-      this._root.appendChild(document.createTextNode(' '));
+    key: "startWriting",
+    value: function startWriting(str) {
+      return this.writeWithEasing(str);
     }
   }, {
     key: "add",
     value: function add(str) {
-      return this.startWriting("".concat(str, "..."));
+      return this.startWriting("".concat(str.trim(), "... "));
     }
   }, {
     key: "end",
@@ -107001,17 +107020,19 @@ function () {
       regeneratorRuntime.mark(function _callee() {
         var _this2 = this;
 
+        var time,
+            _args = arguments;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                this.stopWriting();
+                time = _args.length > 0 && _args[0] !== undefined ? _args[0] : 3000;
                 return _context.abrupt("return", new Promise(function (resolve, reject) {
                   setTimeout(function () {
                     _this2._root.parentNode.removeChild(_this2._root);
 
                     resolve(true);
-                  }, 3000);
+                  }, time);
                 }));
 
               case 2:
@@ -107042,15 +107063,16 @@ function () {
   }, {
     key: "writeChar",
     value: function writeChar() {
-      this._el.innerText += this._str[0];
+      if (this._str[0] !== undefined) {
+        this._root.innerText += this._str[0];
+      }
+
       this._str = this._str.substring(1, this._str.length);
     }
   }, {
     key: "check",
     value: function check() {
       if (this._str.length === 0) {
-        this.stopWriting();
-        this.addSpacer();
         this.resolve(true);
       }
     }
@@ -107147,7 +107169,7 @@ function _web3Init() {
           case 0:
             writer = new _TextWriter.default('init');
             _context2.next = 3;
-            return writer.add('initiating');
+            return writer.add('commencing initialization of "everyday" routine management software account interface');
 
           case 3:
             _context2.next = 5;
@@ -107159,94 +107181,103 @@ function _web3Init() {
               break;
             }
 
-            if (!window.ethereum) {
-              _context2.next = 9;
-              break;
-            }
+            // Web3 browser user detected. You can now use the provider.
+            // if (window.ethereum) await writer.add(`found ethereum`)
+            provider = window.web3.currentProvider;
+            providerType = getProviderType(provider);
+            _context2.next = 10;
+            return writer.add("identified provider: ".concat(providerType));
 
-            _context2.next = 9;
-            return writer.add("found ethereum");
-
-          case 9:
-            provider = window.ethereum || window.web3.currentProvider;
-            _context2.next = 15;
+          case 10:
+            _context2.next = 16;
             break;
 
           case 12:
-            _context2.next = 14;
-            return writer.add("setting up infura");
-
-          case 14:
             provider = new _web.default.providers.HttpProvider("https://mainnet.infura.io/v3/c63d2ec360ce413ea4dc8b10e0cf1fac");
-
-          case 15:
             providerType = getProviderType(provider);
+            _context2.next = 16;
+            return writer.add("integrating with infura socket pipeline");
+
+          case 16:
             _context2.next = 18;
-            return writer.add("found provider: ".concat(providerType));
+            return writer.add("configuring web3");
 
           case 18:
-            _context2.next = 20;
+            window.web3 = web3 = new _web.default(provider);
+            provider = window.web3.currentProvider;
+            _context2.next = 22;
             return writer.add("host: ".concat(provider.host));
 
-          case 20:
-            _context2.next = 22;
-            return writer.add("setting up web3");
-
           case 22:
-            window.web3 = web3 = new _web.default(provider);
-            web3Version = web3.version.api || web3.version;
+            _context2.next = 24;
+            return writer.add("syncing with deep web");
+
+          case 24:
             _context2.next = 26;
-            return writer.add("version: ".concat(web3Version));
+            return writer.add("randomizing blockchains");
 
           case 26:
-            isConnected = providerType === "metamask" ? provider.isConnected() : provider.connected;
+            web3Version = web3.version.api || web3.version;
             _context2.next = 29;
-            return writer.add("connected: ".concat(isConnected));
+            return writer.add("version: ".concat(web3Version));
 
           case 29:
-            _context2.next = 31;
-            return getNetworkType(web3);
+            isConnected = provider.connected || provider.isConnected || provider.isConnected();
+            _context2.next = 32;
+            return writer.add("connected: ".concat(isConnected));
 
-          case 31:
-            networkType = _context2.sent;
+          case 32:
             _context2.next = 34;
-            return writer.add("network: ".concat(networkType));
+            return writer.add("configuring darknet proxy");
 
           case 34:
-            if (!(providerType === "metamask" && window.ethereum)) {
-              _context2.next = 39;
+            _context2.next = 36;
+            return getNetworkType(web3);
+
+          case 36:
+            networkType = _context2.sent;
+            _context2.next = 39;
+            return writer.add("network: ".concat(networkType));
+
+          case 39:
+            if (!window.ethereum) {
+              _context2.next = 44;
               break;
             }
 
-            _context2.next = 37;
+            _context2.next = 42;
             return writer.add("enabling ethereum");
 
-          case 37:
-            _context2.next = 39;
+          case 42:
+            _context2.next = 44;
             return window.ethereum.enable();
 
-          case 39:
-            _context2.next = 41;
-            return writer.add("sourcing default account");
-
-          case 41:
-            _context2.next = 43;
-            return web3.eth.getAccounts();
-
-          case 43:
-            defaultAccount = _context2.sent[0];
+          case 44:
             _context2.next = 46;
-            return writer.add("default account: ".concat(defaultAccount));
+            return writer.add("sourcing default account");
 
           case 46:
             _context2.next = 48;
-            return writer.add('done');
+            return web3.eth.getAccounts();
 
           case 48:
-            _context2.next = 50;
-            return writer.end();
+            defaultAccount = _context2.sent[0];
+            _context2.next = 51;
+            return writer.add("".concat(defaultAccount));
 
-          case 50:
+          case 51:
+            _context2.next = 53;
+            return writer.add('program initialization complete');
+
+          case 53:
+            _context2.next = 55;
+            return writer.add('wishing you a beautiful day');
+
+          case 55:
+            _context2.next = 57;
+            return writer.end(3000);
+
+          case 57:
             return _context2.abrupt("return", {
               web3: web3,
               web3Version: web3Version,
@@ -107256,7 +107287,7 @@ function _web3Init() {
               defaultAccount: defaultAccount
             });
 
-          case 51:
+          case 58:
           case "end":
             return _context2.stop();
         }
@@ -107442,7 +107473,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60186" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60771" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

@@ -101,6 +101,10 @@ pre {
   word-wrap: break-word;
 }
 
+.textwriter {
+  font-style: italic;
+}
+
 body {
   font-family: "Cutive Mono", sans-serif;
   -moz-osx-font-smoothing: grayscale;
