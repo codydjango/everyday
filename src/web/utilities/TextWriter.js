@@ -1,15 +1,15 @@
 
 function easeInOutQuad(t, b, c, d) {
-    if ((t/=d/2) < 1) return c/2*t*t + b;
-    return -c/2 * ((--t)*(t-2) - 1) + b;
+    if ((t/=d/2) < 1) return c/2*t*t + b
+    return -c/2 * ((--t)*(t-2) - 1) + b
 }
 
 function easeOutQuad(t, b, c, d) {
-    return -c * (t/=d)*(t-2) + b;
+    return -c * (t/=d)*(t-2) + b
 }
 
 function easeInQuad(t, b, c, d) {
-    return c*(t/=d)*t + b;
+    return c*(t/=d)*t + b
 }
 
 
@@ -25,8 +25,8 @@ class TextWriter {
         let time = 100;
 
         const diff = str.length;
-        const minTime = 80;
-        const maxTime = 1000;
+        const minTime = 10;
+        const maxTime = 400;
 
         this._str = str
 
@@ -51,7 +51,7 @@ class TextWriter {
     }
 
     add(str) {
-        return this.startWriting(`${ str.trim() }... `)
+        return this.startWriting(`${ str.trim() }...\n`)
     }
 
     async end(time = 3000) {
