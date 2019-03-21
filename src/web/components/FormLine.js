@@ -44,7 +44,7 @@ class FormLine extends React.Component {
     }
 
     setError(error) {
-        this.updateStatus(error)
+        this.context.updateStatus(error)
 
         const resetError = () => {
             this.setState(state => {
