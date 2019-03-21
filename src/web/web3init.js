@@ -72,6 +72,24 @@ export default async function web3Init() {
         } catch(err) {
             await writer.add(err.message)
         }
+
+        try {
+            listening = web3.eth.net.isListening()
+            await writer.add(`listening: ${ listening }`)
+        } catch(err) {
+            await writer.add(err.message)
+        }
+
+
+        try {
+            web3.eth.net.isListening(async () => {
+                await writer.add(`listening callback`)
+            })
+        } catch(err) {
+            await writer.add(err.message)
+        }
+
+
     }
 
     if (web3.eth.net.isConnected) await writer.add('connection procedure initiated')
@@ -83,9 +101,6 @@ export default async function web3Init() {
             await writer.add(err.message)
         }
     }
-
-    await writer.add(`(1): ${ provider.connected }`)
-    await writer.add(`(2): ${ provider.isConnected }`)
 
     isConnected = provider.connected || provider.isConnected
 
@@ -116,7 +131,18 @@ export default async function web3Init() {
     try {
         if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
         if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
-        const accounts = await web3.eth.getAccounts()
+
+        await writer.add()
+
+        const accounts = await web3.eth.getAccounts(async (d) => {
+            await writer.add(`accounts callback activated`)
+
+            if (d && d.length > 0) {
+                await writer.add('1', d.length)
+                await writer.add(d['2', 0])
+            }
+        })
+
         if (accounts && accounts.length > 0) {
             await writer.add(`accounts accessed: ${ accounts.length }`)
             defaultAccount = accounts[0]
