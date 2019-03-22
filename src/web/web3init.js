@@ -43,15 +43,25 @@ export default async function web3Init() {
 
 
     await writer.add(`seeking provider`)
+
+    if (typeof window.ethereum !== 'undefined') await writer.add(`ethereum detected`)
+    if (typeof window.web3 !== 'undefined') await writer.add(`web3 detected`)
+
     if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
-        provider = window.web3.currentProvider
+
         if (window.web3.currentProvider) {
             await writer.add(`current provider analysis achieved`)
+        } else {
+            await writer.add(`no current provider`)
         }
 
         if (window.web3.givenProvider) {
             await writer.add(`given provider analysis achieved`)
+        } else {
+            await writer.add(`no given provider`)
         }
+
+        provider = window.web3.currentProvider
     } else {
         provider = new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/c63d2ec360ce413ea4dc8b10e0cf1fac")
         await writer.add(`provider injection accomplished`)
@@ -214,7 +224,7 @@ export default async function web3Init() {
 
 
     await writer.add('program initialization complete')
-    await writer.end(8000)
+    await writer.end(80000)
 
     validProvider = false
     if (defaultAccount) validProvider = true
