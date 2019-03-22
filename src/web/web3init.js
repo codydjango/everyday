@@ -25,15 +25,40 @@ function trustTest(web3, writer) {
         await writer.add(`special trust configuration`)
 
 
-        let networkType
+        let networkType, accounts
+
 
         try {
+            await writer.add(`attempt web3.eth.net.getNetworkType`)
             networkType = await new Promise((resolve, reject) => {
-                web3.eth.net.getNetworkType.call().then(data => {
-                    resolve(data)
-                }).catch(err => {
-                    reject(err)
-                })
+                web3.eth.net.getNetworkType.call()
+                    .then(data => resolve(data))
+                    .catch(err => reject(err))
+            })
+        } catch (err) {
+            await writer.add(`trust error: ${ err.message }`)
+        }
+
+
+        try {
+            await writer.add(`attempt web3.eth.net.getId`)
+            networkId = await new Promise((resolve, reject) => {
+                web3.eth.net.getId.call()
+                    .then(data => resolve(data))
+                    .catch(err => reject(err))
+            })
+            await writer.add(`network id: ${ networkId }`)
+        } catch (err) {
+            await writer.add(`error: ${ err.message }`)
+        }
+
+
+        try {
+            await writer.add(`web3.eth.getAccounts`)
+            accounts = await new Promise((resolve, reject) => {
+                web3.eth.getAccounts.call()
+                    .then(data => resolve(data))
+                    .catch(err => reject(err))
             })
         } catch (err) {
             await writer.add(`trust error: ${ err.message }`)
