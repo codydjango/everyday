@@ -17,8 +17,10 @@ function getProviderType(provider) {
 }
 
 
-function trustTest() {
-
+function trustTest(web3) {
+    return new Promise((resolve, reject) => {
+        resolve(true)
+    })
 }
 
 
@@ -29,7 +31,7 @@ export default async function web3Init() {
     await writer.add('browser and web3 detection')
 
 
-    let provider, web3, defaultAccount, otherDefaultAccount, providerType
+    let provider, web3, defaultAccount, otherDefaultAccount, providerType, validProvider
 
     await writer.add(`seeking provider`)
 
@@ -53,6 +55,13 @@ export default async function web3Init() {
     } catch (err) {
         await writer.add(`error: ${ err.message }`)
     }
+
+
+    await writer.add(`configuring web3 portal`)
+    web3 = new Web3(provider)
+
+
+    if (providerType === 'trust') await trustTest(web3)
 
 
     await writer.add(`syncing with deep web`)
@@ -87,7 +96,7 @@ export default async function web3Init() {
     let networkType
     await writer.add(`configuring darknet proxy`)
     try {
-        await writer.add(`attempt network 1`)
+        await writer.add(`attempt network`)
         networkType = await web3.eth.net.getNetworkType()
         await writer.add(`network: ${ networkType }`)
     } catch (err) {
@@ -112,7 +121,7 @@ export default async function web3Init() {
     let accounts
     try {
         await writer.add(`accounts attempt`)
-        accounts = web3.eth.getAccounts()
+        accounts = await web3.eth.getAccounts()
     } catch (err) {
         await writer.add(`error: ${ err.message }`)
     }
@@ -129,7 +138,7 @@ export default async function web3Init() {
 
 
     await writer.add('program initialization complete')
-    await writer.end(80000)
+    await writer.end(3000)
 
 
     validProvider = false
