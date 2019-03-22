@@ -44533,7 +44533,9 @@ function (_React$Component) {
       var _this2 = this;
 
       setTimeout(function () {
-        _this2.createTaskRef.current.focus();
+        if (_this2.createTaskRef && _this2.createTaskRef.current) {
+          _this2.createTaskRef.current.focus();
+        }
       }, 1000);
     }
   }, {
@@ -44948,6 +44950,7 @@ function (_React$Component) {
   }, {
     key: "processing",
     value: function processing(list) {
+      if (!Now.hasActive(list)) return false;
       return list.length > 0 && list.every(function (i) {
         return i.checked === true;
       }) === false;
@@ -107675,7 +107678,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50686" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53828" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
