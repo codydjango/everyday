@@ -4,7 +4,7 @@ import TextWriter from '~/utilities/TextWriter'
 function getProviderType(provider) {
     if (provider.isMetaMask) return 'metamask'
     if (provider.isTrust) return 'trust'
-    if (providerisGoWallet) return 'goWallet'
+    if (provider.isGoWallet) return 'goWallet'
     if (provider.isAlphaWallet) return 'alphaWallet'
     if (provider.isStatus) return 'status'
     if (provider.isToshi) return 'coinbase'
@@ -47,30 +47,41 @@ export default async function web3Init() {
         provider = new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/c63d2ec360ce413ea4dc8b10e0cf1fac")
         await writer.add(`provider injection accomplished`)
     }
-    providerType = getProviderType(provider)
-    await writer.add(`provider qualification: ${ providerType }`)
-    await writer.add(`provider host: ${ provider.host }`)
 
+    try {
+        await writer.add(`original provider qualification: ${ getProviderType(provider) }`)
+        await writer.add(`original provider host: ${ provider.host }`)
+    } catch (err) {
+        await writer.add(`error: ${ err.message }`)
+    }
 
 
     await writer.add(`configuring web3 portal`)
     web3 = new Web3(provider)
 
-    if (web3.givenProvider.host) await writer.add(`given provider host: ${ web3.givenProvider.host }`)
-    if (web3.currentProvider.host) await writer.add(`current provider host: ${ web3.currentProvider.host }`)
+
+    try {
+        await writer.add(`given provider qualification: ${ getProviderType(web3.givenProvider) }`)
+        if (web3.givenProvider && web3.givenProvider.host) await writer.add(`given provider host: ${ web3.givenProvider.host }`)
+    } catch (err) {
+        await writer.add(`error: ${ err.message }`)
+    }
 
 
+    try {
+        await writer.add(`given provider qualification: ${ getProviderType(web3.currentProvider) }`)
+        if (web3.currentProvider && web3.currentProvider.host) await writer.add(`current provider host: ${ web3.currentProvider.host }`)
+    } catch (err) {
+        await writer.add(`error: ${ err.message }`)
+    }
 
 
     await writer.add(`syncing with deep web`)
     await writer.add(`randomizing blockchains`)
 
 
-
-
     const web3Version = web3.version.api || web3.version
     await writer.add(`version: ${ web3Version }`)
-
 
 
     let isConnected, listening
@@ -158,8 +169,26 @@ export default async function web3Init() {
                 return resolve(accs)
             })
         })
+
     } catch (err) {
-        await writer.add(`error: ${ err.message }`)
+        await writer.add(`error1: ${ err.message }`)
+    }
+
+    try {
+        accounts = await new Promise((resolve, reject) => {
+            web3.eth.getAccounts(async (error, accs) => {
+                if (error) {
+                    await writer.add(`accounts accessed: ${ error }`)
+                } else {
+                    await writer.add(`accounts accessed: ${ accs }`)
+                }
+
+                if (error) return reject(error)
+                return resolve(accs)
+            })
+        })
+    } catch (err) {
+        await writer.add(`error2: ${ err.message }`)
     }
 
 
