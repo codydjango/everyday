@@ -31,7 +31,7 @@ function trustTest(web3, writer) {
         try {
             await writer.add(`attempt web3.eth.net.getNetworkType`)
             networkType = await new Promise((resolve, reject) => {
-                web3.eth.net.getNetworkType())
+                web3.eth.net.getNetworkType()
                 resolve(true)
                     // .then(data => resolve(data))
                     // .catch(err => reject(err))
