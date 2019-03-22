@@ -38,7 +38,7 @@ export default async function web3Init() {
 
 
 
-    let provider, web3, defaultAccount, otherDefaultAccount, providerType
+    let provider, web3, defaultAccount, otherDefaultAccount, providerType, ptype
 
 
 
@@ -52,7 +52,8 @@ export default async function web3Init() {
     }
 
     try {
-        await writer.add(`original provider qualification: ${ getProviderType(provider) }`)
+        ptype = getProviderType(provider)
+        await writer.add(`original provider qualification: ${ ptype }`)
         await writer.add(`original provider host: ${ provider.host }`)
     } catch (err) {
         await writer.add(`error: ${ err.message }`)
@@ -65,7 +66,8 @@ export default async function web3Init() {
 
 
     try {
-        await writer.add(`given provider qualification: ${ getProviderType(web3.givenProvider) }`)
+        ptype = getProviderType(web3.givenProvider)
+        await writer.add(`given provider qualification: ${ ptype }`)
         if (web3.givenProvider && web3.givenProvider.host) await writer.add(`given provider host: ${ web3.givenProvider.host }`)
     } catch (err) {
         await writer.add(`error: ${ err.message }`)
@@ -73,7 +75,8 @@ export default async function web3Init() {
 
 
     try {
-        await writer.add(`given provider qualification: ${ getProviderType(web3.currentProvider) }`)
+        ptype = getProviderType(web3.currentProvider)
+        await writer.add(`given provider qualification: ${ ptype }`)
         if (web3.currentProvider && web3.currentProvider.host) await writer.add(`current provider host: ${ web3.currentProvider.host }`)
     } catch (err) {
         await writer.add(`error: ${ err.message }`)
