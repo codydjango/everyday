@@ -36,55 +36,66 @@ export default async function web3Init() {
     await writer.add('initialization')
     await writer.add('browser and web3 detection')
     let provider, web3, defaultAccount, otherDefaultAccount, providerType
+
+
+
     await writer.add(`seeking provider`)
     if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
-        // Web3 browser user detected. You can now use the provider.
-        // if (window.ethereum) await writer.add(`found ethereum`)
-        provider = window.web3.currentProvider
-        providerType = getProviderType(provider)
-        await writer.add(`identified provider: ${ providerType }`)
+        provider = window.web3.currentProvide
+        await writer.add(`provider analysis achieved`)
     } else {
         provider = new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/c63d2ec360ce413ea4dc8b10e0cf1fac")
-        providerType = getProviderType(provider)
-        await writer.add(`integrating with infura socket pipeline`)
+        await writer.add(`provider injection accomplished`)
     }
+    providerType = getProviderType(provider)
+    await writer.add(`provider qualification: ${ providerType }`)
+    await writer.add(`provider host: ${ provider.host }`)
 
 
-    await writer.add(`configuring web3`)
 
+    await writer.add(`configuring web3 portal`)
     web3 = new Web3(provider)
-    provider = window.web3.currentProvider
 
-    await writer.add(`host: ${ provider.host }`)
+    if (web3.givenProvider.host) await writer.add(`given provider host: ${ web3.givenProvider.host }`)
+    if (web3.currentProvider.host) await writer.add(`current provider host: ${ web3.currentProvider.host }`)
+
+
+
+
     await writer.add(`syncing with deep web`)
     await writer.add(`randomizing blockchains`)
+
+
+
+
     const web3Version = web3.version.api || web3.version
     await writer.add(`version: ${ web3Version }`)
 
-    let isConnected, listening
 
+
+    let isConnected, listening
     if (web3.eth) await writer.add('connection gateway detected')
     if (web3.eth.net) await writer.add('net portal activated')
 
-    if (web3.eth.net.isListening) await writer.add('listening procedure initiated')
-    if (web3.eth.net.isListening) {
-        try {
-            listening = await web3.eth.net.isListening()
-            await writer.add(`listening: ${ listening }`)
-        } catch(err) {
-            await writer.add(err.message)
-        }
-    }
+    // if (web3.eth.net.isListening) await writer.add('listening procedure initiated')
+    // if (web3.eth.net.isListening) {
+    //     try {
+    //         listening = await web3.eth.net.isListening()
+    //         await writer.add(`listening: ${ listening }`)
+    //     } catch(err) {
+    //         await writer.add(`error: ${ err.message }`)
+    //     }
+    // }
 
-    if (web3.eth.net.isConnected) await writer.add('connection procedure initiated')
-    if (web3.eth.net.isConnected) {
-        try {
-            let connected = await web3.eth.net.isConnected()
-            await writer.add(`connected: ${ connected }`)
-        } catch(err) {
-            await writer.add(err.message)
-        }
-    }
+    // if (web3.eth.net.isConnected) await writer.add('connection procedure initiated')
+    // if (web3.eth.net.isConnected) {
+    //     try {
+    //         let connected = await web3.eth.net.isConnected()
+    //         await writer.add(`connected: ${ connected }`)
+    //     } catch(err) {
+    //         await writer.add(`error: ${ err.message }`)
+    //     }
+    // }
 
     isConnected = provider.connected || provider.isConnected
 
@@ -94,11 +105,13 @@ export default async function web3Init() {
             isConnected = isConnected()
             await writer.add(`connected: ${ isConnected }`)
         } catch (err) {
-            await writer.add(err.message)
+            await writer.add(`error: ${ err.message }`)
         }
     } else {
         await writer.add(`connected: ${ isConnected }`)
     }
+
+
 
     let networkType
     await writer.add(`configuring darknet proxy`)
@@ -106,8 +119,9 @@ export default async function web3Init() {
         networkType = await getNetworkType(web3, writer)
         await writer.add(`network: ${ networkType }`)
     } catch (err) {
-        await writer.add(err.message)
+        await writer.add(`error: ${ err.message }`)
     }
+
 
 
     if (window.ethereum) {
@@ -115,17 +129,20 @@ export default async function web3Init() {
         await window.ethereum.enable()
     }
 
+
+
     await writer.add(`sourcing default account`)
 
-    try {
-        if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
-        if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
-        if (web3.eth.defaultAccount) await writer.add(`new ${ web3.eth.defaultAccount}`)
-        web3.eth.defaultAccount = window.web3.eth.defaultAccount;
-        if (web3.eth.defaultAccount) await writer.add(`from window ${ web3.eth.defaultAccount}`)
-    } catch(err) {
-        await writer.add(`${ err.message }`)
-    }
+
+    if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
+    if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
+    // try {
+    //     if (web3.eth.defaultAccount) await writer.add(`new ${ web3.eth.defaultAccount}`)
+    //     web3.eth.defaultAccount = window.web3.eth.defaultAccount
+    //     if (web3.eth.defaultAccount) await writer.add(`from window ${ web3.eth.defaultAccount}`)
+    // } catch(err) {
+    //     await writer.add(`error: ${ err.message }`)
+    // }
 
     let accounts
     try {
@@ -142,8 +159,9 @@ export default async function web3Init() {
             })
         })
     } catch (err) {
-        await writer.add(err.message)
+        await writer.add(`error: ${ err.message }`)
     }
+
 
     if (accounts && accounts.length > 0) {
         await writer.add(`accounts accessed: ${ accounts.length }`)
@@ -156,15 +174,20 @@ export default async function web3Init() {
 
 
     await writer.add('program initialization complete')
-    await writer.end(3000)
+    await writer.end(8000)
+
+    validProvider = false
+    if (defaultAccount) validProvider = true
 
     window.web3 = web3
+
     return {
         web3,
         web3Version,
         providerType,
         isConnected,
         networkType,
-        defaultAccount
+        defaultAccount,
+        validProvider
     }
 }

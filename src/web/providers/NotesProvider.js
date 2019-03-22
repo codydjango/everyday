@@ -39,7 +39,6 @@ const defaultMarkup = `
     <p>It's suggested you log in with MetaMask to keep your data persistent..</p>
     `
 
-
 export default class NotesProvider extends React.Component {
     static get defaultNote () {
         return Object.assign({}, { id: 0, name: '', markup: defaultMarkup, active: true })

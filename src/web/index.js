@@ -14,13 +14,13 @@ import Layout from '~/components/Layout'
     // figure out web3. we're gonna install our own and use an infura provider
     // if they don't have their own provider set up.
 
-    const { providerType, networkType } = await web3Init(window)
+    const { validProvider, networkType } = await web3Init(window)
 
     function getInitial() {
         // if no metamask ask to install
-        if (providerType !== "metamask") return (<Message
+        if (!validProvider) return (<Message
             className="container"
-            children="install metamask to continue" />)
+            children="web3 provider required to continue" />)
 
         // figure out network. If it's not on the mainnet give them a little prompt.
         if (networkType !== 'main') return (<Message
