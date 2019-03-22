@@ -64,6 +64,9 @@ function trustTest(web3, writer) {
             await writer.add(`trust error: ${ err.message }`)
         }
 
+
+        await writer.wait(10000 * 60)
+
         resolve(true)
     })
 }
