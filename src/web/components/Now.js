@@ -27,6 +27,7 @@ export default withContext(class Now extends React.Component {
     }
 
     static processing(list) {
+        if (!Now.hasActive(list)) return false
         return (list.length > 0) && (list.every(i => i.checked === true) === false)
     }
 
