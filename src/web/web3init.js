@@ -100,7 +100,6 @@ export default async function web3Init() {
     let networkType
     await writer.add(`configuring darknet proxy`)
     try {
-        await writer.add(`attempt network`)
         networkType = await web3.eth.net.getNetworkType()
         await writer.add(`network: ${ networkType }`)
     } catch (err) {
@@ -115,21 +114,14 @@ export default async function web3Init() {
     }
 
 
-    await writer.add(`sourcing default account`)
-
-
-    if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
-    if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
-
 
     let accounts
     try {
-        await writer.add(`accounts attempt`)
+        if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
+        if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
         accounts = await web3.eth.getAccounts()
     } catch (err) {
         await writer.add(`error: ${ err.message }`)
-    }
-
 
     if (accounts && accounts.length > 0) {
         await writer.add(`accounts accessed: ${ accounts.length }`)
