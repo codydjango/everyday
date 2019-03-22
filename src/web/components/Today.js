@@ -48,7 +48,11 @@ export default withContext(class Today extends React.Component {
     }
 
     componentDidMount() {
-        setTimeout(() => { this.createTaskRef.current.focus() }, 1000)
+        setTimeout(() => {
+            if (this.createTaskRef && this.createTaskRef.current) {
+                this.createTaskRef.current.focus()
+            }
+        }, 1000)
     }
 
     createNewTask(task) {
