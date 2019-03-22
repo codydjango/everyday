@@ -11,59 +11,9 @@ function getProviderType(provider) {
     if (typeof window.__CIPHER__ !== 'undefined') return 'cipher'
     if (provider.host && provider.host.indexOf('infura') !== -1) return 'infura'
     if (provider.host && provider.host.indexOf('localhost') !== -1) return 'localhost'
-    if (window.ethereum && window.ethereum.isMetaMask) return 'metamask(2)'
+    if (window.ethereum && window.ethereum.isMetaMask) return 'metamask'
 
     return 'unknown'
-}
-
-
-
-
-
-function trustTest(web3, writer) {
-    return new Promise(async (resolve, reject) => {
-        await writer.add(`special trust configuration`)
-
-        let networkType, accounts, networkId
-
-        const network = web3.version.network
-        await writer.add(`network ${network}`)
-
-
-        // try {
-        //     await writer.add(`attempt web3.eth.net.getId`)
-        //     networkId = await new Promise(async (resolve, reject) => {
-        //         let x = web3.eth.net.getId()
-        //         await writer.add(`x : ${ x }`)
-        //         resolve(true)
-        //             // .then(data => resolve(data))
-        //             // .catch(err => reject(err))
-        //     })
-        //     await writer.add(`result: ${ networkId }`)
-        // } catch (err) {
-        //     await writer.add(`trust error: ${ err.message }`)
-        // }
-
-
-        // try {
-        //     await writer.add(`attempt web3.eth.getAccounts`)
-        //     accounts = await new Promise(async (resolve, reject) => {
-        //         let x = web3.eth.getAccounts()
-        //         await writer.add(`x : ${ x }`)
-        //         resolve(true)
-        //             // .then(data => resolve(data))
-        //             // .catch(err => reject(err))
-        //     })
-        //     await writer.add(`result: ${ accounts }`)
-        // } catch (err) {
-        //     await writer.add(`trust error: ${ err.message }`)
-        // }
-
-
-        await writer.wait(10000 * 60)
-
-        resolve(true)
-    })
 }
 
 
@@ -74,7 +24,7 @@ export default async function web3Init() {
     await writer.add('browser and web3 detection')
 
 
-    let provider, web3, defaultAccount, otherDefaultAccount, providerType, validProvider
+    let provider, web3, defaultAccount, otherDefaultAccount, providerType, validProvider = false
 
     await writer.add(`seeking provider`)
 
@@ -100,11 +50,22 @@ export default async function web3Init() {
     }
 
 
+    if (providerType === 'trust') {
+        validProvider = false
+        await writer.add(`trust browser not supported until they increase their support for web3`)
+        return { validProvider }
+    }
+
+
+    if (providerType !== 'metamask') {
+        validProvider = false
+        await writer.add(`${ providerType } browser not supported`)
+        return { validProvider }
+    }
+
+
     await writer.add(`configuring web3 portal`)
     web3 = new Web3(provider)
-
-
-    if (providerType === 'trust') await trustTest(web3, writer)
 
 
     await writer.add(`syncing with deep web`)
@@ -181,10 +142,9 @@ export default async function web3Init() {
 
 
     await writer.add('program initialization complete')
-    await writer.end(1000)
+    await writer.end(300)
 
 
-    validProvider = false
     if (defaultAccount) validProvider = true
 
 
