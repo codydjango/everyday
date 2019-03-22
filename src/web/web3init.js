@@ -31,7 +31,7 @@ function trustTest(web3, writer) {
         try {
             await writer.add(`attempt web3.eth.net.getNetworkType`)
             networkType = await new Promise((resolve, reject) => {
-                // web3.eth.net.getNetworkType.call()
+                web3.eth.net.getNetworkType())
                 resolve(true)
                     // .then(data => resolve(data))
                     // .catch(err => reject(err))
@@ -45,7 +45,7 @@ function trustTest(web3, writer) {
         try {
             await writer.add(`attempt web3.eth.net.getId`)
             networkId = await new Promise((resolve, reject) => {
-                // web3.eth.net.getId.call()
+                web3.eth.net.getId()
                 resolve(true)
                     // .then(data => resolve(data))
                     // .catch(err => reject(err))
@@ -59,7 +59,7 @@ function trustTest(web3, writer) {
         try {
             await writer.add(`web3.eth.getAccounts`)
             accounts = await new Promise((resolve, reject) => {
-                // web3.eth.getAccounts.call()
+                web3.eth.getAccounts()
                 resolve(true)
                     // .then(data => resolve(data))
                     // .catch(err => reject(err))
