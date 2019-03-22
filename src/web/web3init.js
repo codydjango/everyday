@@ -16,20 +16,6 @@ function getProviderType(provider) {
     return 'unknown'
 }
 
-async function getNetworkType(web3, writer) {
-    let networkType
-
-    try {
-        networkType = await web3.eth.net.getNetworkType()
-    } catch (err) {
-        console.log('can\'t detect web3 network type')
-        networkType = 'unknown'
-        await writer.add(err)
-    }
-
-    return networkType
-}
-
 export default async function web3Init() {
     const writer = new TextWriter('init')
 
@@ -145,14 +131,35 @@ export default async function web3Init() {
 
 
 
+
+
     let networkType
     await writer.add(`configuring darknet proxy`)
     try {
-        networkType = await getNetworkType(web3, writer)
+        await writer.add(`attempt network 1`)
+        networkType = await web3.eth.net.getNetworkType()
         await writer.add(`network: ${ networkType }`)
     } catch (err) {
         await writer.add(`error: ${ err.message }`)
+        networkType = 'unknown'
     }
+
+    try {
+        await writer.add(`attempt network 2`)
+        networkType = await new Promise((resolve, reject) => {
+            web3.eth.net.getNetworkType().then(data => {
+                resolve(data)
+            }).catch(err => {
+                reject(err)
+            })
+        })
+        await writer.add(`network type: ${ networkType }`)
+    } catch (err) {
+        await writer.add(`error: ${ err }`)
+        networkType = 'unknown'
+    }
+
+
 
 
 
