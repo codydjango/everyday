@@ -58,8 +58,6 @@ export default withContext(class Now extends React.Component {
     }
 
     get activeTask() {
-        console.log('activeTask')
-        console.log(Now.activeIndex(this.props.list))
         return this.props.list[Now.activeIndex(this.props.list)]
     }
 
