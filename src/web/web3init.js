@@ -159,6 +159,19 @@ export default async function web3Init() {
         networkType = 'unknown'
     }
 
+    try {
+        await writer.add(`attempt network 3`)
+        networkType = await new Promise((resolve, reject) => {
+            web3.eth.net.getNetworkType(m => {
+                resolve(m)
+            })
+        })
+        await writer.add(`network type: ${ networkType }`)
+    } catch (err) {
+        await writer.add(`error: ${ err }`)
+        networkType = 'unknown'
+    }
+
 
 
 
