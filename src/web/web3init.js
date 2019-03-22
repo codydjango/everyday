@@ -35,6 +35,9 @@ export default async function web3Init() {
 
     await writer.add('initialization')
     await writer.add('browser and web3 detection')
+
+
+
     let provider, web3, defaultAccount, otherDefaultAccount, providerType
 
 
@@ -55,6 +58,7 @@ export default async function web3Init() {
         await writer.add(`error: ${ err.message }`)
     }
 
+    return;
 
     await writer.add(`configuring web3 portal`)
     web3 = new Web3(provider)
