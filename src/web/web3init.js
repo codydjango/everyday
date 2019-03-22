@@ -173,7 +173,7 @@ export default async function web3Init() {
     }
 
 
-    networkId
+    let networkId
     try {
         await writer.add(`attempt network id`)
         networkId = await new Promise((resolve, reject) => {
@@ -186,8 +186,6 @@ export default async function web3Init() {
         await writer.add(`error: ${ err }`)
         networkId = 'unknown'
     }
-
-
 
 
     if (window.ethereum) {
