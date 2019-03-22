@@ -42163,21 +42163,16 @@ function () {
   }, {
     key: "normalizeDay",
     value: function normalizeDay(data) {
-      console.log('data', 'activity?', data.activity, data);
-
       if (!data.activity) {
         data.activity = {
           log: '',
           timestamp: +new Date()
         };
-        console.log('no activity found, initialized.');
       }
 
       var date1 = new Date();
       var date2 = new Date(data.activity.timestamp);
       var differentDay = date1.getDay() !== date2.getDay();
-      console.log(date1.getDay(), date2.getDay());
-      console.log('differentDay', differentDay);
       var difference = date1.getTime() - date2.getTime();
       var daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24);
       if (differentDay && daysDifference) this.updateActivity(data, daysDifference);
@@ -46897,7 +46892,7 @@ function (_React$Component) {
     value: function handleArchiveUpdate(name) {
       this.props.updateNote(name);
       this.inputRef.current.focus();
-      this.props.updateStatus("Updated.");
+      this.props.updateStatus("updated");
     }
   }, {
     key: "handleArchiveDelete",
@@ -46907,27 +46902,26 @@ function (_React$Component) {
       }
 
       this.inputRef.current.focus();
-      this.props.updateStatus("Deleted note.");
+      this.props.updateStatus("deleted");
     }
   }, {
     key: "handleArchiveSave",
     value: function handleArchiveSave(name) {
       this.props.archiveNote(name);
       this.inputRef.current.focus();
-      this.props.updateStatus("Saved new as '".concat(name, "'."));
+      this.props.updateStatus("saved as '".concat(name, "'"));
     }
   }, {
     key: "handleArchiveClose",
     value: function handleArchiveClose() {
       this.props.closeNote();
       this.inputRef.current.focus();
-      this.props.updateStatus("Closed.");
     }
   }, {
     key: "handleArchiveLoad",
     value: function handleArchiveLoad(id) {
       this.props.loadNote(id);
-      this.props.updateStatus("Loaded.");
+      this.props.updateStatus("loaded");
     }
   }, {
     key: "onInput",
@@ -46955,9 +46949,9 @@ function (_React$Component) {
       }, _react.default.createElement("h4", {
         children: "scratchpad"
       })), _react.default.createElement("span", null, _react.default.createElement("small", {
-        children: this.state.dirty ? "Unsaved..." : "Saved."
+        children: this.state.dirty ? 'unsaved' : 'saved'
       }))), _react.default.createElement(StyledInput, {
-        className: "field ".concat(this.state.error ? "error" : ""),
+        className: "field ".concat(this.state.error ? 'error' : ''),
         contentEditable: true,
         "data-gramm_editor": "false",
         ref: this.inputRef,
@@ -47871,8 +47865,8 @@ function activeIndex(list) {
   return index !== -1 ? index : null;
 }
 
-var defaultString = "\n    Hello and welcome. It's so nice to meet you.\n\n    This app is very simple:\n    * Add tasks to your daily routine.\n    * Order tasks to strategize your day.\n    * Click \"done\" for each task that you accomplish.\n    * Done all tasks to complete your day.\n    * Track your streak of completed days.\n    * Capture notes in the scratchpad.\n    * Archive notes that are no longer relevant.\n    * Find old notes with the full-text search.\n\n    It's suggested you install the MetaMask browser extension so your data will be persistent and synced with the cloud. MetaMask is an easier and more secure way to log in to web applications using cryptography. No passwords!\n    ";
-var defaultMarkup = "\n    <p>Hello and welcome. It's nice to meet you.</p>\n    <p>This app is very simple:</p>\n    <div>* Add tasks to your daily routine.</div>\n    <div>* Order tasks to strategize your day.<br></div>\n    <div>* Click \"done\" for each task that you accomplish.</div>\n    <div>* Done all tasks to complete your day.<br></div>\n    <div>* Track your streak of completed days.</div>\n    <div>* Capture notes in the scratchpad.</div>\n    <div>* Archive notes that are no longer relevant.</div>\n    <div>* Find old notes with the full-text search.</div>\n    <div><br></div>\n    <p>It's suggested you login with the MetaMask browser extension so your data will be persistent and synced with the cloud.</p>\n    ";
+var defaultString = "\n    This app is very simple:\n    * Add tasks to your daily routine.\n    * Order tasks to strategize your day.\n    * Click \"done\" for each task that you accomplish.\n    * Done all tasks to complete your day.\n    * Track your streak of completed days.\n    * Capture notes in the scratchpad.\n    * Archive notes that are no longer relevant.\n    * Find old notes with the full-text search.\n\n    It's suggested you log in with MetaMask to keep your data persistent.\n    ";
+var defaultMarkup = "\n    <p>This app is very simple:</p>\n    <div>* Add tasks to your daily routine.</div>\n    <div>* Order tasks to strategize your day.<br></div>\n    <div>* Click \"done\" for each task that you accomplish.</div>\n    <div>* Done all tasks to complete your day.<br></div>\n    <div>* Track your streak of completed days.</div>\n    <div>* Capture notes in the scratchpad.</div>\n    <div>* Archive notes that are no longer relevant.</div>\n    <div>* Find old notes with the full-text search.</div>\n    <div><br></div>\n    <p>It's suggested you log in with MetaMask to keep your data persistent..</p>\n    ";
 
 var NotesProvider =
 /*#__PURE__*/
@@ -107134,56 +107128,23 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 function getProviderType(provider) {
-  if (provider.isMetaMask) {
-    return 'metamask';
-  } else if (provider.host && provider.host.indexOf('infura') !== -1) {
-    return 'infura';
-  } else if (provider.host && provider.host.indexOf('localhost') !== -1) {
-    return 'localhost';
-  }
-
+  if (provider.isMetaMask) return 'metamask';
+  if (provider.isTrust) return 'trust';
+  if (provider.isGoWallet) return 'goWallet';
+  if (provider.isAlphaWallet) return 'alphaWallet';
+  if (provider.isStatus) return 'status';
+  if (provider.isToshi) return 'coinbase';
+  if (typeof window.__CIPHER__ !== 'undefined') return 'cipher';
+  if (provider.host && provider.host.indexOf('infura') !== -1) return 'infura';
+  if (provider.host && provider.host.indexOf('localhost') !== -1) return 'localhost';
+  if (window.ethereum && window.ethereum.isMetaMask) return 'metamask(2)';
   return 'unknown';
 }
 
-function getNetworkType(_x) {
-  return _getNetworkType.apply(this, arguments);
-}
-
-function _getNetworkType() {
-  _getNetworkType = _asyncToGenerator(
-  /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee(web3) {
-    var networkType;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            _context.prev = 0;
-            _context.next = 3;
-            return web3.eth.net.getNetworkType();
-
-          case 3:
-            networkType = _context.sent;
-            _context.next = 10;
-            break;
-
-          case 6:
-            _context.prev = 6;
-            _context.t0 = _context["catch"](0);
-            console.log('can\'t detect web3 network type');
-            networkType = 'unknown';
-
-          case 10:
-            return _context.abrupt("return", networkType);
-
-          case 11:
-          case "end":
-            return _context.stop();
-        }
-      }
-    }, _callee, this, [[0, 6]]);
-  }));
-  return _getNetworkType.apply(this, arguments);
+function trustTest(web3) {
+  return new Promise(function (resolve, reject) {
+    resolve(true);
+  });
 }
 
 function web3Init() {
@@ -107193,138 +107154,302 @@ function web3Init() {
 function _web3Init() {
   _web3Init = _asyncToGenerator(
   /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee2() {
-    var writer, provider, web3, defaultAccount, otherDefaultAccount, providerType, web3Version, isConnected, networkType;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+  regeneratorRuntime.mark(function _callee() {
+    var writer, provider, web3, defaultAccount, otherDefaultAccount, providerType, validProvider, web3Version, isConnected, listening, networkType, accounts;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context.prev = _context.next) {
           case 0:
             writer = new _TextWriter.default('init');
-            _context2.next = 3;
+            _context.next = 3;
             return writer.add('initialization');
 
           case 3:
-            _context2.next = 5;
+            _context.next = 5;
             return writer.add('browser and web3 detection');
 
           case 5:
-            _context2.next = 7;
+            _context.next = 7;
             return writer.add("seeking provider");
 
           case 7:
-            if (!(typeof window.ethereum !== 'undefined' || typeof window.web3 !== 'undefined')) {
-              _context2.next = 14;
+            if (!(typeof window.ethereum !== 'undefined')) {
+              _context.next = 10;
               break;
             }
 
-            // Web3 browser user detected. You can now use the provider.
-            // if (window.ethereum) await writer.add(`found ethereum`)
-            provider = window.web3.currentProvider;
-            providerType = getProviderType(provider);
-            _context2.next = 12;
-            return writer.add("identified provider: ".concat(providerType));
+            _context.next = 10;
+            return writer.add("ethereum detected");
 
-          case 12:
-            _context2.next = 18;
+          case 10:
+            if (!(typeof window.web3 !== 'undefined')) {
+              _context.next = 13;
+              break;
+            }
+
+            _context.next = 13;
+            return writer.add("web3 detected");
+
+          case 13:
+            if (!(typeof window.ethereum !== 'undefined' || typeof window.web3 !== 'undefined')) {
+              _context.next = 17;
+              break;
+            }
+
+            provider = window.web3.currentProvider;
+            _context.next = 20;
             break;
 
-          case 14:
+          case 17:
             provider = new _web.default.providers.HttpProvider("https://mainnet.infura.io/v3/c63d2ec360ce413ea4dc8b10e0cf1fac");
-            providerType = getProviderType(provider);
-            _context2.next = 18;
-            return writer.add("integrating with infura socket pipeline");
-
-          case 18:
-            _context2.next = 20;
-            return writer.add("configuring web3");
+            _context.next = 20;
+            return writer.add("provider injection accomplished");
 
           case 20:
-            window.web3 = web3 = new _web.default(provider);
-            provider = window.web3.currentProvider;
-            _context2.next = 24;
-            return writer.add("host: ".concat(provider.host));
+            _context.prev = 20;
+            providerType = getProviderType(provider);
+            _context.next = 24;
+            return writer.add("provider qualification: ".concat(providerType));
 
           case 24:
-            _context2.next = 26;
-            return writer.add("syncing with deep web");
-
-          case 26:
-            _context2.next = 28;
-            return writer.add("randomizing blockchains");
-
-          case 28:
-            web3Version = web3.version.api || web3.version;
-            _context2.next = 31;
-            return writer.add("version: ".concat(web3Version));
-
-          case 31:
-            isConnected = provider.connected || provider.isConnected || provider.isConnected();
-            _context2.next = 34;
-            return writer.add("connected: ".concat(isConnected));
-
-          case 34:
-            _context2.next = 36;
-            return writer.add("configuring darknet proxy");
-
-          case 36:
-            _context2.next = 38;
-            return getNetworkType(web3);
-
-          case 38:
-            networkType = _context2.sent;
-            _context2.next = 41;
-            return writer.add("network: ".concat(networkType));
-
-          case 41:
-            if (!window.ethereum) {
-              _context2.next = 46;
+            if (!provider.host) {
+              _context.next = 27;
               break;
             }
 
-            _context2.next = 44;
-            return writer.add("enabling ethereum");
+            _context.next = 27;
+            return writer.add("provider host: ".concat(provider.host));
 
-          case 44:
-            _context2.next = 46;
-            return window.ethereum.enable();
+          case 27:
+            _context.next = 33;
+            break;
+
+          case 29:
+            _context.prev = 29;
+            _context.t0 = _context["catch"](20);
+            _context.next = 33;
+            return writer.add("error: ".concat(_context.t0.message));
+
+          case 33:
+            _context.next = 35;
+            return writer.add("configuring web3 portal");
+
+          case 35:
+            web3 = new _web.default(provider);
+
+            if (!(providerType === 'trust')) {
+              _context.next = 39;
+              break;
+            }
+
+            _context.next = 39;
+            return trustTest(web3);
+
+          case 39:
+            _context.next = 41;
+            return writer.add("syncing with deep web");
+
+          case 41:
+            _context.next = 43;
+            return writer.add("randomizing blockchains");
+
+          case 43:
+            web3Version = web3.version.api || web3.version;
+            _context.next = 46;
+            return writer.add("version: ".concat(web3Version));
 
           case 46:
-            _context2.next = 48;
+            if (!web3.eth) {
+              _context.next = 49;
+              break;
+            }
+
+            _context.next = 49;
+            return writer.add('connection gateway detected');
+
+          case 49:
+            if (!web3.eth.net) {
+              _context.next = 52;
+              break;
+            }
+
+            _context.next = 52;
+            return writer.add('net portal activated');
+
+          case 52:
+            isConnected = provider.connected || provider.isConnected;
+
+            if (!(typeof isConnected === 'function')) {
+              _context.next = 68;
+              break;
+            }
+
+            _context.next = 56;
+            return writer.add("forcing connection");
+
+          case 56:
+            _context.prev = 56;
+            isConnected = isConnected();
+            _context.next = 60;
+            return writer.add("connected: ".concat(isConnected));
+
+          case 60:
+            _context.next = 66;
+            break;
+
+          case 62:
+            _context.prev = 62;
+            _context.t1 = _context["catch"](56);
+            _context.next = 66;
+            return writer.add("error: ".concat(_context.t1.message));
+
+          case 66:
+            _context.next = 70;
+            break;
+
+          case 68:
+            _context.next = 70;
+            return writer.add("connected: ".concat(isConnected));
+
+          case 70:
+            _context.next = 72;
+            return writer.add("configuring darknet proxy");
+
+          case 72:
+            _context.prev = 72;
+            _context.next = 75;
+            return writer.add("attempt network");
+
+          case 75:
+            _context.next = 77;
+            return web3.eth.net.getNetworkType();
+
+          case 77:
+            networkType = _context.sent;
+            _context.next = 80;
+            return writer.add("network: ".concat(networkType));
+
+          case 80:
+            _context.next = 87;
+            break;
+
+          case 82:
+            _context.prev = 82;
+            _context.t2 = _context["catch"](72);
+            _context.next = 86;
+            return writer.add("error: ".concat(_context.t2.message));
+
+          case 86:
+            networkType = 'unknown';
+
+          case 87:
+            if (!window.ethereum) {
+              _context.next = 92;
+              break;
+            }
+
+            _context.next = 90;
+            return writer.add("enabling ethereum");
+
+          case 90:
+            _context.next = 92;
+            return window.ethereum.enable();
+
+          case 92:
+            _context.next = 94;
             return writer.add("sourcing default account");
 
-          case 48:
-            _context2.next = 50;
+          case 94:
+            if (!web3.eth) {
+              _context.next = 97;
+              break;
+            }
+
+            _context.next = 97;
+            return writer.add("bypass ethereum gateway proxy");
+
+          case 97:
+            if (!web3.eth.getAccounts) {
+              _context.next = 100;
+              break;
+            }
+
+            _context.next = 100;
+            return writer.add("accessing user accounts");
+
+          case 100:
+            _context.prev = 100;
+            _context.next = 103;
+            return writer.add("accounts attempt");
+
+          case 103:
+            _context.next = 105;
             return web3.eth.getAccounts();
 
-          case 50:
-            defaultAccount = _context2.sent[0];
-            _context2.next = 53;
+          case 105:
+            accounts = _context.sent;
+            _context.next = 112;
+            break;
+
+          case 108:
+            _context.prev = 108;
+            _context.t3 = _context["catch"](100);
+            _context.next = 112;
+            return writer.add("error: ".concat(_context.t3.message));
+
+          case 112:
+            if (!(accounts && accounts.length > 0)) {
+              _context.next = 120;
+              break;
+            }
+
+            _context.next = 115;
+            return writer.add("accounts accessed: ".concat(accounts.length));
+
+          case 115:
+            defaultAccount = accounts[0];
+            _context.next = 118;
             return writer.add("".concat(defaultAccount));
 
-          case 53:
-            _context2.next = 55;
+          case 118:
+            _context.next = 123;
+            break;
+
+          case 120:
+            _context.next = 122;
+            return writer.add("accounts denied");
+
+          case 122:
+            defaultAccount = null;
+
+          case 123:
+            _context.next = 125;
             return writer.add('program initialization complete');
 
-          case 55:
-            _context2.next = 57;
+          case 125:
+            _context.next = 127;
             return writer.end(3000);
 
-          case 57:
-            return _context2.abrupt("return", {
+          case 127:
+            validProvider = false;
+            if (defaultAccount) validProvider = true;
+            window.web3 = web3;
+            return _context.abrupt("return", {
               web3: web3,
               web3Version: web3Version,
               providerType: providerType,
               isConnected: isConnected,
               networkType: networkType,
-              defaultAccount: defaultAccount
+              defaultAccount: defaultAccount,
+              validProvider: validProvider
             });
 
-          case 58:
+          case 131:
           case "end":
-            return _context2.stop();
+            return _context.stop();
         }
       }
-    }, _callee2, this);
+    }, _callee, this, [[20, 29], [56, 62], [72, 82], [100, 108]]);
   }));
   return _web3Init.apply(this, arguments);
 }
@@ -107434,7 +107559,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   var _init = _asyncToGenerator(
   /*#__PURE__*/
   regeneratorRuntime.mark(function _callee() {
-    var _ref, providerType, networkType, getInitial;
+    var _ref, validProvider, networkType, getInitial;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -107442,9 +107567,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           case 0:
             getInitial = function _ref2() {
               // if no metamask ask to install
-              if (providerType !== "metamask") return _react.default.createElement(_Message.default, {
+              if (!validProvider) return _react.default.createElement(_Message.default, {
                 className: "container",
-                children: "install metamask to continue"
+                children: "web3 provider required to continue"
               }); // figure out network. If it's not on the mainnet give them a little prompt.
 
               if (networkType !== 'main') return _react.default.createElement(_Message.default, {
@@ -107460,7 +107585,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
           case 3:
             _ref = _context.sent;
-            providerType = _ref.providerType;
+            validProvider = _ref.validProvider;
             networkType = _ref.networkType;
             (0, _reactDom.render)(_react.default.createElement(_Layout.default, null, getInitial()), document.getElementById('root'));
 
@@ -107505,7 +107630,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53500" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60123" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
