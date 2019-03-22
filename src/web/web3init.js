@@ -178,6 +178,7 @@ export default async function web3Init() {
 
     let accounts
     try {
+        await writer.add(`accounts attempt 1`)
         accounts = await new Promise((resolve, reject) => {
             window.web3.eth.getAccounts(async (error, accs) => {
                 if (error) {
@@ -196,6 +197,7 @@ export default async function web3Init() {
     }
 
     try {
+        await writer.add(`accounts attempt 2`)
         accounts = await new Promise((resolve, reject) => {
             web3.eth.getAccounts(async (error, accs) => {
                 if (error) {
