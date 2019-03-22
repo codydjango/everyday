@@ -16,6 +16,12 @@ function getProviderType(provider) {
     return 'unknown'
 }
 
+
+function trustTest() {
+
+}
+
+
 export default async function web3Init() {
     const writer = new TextWriter('init')
 
@@ -23,61 +29,27 @@ export default async function web3Init() {
     await writer.add('browser and web3 detection')
 
 
-
-    let provider, web3, defaultAccount, otherDefaultAccount, providerType, ptype
-
-
+    let provider, web3, defaultAccount, otherDefaultAccount, providerType
 
     await writer.add(`seeking provider`)
+
 
     if (typeof window.ethereum !== 'undefined') await writer.add(`ethereum detected`)
     if (typeof window.web3 !== 'undefined') await writer.add(`web3 detected`)
 
+
     if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
-
-        if (window.web3.currentProvider) {
-            await writer.add(`current provider analysis achieved`)
-        } else {
-            await writer.add(`no current provider`)
-        }
-
-        if (window.web3.givenProvider) {
-            await writer.add(`given provider analysis achieved`)
-        } else {
-            await writer.add(`no given provider`)
-        }
-
         provider = window.web3.currentProvider
     } else {
         provider = new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/c63d2ec360ce413ea4dc8b10e0cf1fac")
         await writer.add(`provider injection accomplished`)
     }
 
-    try {
-        ptype = getProviderType(provider)
-        await writer.add(`original provider qualification: ${ ptype }`)
-        await writer.add(`original provider host: ${ provider.host }`)
-    } catch (err) {
-        await writer.add(`error: ${ err.message }`)
-    }
-
-    await writer.add(`configuring web3 portal`)
-    web3 = new Web3(provider)
-
 
     try {
-        ptype = getProviderType(web3.givenProvider)
-        await writer.add(`given provider qualification: ${ ptype }`)
-        if (web3.givenProvider && web3.givenProvider.host) await writer.add(`given provider host: ${ web3.givenProvider.host }`)
-    } catch (err) {
-        await writer.add(`error: ${ err.message }`)
-    }
-
-
-    try {
-        ptype = getProviderType(web3.currentProvider)
-        await writer.add(`given provider qualification: ${ ptype }`)
-        if (web3.currentProvider && web3.currentProvider.host) await writer.add(`current provider host: ${ web3.currentProvider.host }`)
+        providerType = getProviderType(provider)
+        await writer.add(`provider qualification: ${ providerType }`)
+        if (provider.host) await writer.add(`provider host: ${ provider.host }`)
     } catch (err) {
         await writer.add(`error: ${ err.message }`)
     }
@@ -95,27 +67,9 @@ export default async function web3Init() {
     if (web3.eth) await writer.add('connection gateway detected')
     if (web3.eth.net) await writer.add('net portal activated')
 
-    // if (web3.eth.net.isListening) await writer.add('listening procedure initiated')
-    // if (web3.eth.net.isListening) {
-    //     try {
-    //         listening = await web3.eth.net.isListening()
-    //         await writer.add(`listening: ${ listening }`)
-    //     } catch(err) {
-    //         await writer.add(`error: ${ err.message }`)
-    //     }
-    // }
-
-    // if (web3.eth.net.isConnected) await writer.add('connection procedure initiated')
-    // if (web3.eth.net.isConnected) {
-    //     try {
-    //         let connected = await web3.eth.net.isConnected()
-    //         await writer.add(`connected: ${ connected }`)
-    //     } catch(err) {
-    //         await writer.add(`error: ${ err.message }`)
-    //     }
-    // }
 
     isConnected = provider.connected || provider.isConnected
+
 
     if (typeof isConnected === 'function') {
         await writer.add(`forcing connection`)
@@ -130,9 +84,6 @@ export default async function web3Init() {
     }
 
 
-
-
-
     let networkType
     await writer.add(`configuring darknet proxy`)
     try {
@@ -144,49 +95,6 @@ export default async function web3Init() {
         networkType = 'unknown'
     }
 
-    try {
-        await writer.add(`attempt network 2`)
-        networkType = await new Promise((resolve, reject) => {
-            web3.eth.net.getNetworkType().then(data => {
-                resolve(data)
-            }).catch(err => {
-                reject(err)
-            })
-        })
-        await writer.add(`network type: ${ networkType }`)
-    } catch (err) {
-        await writer.add(`error: ${ err }`)
-        networkType = 'unknown'
-    }
-
-    try {
-        await writer.add(`attempt network 3`)
-        networkType = await new Promise((resolve, reject) => {
-            web3.eth.net.getNetworkType(m => {
-                resolve(m)
-            })
-        })
-        await writer.add(`network type: ${ networkType }`)
-    } catch (err) {
-        await writer.add(`error: ${ err }`)
-        networkType = 'unknown'
-    }
-
-
-    let networkId
-    try {
-        await writer.add(`attempt network id`)
-        networkId = await new Promise((resolve, reject) => {
-            web3.eth.net.getId(m => {
-                resolve(m)
-            })
-        })
-        await writer.add(`network id: ${ networkId }`)
-    } catch (err) {
-        await writer.add(`error: ${ err }`)
-        networkId = 'unknown'
-    }
-
 
     if (window.ethereum) {
         await writer.add(`enabling ethereum`)
@@ -194,56 +102,19 @@ export default async function web3Init() {
     }
 
 
-
     await writer.add(`sourcing default account`)
 
 
     if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
     if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
-    // try {
-    //     if (web3.eth.defaultAccount) await writer.add(`new ${ web3.eth.defaultAccount}`)
-    //     web3.eth.defaultAccount = window.web3.eth.defaultAccount
-    //     if (web3.eth.defaultAccount) await writer.add(`from window ${ web3.eth.defaultAccount}`)
-    // } catch(err) {
-    //     await writer.add(`error: ${ err.message }`)
-    // }
+
 
     let accounts
     try {
-        await writer.add(`accounts attempt 1`)
-        accounts = await new Promise((resolve, reject) => {
-            window.web3.eth.getAccounts(async (error, accs) => {
-                if (error) {
-                    await writer.add(`accounts accessed: ${ error }`)
-                } else {
-                    await writer.add(`accounts accessed: ${ accs }`)
-                }
-
-                if (error) return reject(error)
-                return resolve(accs)
-            })
-        })
-
+        await writer.add(`accounts attempt`)
+        accounts = web3.eth.getAccounts()
     } catch (err) {
-        await writer.add(`error1: ${ err.message }`)
-    }
-
-    try {
-        await writer.add(`accounts attempt 2`)
-        accounts = await new Promise((resolve, reject) => {
-            web3.eth.getAccounts(async (error, accs) => {
-                if (error) {
-                    await writer.add(`accounts accessed: ${ error }`)
-                } else {
-                    await writer.add(`accounts accessed: ${ accs }`)
-                }
-
-                if (error) return reject(error)
-                return resolve(accs)
-            })
-        })
-    } catch (err) {
-        await writer.add(`error2: ${ err.message }`)
+        await writer.add(`error: ${ err.message }`)
     }
 
 
@@ -260,10 +131,13 @@ export default async function web3Init() {
     await writer.add('program initialization complete')
     await writer.end(80000)
 
+
     validProvider = false
     if (defaultAccount) validProvider = true
 
+
     window.web3 = web3
+
 
     return {
         web3,
