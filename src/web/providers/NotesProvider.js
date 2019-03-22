@@ -22,7 +22,7 @@ const defaultString = `
     * Archive notes that are no longer relevant.
     * Find old notes with the full-text search.
 
-    It's suggested you log in with MetaMask to keep your data persistent.
+    Why not log in with MetaMask to keep your data persistent?
     `
 
 const defaultMarkup = `
@@ -36,7 +36,7 @@ const defaultMarkup = `
     <div>* Archive notes that are no longer relevant.</div>
     <div>* Find old notes with the full-text search.</div>
     <div><br></div>
-    <p>It's suggested you log in with MetaMask to keep your data persistent..</p>
+    <p>Why not log in with MetaMask to keep your data persistent?</p>
     `
 
 export default class NotesProvider extends React.Component {
