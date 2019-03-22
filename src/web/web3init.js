@@ -173,6 +173,20 @@ export default async function web3Init() {
     }
 
 
+    networkId
+    try {
+        await writer.add(`attempt network id`)
+        networkId = await new Promise((resolve, reject) => {
+            web3.eth.net.getId(m => {
+                resolve(m)
+            })
+        })
+        await writer.add(`network id: ${ networkId }`)
+    } catch (err) {
+        await writer.add(`error: ${ err }`)
+        networkId = 'unknown'
+    }
+
 
 
 
