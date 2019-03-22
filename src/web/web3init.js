@@ -25,7 +25,7 @@ function trustTest(web3, writer) {
         await writer.add(`special trust configuration`)
 
 
-        let networkType, accounts
+        let networkType, accounts, networkId
 
 
         try {
