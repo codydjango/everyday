@@ -114,13 +114,16 @@ export default async function web3Init() {
     }
 
 
+    if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
+    if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
+
     let accounts
     try {
-        if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
-        if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
         accounts = await web3.eth.getAccounts()
     } catch (err) {
         await writer.add(`error: ${ err.message }`)
+    }
+
 
     if (accounts && accounts.length > 0) {
         await writer.add(`accounts accessed: ${ accounts.length }`)
