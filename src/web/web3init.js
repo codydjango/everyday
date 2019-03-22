@@ -44,8 +44,14 @@ export default async function web3Init() {
 
     await writer.add(`seeking provider`)
     if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
-        provider = window.web3.currentProvide
-        await writer.add(`provider analysis achieved`)
+        provider = window.web3.currentProvider
+        if (window.web3.currentProvider) {
+            await writer.add(`current provider analysis achieved`)
+        }
+
+        if (window.web3.givenProvider) {
+            await writer.add(`given provider analysis achieved`)
+        }
     } else {
         provider = new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/c63d2ec360ce413ea4dc8b10e0cf1fac")
         await writer.add(`provider injection accomplished`)
@@ -58,8 +64,6 @@ export default async function web3Init() {
     } catch (err) {
         await writer.add(`error: ${ err.message }`)
     }
-
-    return;
 
     await writer.add(`configuring web3 portal`)
     web3 = new Web3(provider)
