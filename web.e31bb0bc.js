@@ -107039,13 +107039,11 @@ function () {
       return this.startWriting("".concat(str.trim(), "...\n"));
     }
   }, {
-    key: "end",
+    key: "wait",
     value: function () {
-      var _end = _asyncToGenerator(
+      var _wait = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee() {
-        var _this2 = this;
-
         var time,
             _args = arguments;
         return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -107055,8 +107053,6 @@ function () {
                 time = _args.length > 0 && _args[0] !== undefined ? _args[0] : 3000;
                 return _context.abrupt("return", new Promise(function (resolve, reject) {
                   setTimeout(function () {
-                    _this2._el.parentNode.removeChild(_this2._el);
-
                     resolve(true);
                   }, time);
                 }));
@@ -107067,6 +107063,39 @@ function () {
             }
           }
         }, _callee, this);
+      }));
+
+      function wait() {
+        return _wait.apply(this, arguments);
+      }
+
+      return wait;
+    }()
+  }, {
+    key: "end",
+    value: function () {
+      var _end = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee2() {
+        var time,
+            _args2 = arguments;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                time = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] : 3000;
+                _context2.next = 3;
+                return this.wait(3000);
+
+              case 3:
+                this._el.parentNode.removeChild(this._el);
+
+              case 4:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
       }));
 
       function end() {
@@ -107630,7 +107659,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60123" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62207" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
