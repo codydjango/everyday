@@ -59,13 +59,17 @@ class TextWriter {
         return this.startWriting(`${ str.trim() }...\n`)
     }
 
-    async end(time = 3000) {
+    async wait(time = 3000) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                this._el.parentNode.removeChild(this._el)
                 resolve(true)
             }, time)
         })
+    }
+
+    async end(time = 3000) {
+        await this.wait(3000)
+        this._el.parentNode.removeChild(this._el)
     }
 
     _processString() {

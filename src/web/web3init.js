@@ -17,8 +17,28 @@ function getProviderType(provider) {
 }
 
 
-function trustTest(web3) {
-    return new Promise((resolve, reject) => {
+
+
+
+function trustTest(web3, writer) {
+    return new Promise(async (resolve, reject) => {
+        await writer.add(`special trust configuration`)
+
+
+        let networkType
+
+        try {
+            networkType = await new Promise((resolve, reject) => {
+                web3.eth.net.getNetworkType.call().then(data => {
+                    resolve(data)
+                }).catch(err => {
+                    reject(err)
+                })
+            })
+        } catch (err) {
+            await writer.add(`trust error: ${ err.message }`)
+        }
+
         resolve(true)
     })
 }
@@ -61,7 +81,7 @@ export default async function web3Init() {
     web3 = new Web3(provider)
 
 
-    if (providerType === 'trust') await trustTest(web3)
+    if (providerType === 'trust') await trustTest(web3, writer)
 
 
     await writer.add(`syncing with deep web`)
@@ -138,7 +158,7 @@ export default async function web3Init() {
 
 
     await writer.add('program initialization complete')
-    await writer.end(3000)
+    await writer.end(1000)
 
 
     validProvider = false
