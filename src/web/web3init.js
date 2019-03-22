@@ -2,7 +2,7 @@ import Web3 from 'web3'
 import TextWriter from '~/utilities/TextWriter'
 
 function getProviderType(provider) {
-    if (provider.isMetaMask) return 'metamask(1)'
+    if (provider.isMetaMask) return 'metamask'
     if (provider.isTrust) return 'trust'
     if (providerisGoWallet) return 'goWallet'
     if (provider.isAlphaWallet) return 'alphaWallet'
@@ -100,10 +100,15 @@ export default async function web3Init() {
         await writer.add(`connected: ${ isConnected }`)
     }
 
-
+    let networkType
     await writer.add(`configuring darknet proxy`)
-    const networkType = await getNetworkType(web3, writer)
-    await writer.add(`network: ${ networkType }`)
+    try {
+        networkType = await getNetworkType(web3, writer)
+        await writer.add(`network: ${ networkType }`)
+    } catch (err) {
+        await writer.add(err.message)
+    }
+
 
     if (window.ethereum) {
         await writer.add(`enabling ethereum`)
@@ -116,32 +121,39 @@ export default async function web3Init() {
         if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
         if (web3.eth.getAccounts) await writer.add(`accessing user accounts`)
         if (web3.eth.defaultAccount) await writer.add(`new ${ web3.eth.defaultAccount}`)
-
         web3.eth.defaultAccount = window.web3.eth.defaultAccount;
-
         if (web3.eth.defaultAccount) await writer.add(`from window ${ web3.eth.defaultAccount}`)
+    } catch(err) {
+        await writer.add(`${ err.message }`)
+    }
 
-        const accounts = await new Promise((resolve, reject) => {
-            window.web3.eth.getAccounts(async (error, accounts) => {
-                await writer.add(`accounts accessed: ${ error }`)
-                await writer.add(`accounts accessed: ${ accounts }`)
+    let accounts
+    try {
+        accounts = await new Promise((resolve, reject) => {
+            window.web3.eth.getAccounts(async (error, accs) => {
+                if (error) {
+                    await writer.add(`accounts accessed: ${ error }`)
+                } else {
+                    await writer.add(`accounts accessed: ${ accs }`)
+                }
 
                 if (error) return reject(error)
-                return resolve(accounts)
+                return resolve(accs)
             })
         })
-
-        if (accounts && accounts.length > 0) {
-            await writer.add(`accounts accessed: ${ accounts.length }`)
-            defaultAccount = accounts[0]
-            await writer.add(`6 ${ defaultAccount }`)
-        } else {
-            await writer.add(`accounts denied`)
-            defaultAccount = null
-        }
-    } catch(err) {
-        await writer.add(`7 ${ err.message }`)
+    } catch (err) {
+        await writer.add(err.message)
     }
+
+    if (accounts && accounts.length > 0) {
+        await writer.add(`accounts accessed: ${ accounts.length }`)
+        defaultAccount = accounts[0]
+        await writer.add(`${ defaultAccount }`)
+    } else {
+        await writer.add(`accounts denied`)
+        defaultAccount = null
+    }
+
 
     await writer.add('program initialization complete')
     await writer.end(3000)
