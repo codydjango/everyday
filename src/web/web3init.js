@@ -24,53 +24,40 @@ function trustTest(web3, writer) {
     return new Promise(async (resolve, reject) => {
         await writer.add(`special trust configuration`)
 
-
         let networkType, accounts, networkId
 
-
-        try {
-            await writer.add(`attempt web3.eth.net.getNetworkType`)
-            networkType = await new Promise(async (resolve, reject) => {
-                let x = await web3.eth.net.getNetworkType()
-                await writer.add(`x : ${ x }`)
-                resolve(true)
-                    // .then(data => resolve(data))
-                    // .catch(err => reject(err))
-            })
-            await writer.add(`result: ${ networkType }`)
-        } catch (err) {
-            await writer.add(`trust error: ${ err.message }`)
-        }
+        const network = web3.version.network
+        await writer.add(`network ${network}`)
 
 
-        try {
-            await writer.add(`attempt web3.eth.net.getId`)
-            networkId = await new Promise(async (resolve, reject) => {
-                let x = await web3.eth.net.getId()
-                await writer.add(`x : ${ x }`)
-                resolve(true)
-                    // .then(data => resolve(data))
-                    // .catch(err => reject(err))
-            })
-            await writer.add(`result: ${ networkId }`)
-        } catch (err) {
-            await writer.add(`trust error: ${ err.message }`)
-        }
+        // try {
+        //     await writer.add(`attempt web3.eth.net.getId`)
+        //     networkId = await new Promise(async (resolve, reject) => {
+        //         let x = web3.eth.net.getId()
+        //         await writer.add(`x : ${ x }`)
+        //         resolve(true)
+        //             // .then(data => resolve(data))
+        //             // .catch(err => reject(err))
+        //     })
+        //     await writer.add(`result: ${ networkId }`)
+        // } catch (err) {
+        //     await writer.add(`trust error: ${ err.message }`)
+        // }
 
 
-        try {
-            await writer.add(`attempt web3.eth.getAccounts`)
-            accounts = await new Promise(async (resolve, reject) => {
-                let x = await web3.eth.getAccounts()
-                await writer.add(`x : ${ x }`)
-                resolve(true)
-                    // .then(data => resolve(data))
-                    // .catch(err => reject(err))
-            })
-            await writer.add(`result: ${ accounts }`)
-        } catch (err) {
-            await writer.add(`trust error: ${ err.message }`)
-        }
+        // try {
+        //     await writer.add(`attempt web3.eth.getAccounts`)
+        //     accounts = await new Promise(async (resolve, reject) => {
+        //         let x = web3.eth.getAccounts()
+        //         await writer.add(`x : ${ x }`)
+        //         resolve(true)
+        //             // .then(data => resolve(data))
+        //             // .catch(err => reject(err))
+        //     })
+        //     await writer.add(`result: ${ accounts }`)
+        // } catch (err) {
+        //     await writer.add(`trust error: ${ err.message }`)
+        // }
 
 
         await writer.wait(10000 * 60)
