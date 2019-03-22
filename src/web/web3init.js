@@ -114,7 +114,6 @@ export default async function web3Init() {
     }
 
 
-
     let accounts
     try {
         if (web3.eth) await writer.add(`bypass ethereum gateway proxy`)
