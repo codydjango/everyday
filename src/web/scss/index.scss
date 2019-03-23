@@ -6,8 +6,12 @@ $marginBottom: 14px;
 $shortMarginBottom: 5px;
 $titleMarginBottom: 10px;
 $backgroundYellow: rgb(243, 243, 0);
-$backgroundYellowBorder: #e5e700;
-$backgroundYellowBorderFocus: rgb(209, 209, 3);
+$backgroundYellowBorder: #5c5e00;
+$backgroundYellowBorderFocus: rgb(129, 129, 2);
+
+$darkBackground: black;
+$darkBorder: #fbff00;
+$darkBorderFocus: rgb(209, 209, 3);
 
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
@@ -64,8 +68,15 @@ body {
     -webkit-font-smoothing: antialiased;
     font-weight: 400;
     font-size: 14px;
-    background-color: yellow;
+    background-color: $backgroundYellow;
     @extend .noselect;
+
+    color: black;
+
+    &.dark {
+        background-color: rgb(20, 20, 20);
+        color: rgb(240, 240, 240);
+    }
 }
 
 h1 {
