@@ -42,7 +42,10 @@ export default props => {
         role="button"
         className={ `link ${ (className) ? className : '' }` }
         onKeyPress={ e => { if (e.key === 'Enter') onClick() }}
-        onClick={ onClick }
+        onClick={ e => {
+            e.preventDefault()
+            onClick()
+        } }
         { ...modifiedProps }>
         { children }
     </StyledLink>)

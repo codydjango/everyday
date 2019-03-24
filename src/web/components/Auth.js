@@ -104,9 +104,7 @@ class Auth extends React.Component {
         return response.data.token
     }
 
-    async login(e) {
-        e.preventDefault()
-
+    async login() {
         let nonce, signature, session, token = false
         let account = this.props.account
 
@@ -123,8 +121,7 @@ class Auth extends React.Component {
         }
     }
 
-    logout(e) {
-        e.preventDefault()
+    logout() {
         this.props.updateAuth({ account: this.props.account, token: null}, true)
         this.props.updateStatus('I hope to see you again soon')
     }

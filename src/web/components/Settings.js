@@ -16,9 +16,7 @@ class Settings extends React.Component {
         const { themeStyle, rotateTheme } = this.props
 
         return (<StyledDiv>
-            <Link children={ themeStyle } onClick={ () => {
-                rotateTheme()
-            } } />
+            <Link children={ themeStyle } onClick={ rotateTheme } />
         </StyledDiv>)
     }
 }

@@ -79,7 +79,7 @@ export default withContext(class Today extends React.Component {
         }))
     }
 
-    toggleEdit(e) {
+    toggleEdit() {
         if (this.state.edit) {
             this.stopEdit()
         } else {
@@ -146,20 +146,11 @@ export default withContext(class Today extends React.Component {
             <footer>
                 <div>
                     <Link children={ (this.state.edit) ? 'close' : 'edit' }
-                        onClick={ e => {
-                            e.preventDefault()
-                            this.toggleEdit()
-                        } } />
+                        onClick={ this.toggleEdit } />
                     <Link children={ (this.state.help) ? 'close' : 'help' }
-                        onClick={ e => {
-                            e.preventDefault()
-                            this.toggleHelp()
-                        } } />
+                        onClick={ this.toggleHelp } />
                     <Link children="reset"
-                        onClick={ e => {
-                            e.preventDefault()
-                            this.props.clearList()
-                        } } />
+                        onClick={ this.props.clearList } />
                 </div>
                 { (this.state.edit) ? getEditInstruction() : '' }
                 { (this.state.help) ? getHelpInstruction() : '' }
