@@ -12,32 +12,30 @@ function activeIndex(list) {
 }
 
 const defaultString = `
-    This app is very simple:
-    * Add tasks to your daily routine.
-    * Order tasks to strategize your day.
-    * Click "done" for each task that you accomplish.
-    * Done all tasks to complete your day.
-    * Track your streak of completed days.
-    * Capture notes in the scratchpad.
-    * Archive notes that are no longer relevant.
-    * Find old notes with the full-text search.
+This app is basic:
+* Add tasks to your routine.
+* Order tasks to strategize your day.
+* Click "done" for each task that you complete.
 
-    Why not log in with MetaMask to keep your data persistent?
-    `
+You can also capture notes throughout your day using this scratchpad:
+* Archive notes that are no longer relevant.
+* Find old notes with the full-text search.
+
+Why not log in with MetaMask to keep your data persistent?
+`
 
 const defaultMarkup = `
-    <p>This app is very simple:</p>
-    <div>* Add tasks to your daily routine.</div>
-    <div>* Order tasks to strategize your day.<br></div>
-    <div>* Click "done" for each task that you accomplish.</div>
-    <div>* Done all tasks to complete your day.<br></div>
-    <div>* Track your streak of completed days.</div>
-    <div>* Capture notes in the scratchpad.</div>
-    <div>* Archive notes that are no longer relevant.</div>
-    <div>* Find old notes with the full-text search.</div>
-    <div><br></div>
-    <p>Why not log in with MetaMask to keep your data persistent?</p>
-    `
+<p>This app is basic:</p>
+<div>* Add tasks to your daily routine.</div>
+<div>* Order tasks to strategize your day.<br></div>
+<div>* Click "done" for each task that you complete.</div>
+<div><br></div>
+<p>You can also capture notes throughout your day using this scratchpad:
+<div>* Archive notes that are no longer relevant.</div>
+<div>* Find old notes with the full-text search.</div>
+<div><br></div>
+<p>Why not log in with MetaMask to keep your data persistent?</p>
+`
 
 export default class NotesProvider extends React.Component {
     static get defaultNote () {
