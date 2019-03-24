@@ -27,11 +27,17 @@ class TextWriter {
     }
 
     writeWithEasing(str) {
+        // let time = 100;
+
+        // const diff = str.length;
+        // const minTime = 10;
+        // const maxTime = 400;
+
         let time = 100;
 
         const diff = str.length;
-        const minTime = 10;
-        const maxTime = 400;
+        const minTime = 3;
+        const maxTime = 200;
 
         this._str = str
 
@@ -59,7 +65,7 @@ class TextWriter {
         return this.startWriting(`${ str.trim() }...\n`)
     }
 
-    async wait(time = 3000) {
+    async wait(time = 1000) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 resolve(true)
@@ -67,8 +73,8 @@ class TextWriter {
         })
     }
 
-    async end(time = 3000) {
-        await this.wait(3000)
+    async end(time = 1000) {
+        await this.wait(time)
         this._el.parentNode.removeChild(this._el)
     }
 
