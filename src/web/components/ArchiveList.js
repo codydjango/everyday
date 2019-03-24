@@ -10,11 +10,11 @@ const StyledList = styled.ul`
     padding: 0px;
     list-style-position: inside;
     margin: 0 0 4px 0;
-    border: 1px dashed #e5e700;
+    border: 1px dashed ${ props => props.theme.border };
 `
 
 const StyledListItem = styled.li`
-    border-bottom: 1px dashed #e5e700;
+    border-bottom: 1px dashed ${ props => props.theme.border };
     margin: 0px;
     padding: 0px;
     font-style: italic;
@@ -34,7 +34,8 @@ const StyledSearchContainer = styled.div`
     margin-bottom: 6px;
 
     input {
-        flex: 1
+        flex: 1;
+        color: ${ props => props.theme.text };
     }
 
     .button {

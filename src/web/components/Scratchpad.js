@@ -25,8 +25,9 @@ const StyledInput = styled.div`
        -moz-user-select: text;
         -ms-user-select: text;
             user-select: text;
-    background-color: rgb(243, 243, 0);
-    border: 1px solid rgb(243, 243, 0);
+
+    background-color: ${ props => props.theme.secondary };
+    border: 1px solid ${ props => props.theme.border };
     padding: 4px;
     width: 100%;
     box-sizing: border-box;
@@ -34,13 +35,18 @@ const StyledInput = styled.div`
     min-height: 200px;
     height: 400px;
     max-height: 400px;
-    transition : border 5500ms ease-out;
+    transition : border ${ props => props.theme.transition };
     margin: 2px 0 8px 0;
     overflow: scroll;
 
     &:focus {
         outline: none;
-        border: 1px solid rgb(209, 209, 5);
+        border: 1px solid ${ props => props.theme.borderActive };
+    }
+
+    &.error {
+        outline: none;
+        border: 1px solid ${ props => props.theme.borderError };
     }
 `
 

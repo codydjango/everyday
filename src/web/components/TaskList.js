@@ -3,6 +3,7 @@ import Task from '~/components/Task'
 import getKey from '~/utilities/getKey'
 import throttle from '~/utilities/throttle'
 import produce from 'immer'
+import styled from 'styled-components'
 
 function aggregates(list) {
     const counts = {}
@@ -18,6 +19,32 @@ function aggregates(list) {
         return i
     })
 }
+
+const StyledList = styled.ul`
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-bottom: ${ props => props.theme.marginBottom };
+
+    .task {
+        display: block;
+    }
+
+    &.edit {
+        .task {
+            label {
+                background-color: ${ props => props.theme.secondary };
+            }
+        }
+    }
+
+    .drag {
+        cursor: move;
+        label {
+            cursor: move;
+        }
+    }
+`
 
 export default props => {
     const normalTask = item => <Task tabIndex="0" handleAction={ props.onClick } item={ item } />
@@ -68,7 +95,7 @@ export default props => {
 
     const calculatedList = aggregates(props.list)
     return (props.edit)
-        ? (<ul className={'list taskList edit'}>
+        ? (<StyledList className={'list taskList edit'}>
                 { calculatedList.map((item, i) => {
                     return (<li
                         onDragOver={ () => { throttle(onDragOver, 100)(i) } }
@@ -82,12 +109,12 @@ export default props => {
                         </div>
                     </li>)
                 })}
-            </ul>)
-        : (<ul className={'list taskList'}>
+            </StyledList>)
+        : (<StyledList className={'list taskList'}>
                 { calculatedList.map((item, i) => (<li
                     className={ (props.edit) ? 'drag': '' }
                     key={ getKey(item) }>
                     { normalTask(item) }
                 </li>))}
-            </ul>)
+            </StyledList>)
 }

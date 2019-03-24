@@ -11,6 +11,38 @@ const StyledDataInterface = styled.small`
         display: inline-block;
         overflow: hidden;
     }
+
+    .link {
+        display: inline-block;
+        padding: 0;
+        margin: 0 2px;
+        position: relative;
+        color: ${ props => props.theme.text };
+        text-decoration: none;
+        overflow: auto;
+
+        &::after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: ${ props => props.theme.linkUnderline };
+            transition: height,
+            margin-top .2s;
+            margin-top: -3px;
+        }
+
+        &:hover::after {
+            height: 2px;
+            margin-top: -1px;
+        }
+
+        &:focus::after {
+            height: 2px;
+            margin-top: -1px;
+        }
+    }
 `
 
 class DataInterface extends React.Component {
@@ -44,10 +76,10 @@ class DataInterface extends React.Component {
 
         return (<StyledDataInterface className={ className }>
             { (hasData())
-            ? ( <span>
+            ? ( <React.Fragment>
                     <Import onImport={ handleImport }/>
                     <a className="link" download="export.json" href={ getHref() }>export</a>
-                </span>)
+                </React.Fragment>)
             : ''
             }
         </StyledDataInterface>)

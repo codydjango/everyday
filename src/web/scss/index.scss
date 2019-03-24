@@ -5,9 +5,6 @@ $padding: 4px;
 $marginBottom: 14px;
 $shortMarginBottom: 5px;
 $titleMarginBottom: 10px;
-$backgroundYellow: rgb(243, 243, 0);
-$backgroundYellowBorder: #e5e700;
-$backgroundYellowBorderFocus: rgb(209, 209, 3);
 
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
@@ -64,7 +61,6 @@ body {
     -webkit-font-smoothing: antialiased;
     font-weight: 400;
     font-size: 14px;
-    background-color: yellow;
     @extend .noselect;
 }
 
@@ -74,25 +70,6 @@ h1 {
     margin: 0 0 0 0;
     line-height: 1em;
     font-size: 32px;
-}
-
-.auth {
-    .authInfo {
-        .loginWith {
-            font-size: 12px;
-            line-height: 12px;
-            height: 12px;
-            display: block;
-        }
-
-        .loginAddress {
-            font-size: 18px;
-            line-height: 20px;
-            font-weight: 700;
-            height: 20px;
-            display: block;
-        }
-    }
 }
 
 h2 {
@@ -118,45 +95,6 @@ sub {
     top: 4px;
 }
 
-a {
-    color: black;
-}
-
-p {
-    margin-top: 0px;
-    padding-top: 0px;
-}
-
-.link {
-    display: inline-block;
-    padding: 2px;
-    position: relative;
-    color: #000;
-    text-decoration: none;
-    overflow: auto;
-
-    &::after {
-        content: '';
-        display: block;
-        position: absolute;
-        width: 92%;
-        height: 1px;
-        background: rgba(76, 76, 0, 1.000);
-        transition: height,margin-top .2s;
-        margin-top: -3px;
-    }
-
-    &:hover::after {
-        height: 2px;
-        margin-top: -1px;
-    }
-
-    &:focus::after {
-        height: 2px;
-        margin-top: -1px;
-    }
-}
-
 .list {
     list-style: none;
     padding: 0;
@@ -171,29 +109,6 @@ p {
 
     li {
         font-style: italic;
-    }
-}
-
-.taskList {
-    @extend .list;
-
-    .task {
-        display: block;
-    }
-
-    &.edit {
-        .task {
-            label {
-                background-color: $backgroundYellow
-            }
-        }
-    }
-
-    .drag {
-        cursor: move;
-        label {
-            cursor: move;
-        }
     }
 }
 

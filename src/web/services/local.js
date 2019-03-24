@@ -9,6 +9,23 @@ class Local {
         return 'local storage'
     }
 
+    set(name, value) {
+        this.store.setItem(name, JSON.stringify(value))
+    }
+
+    get(name, defaultValue) {
+        let val
+        try {
+            val = JSON.parse(this.store.getItem(name))
+        } catch (err) {
+            console.log('err', err)
+            this.store.removeItem(name)
+            return defaultValue
+        }
+
+        return val || defaultValue
+    }
+
     async save(account, data) {
         this.store.setItem(account, JSON.stringify(data))
     }

@@ -17,11 +17,14 @@ const StyledDiv = styled.div`
     }
 `
 
-export default ({ children }) => (
-    <StyledDiv>
+export default ({ children, theme }) => {
+    console.log('theme', theme)
+
+    return (<StyledDiv>
         <div className="message">
             <span className="messageLine">############################</span>
             { children }
             <span className="messageLine">############################</span>
         </div>
     </StyledDiv>)
+}

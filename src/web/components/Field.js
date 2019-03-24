@@ -13,19 +13,20 @@ const StyledLabel = styled.label`
 `
 
 const StyledInput = styled.input`
-    background-color: rgb(243, 243, 0);
-    transition : border 500ms ease-out;
+    background-color: ${ props => props.theme.secondary };
+    transition : border ${ props => props.theme.transition };
     width: 100%;
     max-width: 300px;
-    border: 1px solid rgb(243, 243, 0);
+    border: 1px solid ${ props => props.theme.border };
+    color: ${ props => props.theme.text };
 
     &:focus {
         outline: none;
-        border: 1px solid rgb(209, 209, 5);
+        border: 1px solid ${ props => props.theme.borderActive };
     }
 
     &.error {
-        border-color: tomato;
+        border-color: ${ props => props.theme.borderError };
     }
 `
 

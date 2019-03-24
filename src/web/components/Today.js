@@ -145,17 +145,17 @@ export default withContext(class Today extends React.Component {
 
             <footer>
                 <div>
-                    <Link text={ (this.state.edit) ? 'close' : 'edit' }
+                    <Link children={ (this.state.edit) ? 'close' : 'edit' }
                         onClick={ e => {
                             e.preventDefault()
                             this.toggleEdit()
                         } } />
-                    <Link text={ (this.state.help) ? 'close' : 'help' }
+                    <Link children={ (this.state.help) ? 'close' : 'help' }
                         onClick={ e => {
                             e.preventDefault()
                             this.toggleHelp()
                         } } />
-                    <Link text="reset"
+                    <Link children="reset"
                         onClick={ e => {
                             e.preventDefault()
                             this.props.clearList()

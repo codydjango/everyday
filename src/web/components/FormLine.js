@@ -62,7 +62,7 @@ class FormLine extends React.Component {
         })
     }
 
-    onClick(e) {
+    onClick() {
         const validators = this.props.validators || []
         const value = this.inputRef.current.value || this.inputRef.current.placeholder
 
@@ -70,7 +70,6 @@ class FormLine extends React.Component {
             this.props.onSubmit(validators.reduce((acc, fn) => fn(acc), value))
             this.inputRef.current.value = ''
         } catch (err) {
-            console.log('err', err)
             if (err === validationErr) {
                 this.setError(err.message)
             } else {

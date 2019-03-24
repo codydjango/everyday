@@ -1,14 +1,33 @@
 import React from 'react'
-
+import styled from 'styled-components'
 import { withContext } from '~/hoc'
 import { AuthContext, StatusContext } from '~/context'
 import getOrdinal from '~/utilities/getOrdinal'
 import comms from '~/services/comms'
+import Link from '~/components/Link'
 
 import 'babel-polyfill'
 
 const noAccountError = new Error('no accounts')
 
+const StyledDiv = styled.div`
+    .authInfo {
+        .loginWith {
+            font-size: 12px;
+            line-height: 12px;
+            height: 12px;
+            display: block;
+        }
+
+        .loginAddress {
+            font-size: 18px;
+            line-height: 20px;
+            font-weight: 700;
+            height: 20px;
+            display: block;
+        }
+    }
+`
 class Auth extends React.Component {
     constructor(props) {
         super(props)
@@ -123,12 +142,16 @@ class Auth extends React.Component {
 
         const showLoggedInName = () => (<span className="authInfo">
             <span className="loginWith">logout from</span>
-            <span className="loginAddress"><a href="#" onClick={ this.logout }>{ this.getShortAccount() }</a></span>
+            <span className="loginAddress">
+                <Link onClick={ this.logout } children={ this.getShortAccount() } />
+            </span>
         </span>)
 
         const showLoginWithActiveMetamaskAccount = () => (<div className="authInfo">
             <span className="loginWith">login with</span>
-            <span className="loginAddress"><a href="#" onClick={ this.login }>{ this.getShortAccount() }</a></span>
+            <span className="loginAddress">
+                <Link onClick={ this.login } children={ this.getShortAccount() } />
+            </span>
         </div>)
 
         let show
@@ -142,9 +165,9 @@ class Auth extends React.Component {
             show = showMetamaskPrompt
         }
 
-        return (<div className="auth">
+        return (<StyledDiv className="auth">
             { show() }
-        </div>)
+        </StyledDiv>)
     }
 }
 
