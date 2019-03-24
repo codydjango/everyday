@@ -24,8 +24,8 @@ import Layout from '~/components/Layout'
 
         // figure out network. If it's not on the mainnet give them a little prompt.
         if (networkType !== 'main') return (<Message
-                className="container"
-                children="please switch to the mainnet" />)
+            className="container"
+            children="please switch to the mainnet" />)
 
         // else return app
         return (<App />)

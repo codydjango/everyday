@@ -11,6 +11,7 @@ import Scratchpad from '~/components/Scratchpad'
 import Header from '~/components/Header'
 import Footer from '~/components/Footer'
 import Activity from '~/components/Activity'
+import Settings from '~/components/Settings'
 
 import StatusProvider from '~/providers/StatusProvider'
 import AuthProvider  from '~/providers/AuthProvider'
@@ -33,6 +34,8 @@ const Work = styled.div``
 
 class App extends React.Component {
     render() {
+        const { setTheme, themeStyle } = this.props
+        console.log('themeStyle', themeStyle, setTheme)
         return (
             <Container className="container">
                 <Header className="header">
@@ -53,6 +56,7 @@ class App extends React.Component {
                 <Footer className="footer">
                     <Status className="messageLeft" />
                     <DataInterface className="messageRight" />
+                    <Settings className="messageRight" themeStyle={ themeStyle } setTheme={ setTheme }/>
                 </Footer>
             </Container>
         )

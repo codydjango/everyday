@@ -25,8 +25,9 @@ const StyledInput = styled.div`
        -moz-user-select: text;
         -ms-user-select: text;
             user-select: text;
-    background-color: rgb(243, 243, 0);
-    border: 1px solid rgb(243, 243, 0);
+
+    background-color: ${ props => props.theme.main };
+    border: 1px solid ${ props => props.theme.border };
     padding: 4px;
     width: 100%;
     box-sizing: border-box;
