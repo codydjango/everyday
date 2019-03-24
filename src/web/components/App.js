@@ -35,7 +35,6 @@ const Work = styled.div``
 class App extends React.Component {
     render() {
         const { setTheme, themeStyle } = this.props
-        console.log('themeStyle', themeStyle, setTheme)
         return (
             <Container className="container">
                 <Header className="header">

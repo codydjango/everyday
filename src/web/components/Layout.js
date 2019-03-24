@@ -1,7 +1,6 @@
 import React from 'react'
 import styled, { ThemeProvider } from 'styled-components'
 import produce from 'immer'
-import StatusContext from '~/context'
 
 const themes = {
     normal: {
@@ -15,6 +14,8 @@ const themes = {
         border: "blue"
     }
 }
+
+const INITIALTHEME = 'normal'
 
 // const theme = () => ({
 //     main: 'rgb(243, 243, 0)',
@@ -32,14 +33,13 @@ const StyledDiv = styled.div`
     color: ${ props => props.theme.color };
 `
 
-
 class Layout extends React.Component {
     constructor(props) {
         super(props)
 
         this.state = {
-            theme: themes.normal,
-            themeStyle: 'normal'
+            theme: themes[INITIALTHEME],
+            themeStyle: INITIALTHEME
         }
 
         this.setTheme = this.setTheme.bind(this)
@@ -57,7 +57,7 @@ class Layout extends React.Component {
 
         const childrenWithProps = React.Children.map(children, child =>
             React.cloneElement(child, {
-                themeStyle: this.themeStyle,
+                themeStyle: this.state.themeStyle,
                 setTheme: this.setTheme,
                 ...rest
             })
@@ -70,7 +70,5 @@ class Layout extends React.Component {
         </ThemeProvider>)
     }
 }
-
-Layout.contextType = StatusContext
 
 export default Layout

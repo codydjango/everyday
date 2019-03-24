@@ -15,7 +15,7 @@ class Settings extends React.Component {
     render() {
         const { themeStyle, setTheme } = this.props
         const nextTheme = (themeStyle === 'dark' ? 'normal' : 'dark')
-        console.log('here', themeStyle, nextTheme)
+
         return (<StyledDiv>
             <Button text={ nextTheme } action={ e => {
                 setTheme(nextTheme)
