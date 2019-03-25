@@ -42354,7 +42354,7 @@ function () {
         notes: [],
         list: []
       });
-      this.status.updateStatus('nice to have you with us.');
+      this.status.updateStatus('nice to see you again');
     }
   }, {
     key: "allData",
@@ -43907,19 +43907,7 @@ function _templateObject() {
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
 function aggregates(list) {
-  var counts = {};
-  return list.slice(0).map(function (i) {
-    delete i.multiple;
-
-    if (Number.isInteger(counts[i.text])) {
-      counts[i.text] += 1;
-      i.multiple = counts[i.text];
-    } else {
-      counts[i.text] = 1;
-    }
-
-    return i;
-  });
+  return list;
 }
 
 var StyledList = _styledComponents.default.ul(_templateObject(), function (props) {
@@ -44064,7 +44052,7 @@ var _styledComponents = _interopRequireDefault(require("styled-components"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _templateObject3() {
-  var data = _taggedTemplateLiteral(["\n    background-color: ", ";\n    transition : border ", ";\n    width: 100%;\n    max-width: 300px;\n    border: 1px solid ", ";\n    color: ", ";\n\n    &:focus {\n        outline: none;\n        border: 1px solid ", ";\n    }\n\n    &.error {\n        border-color: ", ";\n    }\n"]);
+  var data = _taggedTemplateLiteral(["\n    background-color: ", ";\n    width: 100%;\n    max-width: 300px;\n    border: 1px solid ", ";\n    color: ", ";\n\n    ", "\n\n    &:focus {\n        outline: none;\n        border: 1px solid ", ";\n    }\n\n    &.error {\n        border-color: ", ";\n    }\n"]);
 
   _templateObject3 = function _templateObject3() {
     return data;
@@ -44102,11 +44090,11 @@ var StyledLabel = _styledComponents.default.label(_templateObject2());
 var StyledInput = _styledComponents.default.input(_templateObject3(), function (props) {
   return props.theme.secondary;
 }, function (props) {
-  return props.theme.transition;
-}, function (props) {
   return props.theme.border;
 }, function (props) {
   return props.theme.text;
+}, function (props) {
+  return props.theme.transition ? "transition : border ".concat(props.theme.transition, ";") : '';
 }, function (props) {
   return props.theme.borderActive;
 }, function (props) {
@@ -44634,6 +44622,12 @@ function (_React$Component) {
       }, 1000);
     }
   }, {
+    key: "getList",
+    value: function getList() {
+      // return JSON.parse(JSON.stringify(this.state.list))
+      return this.state.list;
+    }
+  }, {
     key: "createNewTask",
     value: function createNewTask(task) {
       this.props.addToList({
@@ -44708,7 +44702,7 @@ function (_React$Component) {
       return _react.default.createElement(StyledDiv, {
         className: this.props.className
       }, _react.default.createElement("h2", null, "routine"), _react.default.createElement(_TaskList.default, {
-        list: this.state.list,
+        list: this.getList(),
         edit: this.state.edit,
         dragged: this.state.dragged,
         onUpdate: this.onUpdate,
@@ -45130,7 +45124,7 @@ function (_React$Component) {
       var _this2 = this;
 
       if (this.state.hasError) return this.renderError();
-      return _react.default.createElement(StyledDiv, null, Now.starting(this.props.list) && _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "your brain is ready"), _react.default.createElement("p", null, _react.default.createElement("small", null, "add a few tasks to your routine to get started."))), Now.processing(this.props.list) && _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, this.activeTask.text.toLowerCase()), this.activeTask.checked ? _react.default.createElement(_Button.default, {
+      return _react.default.createElement(StyledDiv, null, Now.starting(this.props.list) && _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "your brain is ready"), _react.default.createElement("p", null, _react.default.createElement("small", null, "add a task to your routine to get started."))), Now.processing(this.props.list) && _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, this.activeTask.text.toLowerCase()), this.activeTask.checked ? _react.default.createElement(_Button.default, {
         id: "undo",
         action: this.props.undoActiveListItem,
         text: "undo"
@@ -46848,7 +46842,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _templateObject2() {
-  var data = _taggedTemplateLiteral(["\n    -webkit-touch-callout: text;\n    -webkit-user-select: text;\n     -khtml-user-select: text;\n       -moz-user-select: text;\n        -ms-user-select: text;\n            user-select: text;\n\n    background-color: ", ";\n    border: 1px solid ", ";\n    padding: 4px;\n    width: 100%;\n    box-sizing: border-box;\n    min-width: 100%;\n    min-height: 200px;\n    height: 400px;\n    max-height: 400px;\n    transition : border ", ";\n    margin: 2px 0 8px 0;\n    overflow: scroll;\n\n    &:focus {\n        outline: none;\n        border: 1px solid ", ";\n    }\n\n    &.error {\n        outline: none;\n        border: 1px solid ", ";\n    }\n"]);
+  var data = _taggedTemplateLiteral(["\n    -webkit-touch-callout: text;\n    -webkit-user-select: text;\n     -khtml-user-select: text;\n       -moz-user-select: text;\n        -ms-user-select: text;\n            user-select: text;\n\n    background-color: ", ";\n    border: 1px solid ", ";\n    padding: 4px;\n    width: 100%;\n    box-sizing: border-box;\n    min-width: 100%;\n    min-height: 200px;\n    height: 400px;\n    max-height: 400px;\n    margin: 2px 0 8px 0;\n    overflow: scroll;\n\n    ", "\n\n    &:focus {\n        outline: none;\n        border: 1px solid ", ";\n    }\n\n    &.error {\n        outline: none;\n        border: 1px solid ", ";\n    }\n"]);
 
   _templateObject2 = function _templateObject2() {
     return data;
@@ -46876,7 +46870,7 @@ var StyledInput = _styledComponents.default.div(_templateObject2(), function (pr
 }, function (props) {
   return props.theme.border;
 }, function (props) {
-  return props.theme.transition;
+  return props.theme.transition ? "transition : border ".concat(props.theme.transition, ";") : '';
 }, function (props) {
   return props.theme.borderActive;
 }, function (props) {
@@ -47776,6 +47770,22 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function withAggregates(list) {
+  var counts = {};
+  return JSON.parse(JSON.stringify(list)).map(function (obj) {
+    if (obj.multiple) delete obj.multiple;
+
+    if (Number.isInteger(counts[obj.text])) {
+      counts[obj.text] += 1;
+      obj.multiple = counts[obj.text];
+    } else {
+      counts[obj.text] = 1;
+    }
+
+    return obj;
+  });
+}
+
 function bumpActiveIndex(list) {
   var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   var nextIndex, task; // loop through the list starting at the active index until there are
@@ -47863,9 +47873,9 @@ function (_React$Component) {
               case 0:
                 save = _args.length > 1 && _args[1] !== undefined ? _args[1] : true;
                 _context.next = 3;
-                return new Promise(function (resolve, reject) {
+                return new Promise(function (resolve) {
                   _this2.setState((0, _immer.default)(function (draft) {
-                    draft.list = list;
+                    draft.list = withAggregates(list);
                   }), function () {
                     if (save) setTimeout(function () {
                       _store.default.save();
@@ -48051,8 +48061,8 @@ function activeIndex(list) {
   return index !== -1 ? index : null;
 }
 
-var defaultString = "\n    This app is very simple:\n    * Add tasks to your daily routine.\n    * Order tasks to strategize your day.\n    * Click \"done\" for each task that you accomplish.\n    * Done all tasks to complete your day.\n    * Track your streak of completed days.\n    * Capture notes in the scratchpad.\n    * Archive notes that are no longer relevant.\n    * Find old notes with the full-text search.\n\n    Why not log in with MetaMask to keep your data persistent?\n    ";
-var defaultMarkup = "\n    <p>This app is very simple:</p>\n    <div>* Add tasks to your daily routine.</div>\n    <div>* Order tasks to strategize your day.<br></div>\n    <div>* Click \"done\" for each task that you accomplish.</div>\n    <div>* Done all tasks to complete your day.<br></div>\n    <div>* Track your streak of completed days.</div>\n    <div>* Capture notes in the scratchpad.</div>\n    <div>* Archive notes that are no longer relevant.</div>\n    <div>* Find old notes with the full-text search.</div>\n    <div><br></div>\n    <p>Why not log in with MetaMask to keep your data persistent?</p>\n    ";
+var defaultString = "\nThis app is basic:\n* Add tasks to your routine.\n* Order tasks to strategize your day.\n* Click \"done\" for each task that you complete.\n\nYou can also capture notes throughout your day using this scratchpad:\n* Archive notes that are no longer relevant.\n* Find old notes with the full-text search.\n\nWhy not log in with MetaMask to keep your data persistent?\n";
+var defaultMarkup = "\n<p>This app is basic:</p>\n<div>* Add tasks to your daily routine.</div>\n<div>* Order tasks to strategize your day.<br></div>\n<div>* Click \"done\" for each task that you complete.</div>\n<div><br></div>\n<p>You can also capture notes throughout your day using this scratchpad:\n<div>* Archive notes that are no longer relevant.</div>\n<div>* Find old notes with the full-text search.</div>\n<div><br></div>\n<p>Why not log in with MetaMask to keep your data persistent?</p>\n";
 
 var NotesProvider =
 /*#__PURE__*/
@@ -107835,29 +107845,29 @@ var themes = {
     text: "#111111",
     marginBottom: "14px",
     linkUnderline: "rgba(34, 34, 34, 0.6)",
-    transition: "500ms ease-out"
+    transition: "400ms ease-out"
   },
   dark: {
     primary: "#111111",
-    secondary: "#111111",
-    border: "#fff6",
-    borderActive: "#fff6",
+    secondary: "rgba(50, 50, 52, 1)",
+    border: "rgba(90, 90, 92, 1)",
+    borderActive: "#EEF0E3",
     borderError: "#340d0d",
-    text: "#EEF0E3",
+    text: "rgba(145, 145, 146, 1)",
     marginBottom: "14px",
-    linkUnderline: "#EEF0E3B3",
-    transition: "500ms ease-out"
+    linkUnderline: "rgba(145, 145, 146, 0.8)",
+    transition: "400ms ease-out"
   },
-  salmon: {
+  strawberry: {
     primary: "#e06d6d",
     secondary: "#de6363",
     border: "#e06363",
-    borderActive: "#16181b",
+    borderActive: "#FFF",
     borderError: "#d74c4c",
     text: "#FFF",
     marginBottom: "14px",
     linkUnderline: "#EEF0E3B3",
-    transition: "500ms ease-out"
+    transition: "400ms ease-out"
   }
 };
 var INITIALTHEME = 'yellow';
@@ -107898,11 +107908,22 @@ function (_React$Component) {
   _createClass(Layout, [{
     key: "setTheme",
     value: function setTheme(themeStyle) {
+      var _this2 = this;
+
       _local.default.set('theme', themeStyle);
 
       this.setState((0, _immer.default)(function (draft) {
-        draft.theme = themes[themeStyle], draft.themeStyle = themeStyle;
-      }));
+        var theme = Object.assign({}, themes[themeStyle]);
+        delete theme.transition;
+        draft.theme = theme;
+        draft.themeStyle = themeStyle;
+      }), function () {
+        setTimeout(function () {
+          return _this2.setState((0, _immer.default)(function (draft) {
+            draft.theme.transition = themes[themeStyle].transition;
+          }));
+        }, 1);
+      });
     }
   }, {
     key: "rotateTheme",
@@ -107914,7 +107935,7 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
+      var _this3 = this;
 
       var _this$props = this.props,
           children = _this$props.children,
@@ -107922,9 +107943,9 @@ function (_React$Component) {
 
       var childrenWithProps = _react.default.Children.map(children, function (child) {
         return _react.default.cloneElement(child, _objectSpread({
-          themeStyle: _this2.state.themeStyle,
-          setTheme: _this2.setTheme,
-          rotateTheme: _this2.rotateTheme
+          themeStyle: _this3.state.themeStyle,
+          setTheme: _this3.setTheme,
+          rotateTheme: _this3.rotateTheme
         }, rest));
       });
 
@@ -108041,7 +108062,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53238" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53083" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
