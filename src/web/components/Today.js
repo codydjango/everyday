@@ -55,6 +55,12 @@ export default withContext(class Today extends React.Component {
         }, 1000)
     }
 
+    getList() {
+        // return JSON.parse(JSON.stringify(this.state.list))
+
+        return this.state.list
+    }
+
     createNewTask(task) {
         this.props.addToList({
             text: task,
@@ -126,7 +132,7 @@ export default withContext(class Today extends React.Component {
             <h2>routine</h2>
 
             <TaskList
-                list={ this.state.list }
+                list={ this.getList() }
                 edit={ this.state.edit }
                 dragged={ this.state.dragged }
                 onUpdate={ this.onUpdate }

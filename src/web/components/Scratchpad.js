@@ -35,9 +35,10 @@ const StyledInput = styled.div`
     min-height: 200px;
     height: 400px;
     max-height: 400px;
-    transition : border ${ props => props.theme.transition };
     margin: 2px 0 8px 0;
     overflow: scroll;
+
+    ${ props => (props.theme.transition) ? `transition : border ${ props.theme.transition };` : '' }
 
     &:focus {
         outline: none;

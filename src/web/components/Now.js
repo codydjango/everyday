@@ -99,7 +99,7 @@ export default withContext(class Now extends React.Component {
             { (Now.starting(this.props.list)) && (
                 <React.Fragment>
                     <h2>your brain is ready</h2>
-                    <p><small>add a few tasks to your routine to get started.</small></p>
+                    <p><small>add a task to your routine to get started.</small></p>
                 </React.Fragment>
             ) }
 

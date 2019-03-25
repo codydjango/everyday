@@ -47,7 +47,6 @@ const GlobalStyle = createGlobalStyle`
     }
 `
 
-
 const themes = {
     yellow: {
         primary: "#FFDC00",
@@ -58,29 +57,29 @@ const themes = {
         text: "#111111",
         marginBottom: "14px",
         linkUnderline: "rgba(34, 34, 34, 0.6)",
-        transition: "500ms ease-out"
+        transition: "400ms ease-out"
     },
     dark: {
         primary: "#111111",
-        secondary: "#111111",
-        border: "#fff6",
-        borderActive: "#fff6",
+        secondary: "rgba(50, 50, 52, 1)",
+        border: "rgba(90, 90, 92, 1)",
+        borderActive: "#EEF0E3",
         borderError: "#340d0d",
-        text: "#EEF0E3",
+        text: "rgba(145, 145, 146, 1)",
         marginBottom: "14px",
-        linkUnderline: "#EEF0E3B3",
-        transition: "500ms ease-out"
+        linkUnderline: "rgba(145, 145, 146, 0.8)",
+        transition: "400ms ease-out"
     },
-    salmon: {
+    strawberry: {
         primary: "#e06d6d",
         secondary: "#de6363",
         border: "#e06363",
-        borderActive: "#16181b",
+        borderActive: "#FFF",
         borderError: "#d74c4c",
         text: "#FFF",
         marginBottom: "14px",
         linkUnderline: "#EEF0E3B3",
-        transition: "500ms ease-out"
+        transition: "400ms ease-out"
     }
 }
 
@@ -117,10 +116,17 @@ class Layout extends React.Component {
 
     setTheme(themeStyle) {
         local.set('theme', themeStyle)
+
         this.setState(produce(draft => {
-            draft.theme = themes[themeStyle],
+            let theme = Object.assign({}, themes[themeStyle])
+            delete theme.transition
+            draft.theme = theme
             draft.themeStyle = themeStyle
-        }))
+        }), () => {
+            setTimeout(() => this.setState(produce(draft => {
+                draft.theme.transition = themes[themeStyle].transition
+            })), 1)
+        })
     }
 
     rotateTheme() {

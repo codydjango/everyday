@@ -3,6 +3,19 @@ import produce from 'immer'
 import { ListContext } from '~/context'
 import store from '~/services/store'
 
+function withAggregates(list) {
+    const counts = {}
+    return JSON.parse(JSON.stringify(list)).map(obj => {
+        if (obj.multiple) delete obj.multiple
+        if (Number.isInteger(counts[obj.text])) {
+            counts[obj.text] += 1
+            obj.multiple = counts[obj.text]
+        } else {
+            counts[obj.text] = 1
+        }
+        return obj
+    })
+}
 
 function bumpActiveIndex(list, index = 0) {
     let nextIndex, task
@@ -58,9 +71,9 @@ export default class ListProvider extends React.Component {
     }
 
     async updateList(list, save = true) {
-        return await new Promise((resolve, reject) => {
+        return await new Promise((resolve) => {
             this.setState(produce(draft => {
-                draft.list = list
+                draft.list = withAggregates(list)
             }), () => {
                 if (save) setTimeout(() => { store.save() }, 100)
                 resolve(true)

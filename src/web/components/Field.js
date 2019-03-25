@@ -14,11 +14,12 @@ const StyledLabel = styled.label`
 
 const StyledInput = styled.input`
     background-color: ${ props => props.theme.secondary };
-    transition : border ${ props => props.theme.transition };
     width: 100%;
     max-width: 300px;
     border: 1px solid ${ props => props.theme.border };
     color: ${ props => props.theme.text };
+
+    ${ props => (props.theme.transition) ? `transition : border ${ props.theme.transition };` : '' }
 
     &:focus {
         outline: none;

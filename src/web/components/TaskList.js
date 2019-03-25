@@ -6,18 +6,7 @@ import produce from 'immer'
 import styled from 'styled-components'
 
 function aggregates(list) {
-    const counts = {}
-
-    return list.slice(0).map(i => {
-        delete i.multiple
-        if (Number.isInteger(counts[i.text])) {
-            counts[i.text] += 1
-            i.multiple = counts[i.text]
-        } else {
-            counts[i.text] = 1
-        }
-        return i
-    })
+    return list
 }
 
 const StyledList = styled.ul`

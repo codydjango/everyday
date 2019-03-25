@@ -88,7 +88,7 @@ class Store {
 
     create() {
         this.seed({ notes: [], list: [] })
-        this.status.updateStatus('nice to have you with us.')
+        this.status.updateStatus('nice to see you again')
     }
 
     allData() {
