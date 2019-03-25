@@ -30,7 +30,7 @@ export default () => {
 	const year = today.getFullYear()
 
     return (<div className="logo">
-        <StyledSmall>{ `${ day }, ${ month } ${ date }${ ordinal }, ${ year }` }</StyledSmall>
+        <StyledSmall>{ `${ day } ${ month } ${ date }${ ordinal }, ${ year }` }</StyledSmall>
         <StyledH1>everyday</StyledH1>
     </div>)
 }
