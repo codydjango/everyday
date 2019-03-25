@@ -20,11 +20,16 @@ const StyledDiv = styled.div`
         }
 
         .loginAddress {
-            font-size: 18px;
-            line-height: 20px;
+            font-size: 24px;
+            line-height: 24px;
             font-weight: 700;
             height: 20px;
+            padding-top: 6px;
             display: block;
+
+            a {
+                margin-right: 0px !important;
+            }
         }
     }
 `
