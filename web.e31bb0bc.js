@@ -39369,7 +39369,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    .authInfo {\n        .loginWith {\n            font-size: 12px;\n            line-height: 12px;\n            height: 12px;\n            display: block;\n        }\n\n        .loginAddress {\n            font-size: 18px;\n            line-height: 20px;\n            font-weight: 700;\n            height: 20px;\n            display: block;\n        }\n    }\n"]);
+  var data = _taggedTemplateLiteral(["\n    .authInfo {\n        .loginWith {\n            font-size: 12px;\n            line-height: 12px;\n            height: 12px;\n            display: block;\n        }\n\n        .loginAddress {\n            font-size: 24px;\n            line-height: 24px;\n            font-weight: 700;\n            height: 20px;\n            padding-top: 6px;\n            display: block;\n\n            a {\n                margin-right: 0px !important;\n            }\n        }\n    }\n"]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -39829,16 +39829,54 @@ exports.default = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
+var _getOrdinal = _interopRequireDefault(require("~/utilities/getOrdinal"));
+
+var _styledComponents = _interopRequireDefault(require("styled-components"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _templateObject2() {
+  var data = _taggedTemplateLiteral(["\n    display: block;\n    font-style: italic;\n    padding: 0;\n    margin: 0 0 0 0;\n    line-height: 1em;\n    font-size: 32px;\n    height: 32px;\n    line-height: 32px;\n"]);
+
+  _templateObject2 = function _templateObject2() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject() {
+  var data = _taggedTemplateLiteral(["\n    display: block;\n    white-space: nowrap;\n    width: 100%;\n"]);
+
+  _templateObject = function _templateObject() {
+    return data;
+  };
+
+  return data;
+}
+
+function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+var StyledSmall = _styledComponents.default.small(_templateObject());
+
+var StyledH1 = _styledComponents.default.h1(_templateObject2());
+
 var _default = function _default() {
+  var today = new Date();
+  var weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var day = weekday[today.getDay()];
+  var date = today.getDate();
+  var ordinal = (0, _getOrdinal.default)(day);
+  var month = months[today.getMonth()];
+  var year = today.getFullYear();
   return _react.default.createElement("div", {
     className: "logo"
-  }, _react.default.createElement("h1", null, "everyday"));
+  }, _react.default.createElement(StyledSmall, null, "".concat(day, ", ").concat(month, " ").concat(date).concat(ordinal, ", ").concat(year)), _react.default.createElement(StyledH1, null, "everyday"));
 };
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js"}],"components/Status.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","~/utilities/getOrdinal":"utilities/getOrdinal.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js"}],"components/Status.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -108062,7 +108100,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53083" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59068" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
