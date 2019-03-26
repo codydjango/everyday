@@ -20,7 +20,7 @@ const StyledDiv = styled.div`
         }
 
         .loginAddress {
-            font-size: 24px;
+            font-size: 20px;
             line-height: 24px;
             font-weight: 700;
             height: 20px;

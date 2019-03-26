@@ -160,10 +160,15 @@ class Scratchpad extends React.Component {
     render() {
         if (this.state.hasError) return this.renderError()
 
+        const getTitle = () => {
+            const { name } = Scratchpad.active(this.notes)
+            return (name) ? `“${ name }”` : ''
+        }
+
         return (
         <StyledDiv>
             <div className="flex">
-                <span className="flexLeft"><h4 children="scratchpad" /></span>
+                <span className="flexLeft"><h4 children={`scratchpad ${ getTitle() }`} /></span>
                 <span><small children={ (this.state.dirty) ? 'unsaved' : 'saved' } /></span>
             </div>
 

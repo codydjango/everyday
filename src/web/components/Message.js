@@ -18,13 +18,12 @@ const StyledDiv = styled.div`
 `
 
 export default ({ children, theme }) => {
-    console.log('theme', theme)
-
+    const bar = (Array(...Array(children[0].length).keys()).map(i => '#').join(''))
     return (<StyledDiv>
         <div className="message">
-            <span className="messageLine">############################</span>
+            <span className="messageLine">{ bar }</span>
             { children }
-            <span className="messageLine">############################</span>
+            <span className="messageLine">{ bar }</span>
         </div>
     </StyledDiv>)
 }
