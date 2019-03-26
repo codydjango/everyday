@@ -39369,7 +39369,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    .authInfo {\n        .loginWith {\n            font-size: 12px;\n            line-height: 12px;\n            height: 12px;\n            display: block;\n        }\n\n        .loginAddress {\n            font-size: 24px;\n            line-height: 24px;\n            font-weight: 700;\n            height: 20px;\n            padding-top: 6px;\n            display: block;\n\n            a {\n                margin-right: 0px !important;\n            }\n        }\n    }\n"]);
+  var data = _taggedTemplateLiteral(["\n    .authInfo {\n        .loginWith {\n            font-size: 12px;\n            line-height: 12px;\n            height: 12px;\n            display: block;\n        }\n\n        .loginAddress {\n            font-size: 20px;\n            line-height: 24px;\n            font-weight: 700;\n            height: 20px;\n            padding-top: 6px;\n            display: block;\n\n            a {\n                margin-right: 0px !important;\n            }\n        }\n    }\n"]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -39862,17 +39862,18 @@ var StyledSmall = _styledComponents.default.small(_templateObject());
 var StyledH1 = _styledComponents.default.h1(_templateObject2());
 
 var _default = function _default() {
-  var today = new Date();
-  var weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  var day = weekday[today.getDay()];
-  var date = today.getDate();
-  var ordinal = (0, _getOrdinal.default)(day);
-  var month = months[today.getMonth()];
-  var year = today.getFullYear();
+  // const today = new Date()
+  // const weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  // const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+  // const day = weekday[today.getDay()]
+  // const date = today.getDate()
+  // const ordinal = getOrdinal(day)
+  // const month = months[today.getMonth()]
+  // const year = today.getFullYear()
+  // <StyledSmall>{ `${ day } ${ month } ${ date }${ ordinal }, ${ year }` }</StyledSmall>
   return _react.default.createElement("div", {
     className: "logo"
-  }, _react.default.createElement(StyledSmall, null, "".concat(day, ", ").concat(month, " ").concat(date).concat(ordinal, ", ").concat(year)), _react.default.createElement(StyledH1, null, "everyday"));
+  }, _react.default.createElement(StyledH1, null, "everyday"));
 };
 
 exports.default = _default;
@@ -47075,13 +47076,23 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
+      var _this2 = this;
+
       if (this.state.hasError) return this.renderError();
+
+      var getTitle = function getTitle() {
+        var _Scratchpad$active2 = Scratchpad.active(_this2.notes),
+            name = _Scratchpad$active2.name;
+
+        return name ? "\u201C".concat(name, "\u201D") : '';
+      };
+
       return _react.default.createElement(StyledDiv, null, _react.default.createElement("div", {
         className: "flex"
       }, _react.default.createElement("span", {
         className: "flexLeft"
       }, _react.default.createElement("h4", {
-        children: "scratchpad"
+        children: "scratchpad ".concat(getTitle())
       })), _react.default.createElement("span", null, _react.default.createElement("small", {
         children: this.state.dirty ? 'unsaved' : 'saved'
       }))), _react.default.createElement(StyledInput, {
@@ -107745,6 +107756,14 @@ var _styledComponents = _interopRequireDefault(require("styled-components"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _templateObject() {
   var data = _taggedTemplateLiteral(["\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    height: 100%;\n\n    .message {\n        text-align: center;\n        margin: 0 auto;\n    }\n\n    .messageLine {\n        display: block;\n    }\n"]);
 
@@ -107762,14 +107781,16 @@ var StyledDiv = _styledComponents.default.div(_templateObject());
 var _default = function _default(_ref) {
   var children = _ref.children,
       theme = _ref.theme;
-  console.log('theme', theme);
+  var bar = Array.apply(void 0, _toConsumableArray(Array(children[0].length).keys())).map(function (i) {
+    return '#';
+  }).join('');
   return _react.default.createElement(StyledDiv, null, _react.default.createElement("div", {
     className: "message"
   }, _react.default.createElement("span", {
     className: "messageLine"
-  }, "############################"), children, _react.default.createElement("span", {
+  }, bar), children, _react.default.createElement("span", {
     className: "messageLine"
-  }, "############################")));
+  }, bar)));
 };
 
 exports.default = _default;
@@ -108100,7 +108121,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59068" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65023" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
