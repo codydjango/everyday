@@ -8,6 +8,7 @@ import DataInterface from '~/components/DataInterface'
 import Today from '~/components/Today'
 import Now from '~/components/Now'
 import Scratchpad from '~/components/Scratchpad'
+import Flashcards from '~/components/Flashcards'
 import Header from '~/components/Header'
 import Footer from '~/components/Footer'
 import Activity from '~/components/Activity'
@@ -46,6 +47,7 @@ class App extends React.Component {
                     <Work className="work">
                         <Now className="now" />
                         <Scratchpad className="scratchpad" />
+                        <Flashcards className="flashcards" />
                         <Activity />
                     </Work>
 
