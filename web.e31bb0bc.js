@@ -42317,6 +42317,7 @@ function () {
     key: "seed",
     value: function seed(data) {
       this.normalizeDay(data);
+      if (data && data.cards) this.status.updateCards(data.cards);
       if (data && data.notes) this.notes.updateNotes(data.notes, false);
       if (data && data.list) this.list.updateList(data.list, false);
       if (data) this.status.updateActivity(data.activity, false);
@@ -42404,7 +42405,9 @@ function () {
         activity: {
           timestamp: this.status.state.timestamp,
           log: this.status.state.log
-        }
+        },
+        cards: this.status.state.cards,
+        card: this.status.state.card
       };
     }
   }, {
@@ -45107,8 +45110,8 @@ function (_React$Component) {
       initial: _settings.TIMERINITIAL
     });
     _this.state = {
-      'time': _settings.TIMERINITIAL,
-      'hasError': false
+      time: _settings.TIMERINITIAL,
+      hasError: false
     };
     _this.handleToggleTimer = _this.handleToggleTimer.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
@@ -47125,7 +47128,276 @@ function (_React$Component) {
 var _default = (0, _hoc.withContext)(Scratchpad, [_context2.NotesContext, _context2.StatusContext]);
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/utilities/sanitize":"utilities/sanitize.js","~/components/Archive":"components/Archive.js","~/context":"context/index.js","~/hoc":"hoc/index.js"}],"components/Header.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/utilities/sanitize":"utilities/sanitize.js","~/components/Archive":"components/Archive.js","~/context":"context/index.js","~/hoc":"hoc/index.js"}],"components/Stopwatch.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _settings = require("~/settings");
+
+var _Timer = _interopRequireDefault(require("~/utilities/Timer"));
+
+var _Button = _interopRequireDefault(require("~/components/Button"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+var Stopwatch =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(Stopwatch, _React$Component);
+
+  _createClass(Stopwatch, null, [{
+    key: "getDerivedStateFromError",
+    value: function getDerivedStateFromError(error) {
+      return {
+        hasError: true
+      };
+    }
+  }]);
+
+  function Stopwatch(props) {
+    var _this;
+
+    _classCallCheck(this, Stopwatch);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Stopwatch).call(this, props));
+    _this.timer = new _Timer.default({
+      onUpdate: function onUpdate(time) {
+        return _this.setState(function (state) {
+          return {
+            time: time
+          };
+        });
+      },
+      initial: _settings.TIMERINITIAL
+    });
+    _this.state = {
+      time: _settings.TIMERINITIAL,
+      hasError: false,
+      timerType: 'countUp',
+      limit: null,
+      autostart: props.autostart || false
+    };
+    _this.startStopwatch = _this.startStopwatch.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.stopStopwatch = _this.stopStopwatch.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.handleToggleTimer = _this.handleToggleTimer.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    return _this;
+  }
+
+  _createClass(Stopwatch, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      if (this.state.autostart) this.startStopwatch();
+    }
+  }, {
+    key: "handleToggleTimer",
+    value: function handleToggleTimer() {
+      ;
+      this.timer.active ? this.stopStopwatch() : this.startStopwatch();
+    }
+  }, {
+    key: "stopStopwatch",
+    value: function stopStopwatch() {
+      this.timer.stop();
+    }
+  }, {
+    key: "startStopwatch",
+    value: function startStopwatch() {
+      this.timer.start(this.state.timerType, this.state.limit);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      if (this.state.hasError) return this.renderError();
+      return _react.default.createElement(_Button.default, {
+        action: this.handleToggleTimer,
+        text: this.state.time
+      });
+    }
+  }]);
+
+  return Stopwatch;
+}(_react.default.Component);
+
+var _default = Stopwatch;
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js","~/settings":"settings.js","~/utilities/Timer":"utilities/Timer.js","~/components/Button":"components/Button.js"}],"components/Flashcards.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _styledComponents = _interopRequireDefault(require("styled-components"));
+
+var _Button = _interopRequireDefault(require("~/components/Button"));
+
+var _FormLine = _interopRequireDefault(require("~/components/FormLine"));
+
+var _Stopwatch = _interopRequireDefault(require("~/components/Stopwatch"));
+
+var _context = require("~/context");
+
+var _hoc = require("~/hoc");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _templateObject2() {
+  var data = _taggedTemplateLiteral(["\n    position: relative;\n    height: auto;\n    margin-bottom: 14px;\n\n    h4 {\n        font-style: italic;\n        text-transform: lowercase;\n    }\n"]);
+
+  _templateObject2 = function _templateObject2() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject() {
+  var data = _taggedTemplateLiteral(["\n    position: relative;\n    height: auto;\n    margin-bottom: 8px;\n    font-size: 18px;\n    text-align: center;\n    background-color: ", ";\n    color: ", ";\n    padding: 24px;\n    border: 1px solid ", ";\n"]);
+
+  _templateObject = function _templateObject() {
+    return data;
+  };
+
+  return data;
+}
+
+function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+var Card = _styledComponents.default.div(_templateObject(), function (props) {
+  return props.theme.primary;
+}, function (props) {
+  return props.theme.text;
+}, function (props) {
+  return props.theme.border;
+});
+
+var StyledDiv = _styledComponents.default.div(_templateObject2());
+
+var Flashcards =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(Flashcards, _React$Component);
+
+  _createClass(Flashcards, null, [{
+    key: "getDerivedStateFromError",
+    value: function getDerivedStateFromError(error) {
+      return {
+        hasError: true
+      };
+    }
+  }]);
+
+  function Flashcards(props) {
+    var _this;
+
+    _classCallCheck(this, Flashcards);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Flashcards).call(this, props));
+    _this.state = {
+      hasError: false
+    };
+    _this.freshCard = _this.freshCard.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.createCard = _this.createCard.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    return _this;
+  }
+
+  _createClass(Flashcards, [{
+    key: "createCard",
+    value: function createCard(str) {
+      this.props.createCard(str);
+    }
+  }, {
+    key: "freshCard",
+    value: function freshCard() {
+      this.props.randomCard();
+    }
+  }, {
+    key: "renderError",
+    value: function renderError() {
+      return _react.default.createElement("div", {
+        className: "notes"
+      }, _react.default.createElement("h1", null, "Something is wrong"));
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      if (this.state.hasError) return this.renderError();
+      return _react.default.createElement(StyledDiv, null, _react.default.createElement("div", {
+        className: "flex"
+      }, _react.default.createElement("span", {
+        className: "flexLeft"
+      }, _react.default.createElement("h4", {
+        children: "flashcards"
+      }))), _react.default.createElement(Card, {
+        children: this.props.card
+      }), _react.default.createElement(_FormLine.default, {
+        onSubmit: this.createCard,
+        validators: [],
+        inputPlaceholder: "2 + 2 = ?",
+        submitText: "create"
+      }, _react.default.createElement(_Button.default, {
+        className: "random",
+        text: "random",
+        action: this.freshCard
+      }), _react.default.createElement(_Stopwatch.default, {
+        key: this.props.card,
+        autostart: false
+      })));
+    }
+  }]);
+
+  return Flashcards;
+}(_react.default.Component);
+
+var _default = (0, _hoc.withContext)(Flashcards, [_context.StatusContext]);
+
+exports.default = _default;
+},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/components/Button":"components/Button.js","~/components/FormLine":"components/FormLine.js","~/components/Stopwatch":"components/Stopwatch.js","~/context":"context/index.js","~/hoc":"hoc/index.js"}],"components/Header.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47446,6 +47718,10 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+var randomFromList = function randomFromList(list) {
+  return list[Math.floor(Math.random() * list.length)];
+};
+
 var StatusProvider =
 /*#__PURE__*/
 function (_React$Component) {
@@ -47460,15 +47736,27 @@ function (_React$Component) {
     _this.state = {
       status: "it's so nice to see you!",
       timestamp: +new Date(),
-      log: ''
+      log: '',
+      card: "",
+      cards: []
     };
     _this.today = +new Date();
+    _this.randomCard = _this.randomCard.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.createCard = _this.createCard.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.updateCards = _this.updateCards.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.updateStatus = _this.updateStatus.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.updateActivity = _this.updateActivity.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
 
   _createClass(StatusProvider, [{
+    key: "syncToServer",
+    value: function syncToServer() {
+      setTimeout(function () {
+        _store.default.save();
+      }, 100);
+    }
+  }, {
     key: "componentDidMount",
     value: function componentDidMount() {
       _store.default.register('status', this);
@@ -47483,6 +47771,46 @@ function (_React$Component) {
     value: function updateStatus(status) {
       this.setState((0, _immer.default)(function (draft) {
         draft.status = status;
+      }));
+    }
+  }, {
+    key: "createCard",
+    value: function createCard(str) {
+      this.setState((0, _immer.default)(function (draft) {
+        draft.cards.push(str);
+        draft.card = str;
+      }), this.syncToServer);
+    }
+  }, {
+    key: "randomCard",
+    value: function randomCard() {
+      this.setState((0, _immer.default)(function (draft) {
+        var card;
+
+        if (draft.cards.length && draft.cards.length > 0) {
+          card = randomFromList(draft.cards);
+        } else {
+          card = "You're doing just great.";
+        }
+
+        draft.card = card;
+      }));
+    }
+  }, {
+    key: "updateCards",
+    value: function updateCards(data) {
+      var cards = data || [];
+      var card;
+
+      if (cards.length && cards.length > 0) {
+        card = randomFromList(cards);
+      } else {
+        card = "You're doing just great.";
+      }
+
+      this.setState((0, _immer.default)(function (draft) {
+        draft.cards = cards;
+        draft.card = card;
       }));
     }
   }, {
@@ -47502,7 +47830,10 @@ function (_React$Component) {
     value: function render() {
       return _react.default.createElement(_context.StatusContext.Provider, {
         value: _objectSpread({}, this.state, {
-          updateStatus: this.updateStatus
+          updateStatus: this.updateStatus,
+          updateCards: this.updateCards,
+          randomCard: this.randomCard,
+          createCard: this.createCard
         })
       }, this.props.children);
     }
@@ -48347,6 +48678,8 @@ var _Now = _interopRequireDefault(require("~/components/Now"));
 
 var _Scratchpad = _interopRequireDefault(require("~/components/Scratchpad"));
 
+var _Flashcards = _interopRequireDefault(require("~/components/Flashcards"));
+
 var _Header = _interopRequireDefault(require("~/components/Header"));
 
 var _Footer = _interopRequireDefault(require("~/components/Footer"));
@@ -48452,6 +48785,8 @@ function (_React$Component) {
         className: "now"
       }), _react.default.createElement(_Scratchpad.default, {
         className: "scratchpad"
+      }), _react.default.createElement(_Flashcards.default, {
+        className: "flashcards"
       }), _react.default.createElement(_Activity.default, null)), _react.default.createElement(_Today.default, {
         className: "today"
       })), _react.default.createElement(_Footer.default, {
@@ -48474,7 +48809,7 @@ function (_React$Component) {
 var _default = (0, _hoc.withProvider)(App, [_StatusProvider.default, _AuthProvider.default, _ListProvider.default, _NotesProvider.default]);
 
 exports.default = _default;
-},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/components/Auth":"components/Auth.js","~/components/Logo":"components/Logo.js","~/components/Status":"components/Status.js","~/components/DataInterface":"components/DataInterface.js","~/components/Today":"components/Today.js","~/components/Now":"components/Now.js","~/components/Scratchpad":"components/Scratchpad.js","~/components/Header":"components/Header.js","~/components/Footer":"components/Footer.js","~/components/Activity":"components/Activity.js","~/components/Settings":"components/Settings.js","~/providers/StatusProvider":"providers/StatusProvider.js","~/providers/AuthProvider":"providers/AuthProvider.js","~/providers/ListProvider":"providers/ListProvider.js","~/providers/NotesProvider":"providers/NotesProvider.js","~/hoc":"hoc/index.js"}],"../../node_modules/@babel/runtime/helpers/classCallCheck.js":[function(require,module,exports) {
+},{"react":"../../node_modules/react/index.js","styled-components":"../../node_modules/styled-components/dist/styled-components.browser.esm.js","~/components/Auth":"components/Auth.js","~/components/Logo":"components/Logo.js","~/components/Status":"components/Status.js","~/components/DataInterface":"components/DataInterface.js","~/components/Today":"components/Today.js","~/components/Now":"components/Now.js","~/components/Scratchpad":"components/Scratchpad.js","~/components/Flashcards":"components/Flashcards.js","~/components/Header":"components/Header.js","~/components/Footer":"components/Footer.js","~/components/Activity":"components/Activity.js","~/components/Settings":"components/Settings.js","~/providers/StatusProvider":"providers/StatusProvider.js","~/providers/AuthProvider":"providers/AuthProvider.js","~/providers/ListProvider":"providers/ListProvider.js","~/providers/NotesProvider":"providers/NotesProvider.js","~/hoc":"hoc/index.js"}],"../../node_modules/@babel/runtime/helpers/classCallCheck.js":[function(require,module,exports) {
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -108121,7 +108456,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65023" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50813" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
