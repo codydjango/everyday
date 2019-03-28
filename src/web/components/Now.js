@@ -43,7 +43,7 @@ export default withContext(class Now extends React.Component {
         super(props)
 
         this.timer = new Timer({
-            onUpdate: time => this.setState(state => ({ time: time })),
+            onUpdate: time => this.setState(state => ({ time })),
             onDone: () => audios.playBeep(),
             initial: TIMERINITIAL,
         })

@@ -1,17 +1,18 @@
 import React from 'react'
-
+import produce from 'immer'
 import styled from 'styled-components'
-import FormLine from '~/components/FormLine'
+import Button from '~/components/Button'
+// import FormLine from '~/components/FormLine'
 
-
-import { StatusContext, NotesContext, AuthContext } from '~/context'
+import { StatusContext } from '~/context'
 import { withContext } from '~/hoc'
 
+const randomFromList = list => list[Math.floor(Math.random() * list.length)]
 
 const cards = [
     'Tell me about a time when you made a decision for the customer',
     'What does ownership mean to you? Do you have an example where you were faced with ownership?',
-    'When do you create? When do you reduce? Invent and simplify',
+    'Invent and simplify',
     'Are right, a lot',
     'Learn and be curious',
     'Hire and develop the best',
@@ -25,6 +26,17 @@ const cards = [
     'Deliver results',
 ]
 
+const Card = styled.div`
+    position: relative;
+    height: auto;
+    margin-bottom: 8px;
+    font-size: 18px;
+    text-align: center;
+    background-color: ${ props => props.theme.primary };
+    color: ${ props => props.theme.text };
+    padding: 24px;
+    border: 1px solid ${ props => props.theme.border };
+`
 
 const StyledDiv = styled.div`
     position: relative;
@@ -35,38 +47,11 @@ const StyledDiv = styled.div`
         font-style: italic;
         text-transform: lowercase;
     }
-`
 
-const StyledInput = styled.div`
-    -webkit-touch-callout: text;
-    -webkit-user-select: text;
-     -khtml-user-select: text;
-       -moz-user-select: text;
-        -ms-user-select: text;
-            user-select: text;
-
-    background-color: ${ props => props.theme.secondary };
-    border: 1px solid ${ props => props.theme.border };
-    padding: 4px;
-    width: 100%;
-    box-sizing: border-box;
-    min-width: 100%;
-    min-height: 200px;
-    height: 400px;
-    max-height: 400px;
-    margin: 2px 0 8px 0;
-    overflow: scroll;
-
-    ${ props => (props.theme.transition) ? `transition : border ${ props.theme.transition };` : '' }
-
-    &:focus {
-        outline: none;
-        border: 1px solid ${ props => props.theme.borderActive };
-    }
-
-    &.error {
-        outline: none;
-        border: 1px solid ${ props => props.theme.borderError };
+    .more {
+        margin-right: 0px;
+        margin-left: auto;
+        display: block;
     }
 `
 
@@ -79,17 +64,17 @@ class Flashcards extends React.Component {
         super(props)
 
         this.state = {
-            hasError: false
+            hasError: false,
+            card: randomFromList(cards)
         }
 
-        this.inputRef = React.createRef()
-        this.onInput = this.onInput.bind(this)
-        this.handleSave = this.handleSave.bind(this)
+        this.freshCard = this.freshCard.bind(this)
     }
 
-    async handleSave() {
-        if (!this.state.dirty) return
-        this.setState({ dirty: false })
+    freshCard() {
+        this.setState(produce(draft => {
+            draft.card = randomFromList(cards)
+        }))
     }
 
     renderError() {
@@ -101,17 +86,13 @@ class Flashcards extends React.Component {
     render() {
         if (this.state.hasError) return this.renderError()
 
-        const randomFromList = list => list[Math.floor(Math.random() * list.length)]
-        const getCard = () => randomFromList(cards)
-
         return (
         <StyledDiv>
             <div className="flex">
                 <span className="flexLeft"><h4 children={ `flashcards` } /></span>
             </div>
-
-            <Card children={ getCard() } />
-            <Button text="more" action={ getCard() } />
+            <Card children={ this.state.card } />
+            <Button className="more" text="more" action={ this.freshCard } />
         </StyledDiv>)
     }
 }
