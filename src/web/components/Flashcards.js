@@ -1,30 +1,10 @@
 import React from 'react'
-import produce from 'immer'
 import styled from 'styled-components'
 import Button from '~/components/Button'
 import FormLine from '~/components/FormLine'
-
+import Stopwatch from '~/components/Stopwatch'
 import { StatusContext } from '~/context'
 import { withContext } from '~/hoc'
-
-const randomFromList = list => list[Math.floor(Math.random() * list.length)]
-
-// const cards = [
-//     'Tell me about a time when you made a decision for the customer',
-//     'What does ownership mean to you? Do you have an example where you were faced with ownership?',
-//     'Invent and simplify',
-//     'Are right, a lot',
-//     'Learn and be curious',
-//     'Hire and develop the best',
-//     'Insist on the highest standards',
-//     'Think big',
-//     'Bias for action',
-//     'Frugality',
-//     'Earn trust',
-//     'Dive deep',
-//     'Have backbone, disagree and commit',
-//     'Deliver results',
-// ]
 
 const Card = styled.div`
     position: relative;
@@ -93,6 +73,7 @@ class Flashcards extends React.Component {
                 inputPlaceholder="2 + 2 = ?"
                 submitText="create">
                 <Button className="random" text="random" action={ this.freshCard } />
+                <Stopwatch key={ this.props.card } autostart={ false } />
             </FormLine>
         </StyledDiv>)
     }

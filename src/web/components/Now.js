@@ -48,7 +48,7 @@ export default withContext(class Now extends React.Component {
             initial: TIMERINITIAL,
         })
 
-        this.state = { 'time': TIMERINITIAL, 'hasError': false }
+        this.state = { time: TIMERINITIAL, hasError: false }
         this.handleToggleTimer = this.handleToggleTimer.bind(this)
     }
 
