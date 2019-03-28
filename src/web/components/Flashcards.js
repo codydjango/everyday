@@ -2,29 +2,29 @@ import React from 'react'
 import produce from 'immer'
 import styled from 'styled-components'
 import Button from '~/components/Button'
-// import FormLine from '~/components/FormLine'
+import FormLine from '~/components/FormLine'
 
 import { StatusContext } from '~/context'
 import { withContext } from '~/hoc'
 
 const randomFromList = list => list[Math.floor(Math.random() * list.length)]
 
-const cards = [
-    'Tell me about a time when you made a decision for the customer',
-    'What does ownership mean to you? Do you have an example where you were faced with ownership?',
-    'Invent and simplify',
-    'Are right, a lot',
-    'Learn and be curious',
-    'Hire and develop the best',
-    'Insist on the highest standards',
-    'Think big',
-    'Bias for action',
-    'Frugality',
-    'Earn trust',
-    'Dive deep',
-    'Have backbone, disagree and commit',
-    'Deliver results',
-]
+// const cards = [
+//     'Tell me about a time when you made a decision for the customer',
+//     'What does ownership mean to you? Do you have an example where you were faced with ownership?',
+//     'Invent and simplify',
+//     'Are right, a lot',
+//     'Learn and be curious',
+//     'Hire and develop the best',
+//     'Insist on the highest standards',
+//     'Think big',
+//     'Bias for action',
+//     'Frugality',
+//     'Earn trust',
+//     'Dive deep',
+//     'Have backbone, disagree and commit',
+//     'Deliver results',
+// ]
 
 const Card = styled.div`
     position: relative;
@@ -47,12 +47,6 @@ const StyledDiv = styled.div`
         font-style: italic;
         text-transform: lowercase;
     }
-
-    .more {
-        margin-right: 0px;
-        margin-left: auto;
-        display: block;
-    }
 `
 
 class Flashcards extends React.Component {
@@ -62,19 +56,20 @@ class Flashcards extends React.Component {
 
     constructor(props) {
         super(props)
-
         this.state = {
             hasError: false,
-            card: randomFromList(cards)
         }
 
         this.freshCard = this.freshCard.bind(this)
+        this.createCard = this.createCard.bind(this)
+    }
+
+    createCard(str) {
+        this.props.createCard(str)
     }
 
     freshCard() {
-        this.setState(produce(draft => {
-            draft.card = randomFromList(cards)
-        }))
+        this.props.randomCard()
     }
 
     renderError() {
@@ -91,8 +86,14 @@ class Flashcards extends React.Component {
             <div className="flex">
                 <span className="flexLeft"><h4 children={ `flashcards` } /></span>
             </div>
-            <Card children={ this.state.card } />
-            <Button className="more" text="more" action={ this.freshCard } />
+            <Card children={ this.props.card } />
+            <FormLine
+                onSubmit={ this.createCard }
+                validators={ [] }
+                inputPlaceholder="2 + 2 = ?"
+                submitText="create">
+                <Button className="random" text="random" action={ this.freshCard } />
+            </FormLine>
         </StyledDiv>)
     }
 }

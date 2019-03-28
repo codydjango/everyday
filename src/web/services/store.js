@@ -63,6 +63,7 @@ class Store {
     seed(data) {
         this.normalizeDay(data)
 
+        if (data && data.cards) this.status.updateCards(data.cards)
         if (data && data.notes) this.notes.updateNotes(data.notes, false)
         if (data && data.list) this.list.updateList(data.list, false)
         if (data) this.status.updateActivity(data.activity, false)
@@ -98,7 +99,9 @@ class Store {
             activity: {
                 timestamp: this.status.state.timestamp,
                 log: this.status.state.log
-            }
+            },
+            cards: this.status.state.cards,
+            card: this.status.state.card
         }
     }
 
